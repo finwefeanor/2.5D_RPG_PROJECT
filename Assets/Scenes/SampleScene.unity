@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -425,7 +424,8 @@ GameObject:
   m_Component:
   - component: {fileID: 82170544}
   - component: {fileID: 82170545}
-  m_Layer: 0
+  - component: {fileID: 82170546}
+  m_Layer: 7
   m_Name: Enemy_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -462,6 +462,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Note: "ENEMY_0 \u2013 Attach your EnemyAI here."
+--- !u!114 &82170546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 82170543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26f679457c93b0f4984c5da3d9703cc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 30
+  attackDamage: 10
+  attackRange: 1
+  attackRate: 1
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  enemyGetHitSound: {fileID: 0}
+  enemyAttackSound: {fileID: 0}
+  enemyDieSound: {fileID: 0}
 --- !u!1 &97116789
 GameObject:
   m_ObjectHideFlags: 0
@@ -3371,7 +3393,8 @@ GameObject:
   m_Component:
   - component: {fileID: 518674985}
   - component: {fileID: 518674986}
-  m_Layer: 0
+  - component: {fileID: 518674987}
+  m_Layer: 7
   m_Name: Enemy_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3408,6 +3431,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Note: "ENEMY_2 \u2013 Attach your EnemyAI here."
+--- !u!114 &518674987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 518674984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26f679457c93b0f4984c5da3d9703cc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 30
+  attackDamage: 10
+  attackRange: 1
+  attackRate: 1
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  enemyGetHitSound: {fileID: 0}
+  enemyAttackSound: {fileID: 0}
+  enemyDieSound: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -3537,7 +3582,7 @@ GameObject:
   - component: {fileID: 526724532}
   - component: {fileID: 526724531}
   - component: {fileID: 526724530}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FacingIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4293,7 +4338,8 @@ GameObject:
   m_Component:
   - component: {fileID: 606199060}
   - component: {fileID: 606199061}
-  m_Layer: 0
+  - component: {fileID: 606199062}
+  m_Layer: 7
   m_Name: Enemy_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4330,6 +4376,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Note: "ENEMY_3 \u2013 Attach your EnemyAI here."
+--- !u!114 &606199062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 606199059}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26f679457c93b0f4984c5da3d9703cc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 30
+  attackDamage: 10
+  attackRange: 1
+  attackRate: 1
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  enemyGetHitSound: {fileID: 0}
+  enemyAttackSound: {fileID: 0}
+  enemyDieSound: {fileID: 0}
 --- !u!1 &613824982
 GameObject:
   m_ObjectHideFlags: 0
@@ -4342,7 +4410,7 @@ GameObject:
   - component: {fileID: 613824986}
   - component: {fileID: 613824985}
   - component: {fileID: 613824984}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FacingIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7093,7 +7161,7 @@ GameObject:
   - component: {fileID: 881448359}
   - component: {fileID: 881448358}
   - component: {fileID: 881448357}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FacingIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7683,7 +7751,7 @@ GameObject:
   - component: {fileID: 990598816}
   - component: {fileID: 990598815}
   - component: {fileID: 990598814}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8957,6 +9025,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1133985687}
   - component: {fileID: 1133985688}
+  - component: {fileID: 1133985689}
   m_Layer: 0
   m_Name: Merchant
   m_TagString: Untagged
@@ -8993,6 +9062,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Note: "NPC: Merchant \u2013 Attach dialogue component here."
+--- !u!114 &1133985689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1133985686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4756e1d9dbfaf1742a234654fd15f2a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shopUI: {fileID: 0}
+  shopUIController: {fileID: 0}
 --- !u!1 &1136945395
 GameObject:
   m_ObjectHideFlags: 0
@@ -9226,7 +9309,7 @@ GameObject:
   - component: {fileID: 1191440857}
   - component: {fileID: 1191440856}
   - component: {fileID: 1191440855}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: FacingIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9692,7 +9775,7 @@ GameObject:
   - component: {fileID: 1254664378}
   - component: {fileID: 1254664377}
   - component: {fileID: 1254664376}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: FacingIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10359,7 +10442,7 @@ GameObject:
   - component: {fileID: 1334111919}
   - component: {fileID: 1334111918}
   - component: {fileID: 1334111917}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10973,7 +11056,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1393690337}
   - component: {fileID: 1393690338}
-  m_Layer: 0
+  - component: {fileID: 1393690339}
+  m_Layer: 7
   m_Name: Enemy_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11010,6 +11094,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Note: "ENEMY_1 \u2013 Attach your EnemyAI here."
+--- !u!114 &1393690339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1393690336}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26f679457c93b0f4984c5da3d9703cc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 30
+  attackDamage: 10
+  attackRange: 1
+  attackRate: 1
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  enemyGetHitSound: {fileID: 0}
+  enemyAttackSound: {fileID: 0}
+  enemyDieSound: {fileID: 0}
 --- !u!1 &1400513274
 GameObject:
   m_ObjectHideFlags: 0
@@ -11734,6 +11840,37 @@ Material:
     - _Color: {r: 0.85, g: 0.75, b: 0.25, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
+--- !u!1 &1541395981
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1541395982}
+  m_Layer: 0
+  m_Name: ShopManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1541395982
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1541395981}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1786051066}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!21 &1551531248
 Material:
   serializedVersion: 8
@@ -12537,7 +12674,12 @@ GameObject:
   - component: {fileID: 1625179201}
   - component: {fileID: 1625179203}
   - component: {fileID: 1625179202}
-  m_Layer: 0
+  - component: {fileID: 1625179205}
+  - component: {fileID: 1625179204}
+  - component: {fileID: 1625179207}
+  - component: {fileID: 1625179206}
+  - component: {fileID: 1625179208}
+  m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -12558,6 +12700,7 @@ Transform:
   m_Children:
   - {fileID: 1899842601}
   - {fileID: 1191440854}
+  - {fileID: 1848750245}
   m_Father: {fileID: 948669609}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -12606,6 +12749,86 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1625179204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1625179199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27a342d6357dc9b45a6319e98e6ef050, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 100
+  armorReduction: 5
+  playerHitSound: {fileID: 0}
+  playerDieSound: {fileID: 0}
+--- !u!114 &1625179205
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1625179199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb26b6d1303f6d2468b943913c961ae3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outfitObject: {fileID: 1848750244}
+  equipButton: {fileID: 0}
+  unequipButton: {fileID: 0}
+--- !u!114 &1625179206
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1625179199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27a342d6357dc9b45a6319e98e6ef050, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 100
+  armorReduction: 5
+  playerHitSound: {fileID: 0}
+  playerDieSound: {fileID: 0}
+--- !u!114 &1625179207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1625179199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca48005dcfdad364b903b0276979acb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackDamage: 10
+  attackRange: 1.5
+  attackPoint: {fileID: 1191440854}
+  enemyLayers:
+    serializedVersion: 2
+    m_Bits: 128
+  attackSound: {fileID: 0}
+  attackEffect: {fileID: 0}
+--- !u!114 &1625179208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1625179199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae6c5165824d54744bc111c6d5cfd568, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 5
 --- !u!21 &1627229618
 Material:
   serializedVersion: 8
@@ -12968,7 +13191,7 @@ GameObject:
   - component: {fileID: 1706805046}
   - component: {fileID: 1706805045}
   - component: {fileID: 1706805044}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13771,6 +13994,7 @@ Transform:
   - {fileID: 1258276017}
   - {fileID: 2125455411}
   - {fileID: 948669609}
+  - {fileID: 1541395982}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -14176,6 +14400,104 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1848640229}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1848750244
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1848750245}
+  - component: {fileID: 1848750248}
+  - component: {fileID: 1848750247}
+  - component: {fileID: 1848750246}
+  m_Layer: 6
+  m_Name: Outfit
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1848750245
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1848750244}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.65, y: 0.65, z: 0.65}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1625179200}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &1848750246
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1848750244}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1848750247
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1848750244}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1848750248
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1848750244}
+  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1849951264
 GameObject:
   m_ObjectHideFlags: 0
@@ -14636,7 +14958,7 @@ GameObject:
   - component: {fileID: 1899842604}
   - component: {fileID: 1899842603}
   - component: {fileID: 1899842602}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15432,7 +15754,7 @@ GameObject:
   - component: {fileID: 2038404806}
   - component: {fileID: 2038404805}
   - component: {fileID: 2038404804}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
