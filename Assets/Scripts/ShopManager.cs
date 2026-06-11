@@ -1,51 +1,33 @@
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
+// ============================================================
+//  ShopManager.cs  —  Assets/Scripts/
+//
+//  CHANGED FROM ORIGINAL 2D VERSION:
+//    Removed itemButtonPrefab — buttons are pre-built by ShopUIBuilder,
+//    no runtime instantiation needed.
+//    goldText is still wired automatically by ShopUIBuilder.
+// ============================================================
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ShopManager : MonoBehaviour
 {
-    public TextMeshProUGUI playerGoldText; // Ensure this is TextMeshProUGUI
+    [Header("Player Gold")]
     public int playerGold = 100;
-    public GameObject itemButtonPrefab; // Prefab for the item button
-    public Transform shopContent; // Content parent for the shop items
 
-    // These might be missing or not initialized correctly
-    public Sprite itemIcon; // Example sprite for icon, should be assigned in inspector
-    public Sprite itemSprite; // Example sprite for item, should be assigned in inspector
-
+    [Header("UI — auto-wired by ShopUIBuilder")]
+    public Text playerGoldText;
 
     void Start()
     {
         UpdatePlayerGold();
-        PopulateShop();
     }
 
     public void UpdatePlayerGold()
     {
-        playerGoldText.text = "Your Gold: " + playerGold.ToString();
-    }
-
-    void PopulateShop()
-    {
-        // Example items
-        AddShopItem("Hat", 20, itemIcon, itemSprite);
-        AddShopItem("Shirt", 30, itemIcon, itemSprite);
-    }
-
-    void AddShopItem(string name, int price, Sprite icon, Sprite sprite)
-    {
-        GameObject itemButton = Instantiate(itemButtonPrefab, shopContent);
-        ShopItem shopItem = itemButton.GetComponent<ShopItem>();
-        shopItem.itemName = name;
-        shopItem.price = price;
-        shopItem.itemIcon = icon;
-        //shopItem.itemSprite = sprite;
-        shopItem.player = FindObjectOfType<PlayerController>().gameObject;
-        itemButton.GetComponentInChildren<TextMeshProUGUI>().text = name + " - " + price + "G";
-
-        // Ensure the button triggers the BuyItem method
-        itemButton.GetComponent<Button>().onClick.AddListener(shopItem.BuyItem);
+        if (playerGoldText != null)
+            playerGoldText.text = "Gold: " + playerGold;
+        else
+            Debug.LogWarning("ShopManager: goldText not assigned. " +
+                             "Run RPG Scene Builder > Build Shop UI to wire it.");
     }
 }

@@ -13,20 +13,23 @@ public class ShopKeeperInteraction : MonoBehaviour
         if (isPlayerInRange && Input.GetKeyDown(KeyCode.E))
         {
             OpenShop();
+            Debug.Log("Player is in range and E button pressed to open shop");
         }
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
             isPlayerInRange = true;
+
             // Optionally show a prompt (e.g., "Press E to interact")
+            Debug.Log("Player is in range");
             //this.transform.rotation = Quaternion.Euler(new Vector3(0, 180, 0)); /
         }
     }
 
-    void OnTriggerExit2D(Collider2D other)
+    void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Player"))
         {
