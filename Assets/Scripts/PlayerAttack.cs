@@ -6,6 +6,7 @@ using UnityEngine;
 //   ParticleSystem still works fine in 3D — no change
 //   attackPoint: assign a child empty GameObject in front of the player
 
+
 public class PlayerAttack : MonoBehaviour
 {
     public int attackDamage = 10;
@@ -14,6 +15,10 @@ public class PlayerAttack : MonoBehaviour
     public LayerMask enemyLayers;
     public AudioSource attackSound;
     public ParticleSystem attackEffect;
+    [SerializeField] private Animator animator;
+
+    private static readonly int AttackHash = Animator.StringToHash("Attack");
+    
 
     void Update()
     {
@@ -23,6 +28,10 @@ public class PlayerAttack : MonoBehaviour
 
     void Attack()
     {
+        if (animator != null) {
+            animator.SetTrigger(AttackHash);
+        }
+
         if (attackSound != null) attackSound.Play();
         if (attackEffect != null) attackEffect.Play();
 

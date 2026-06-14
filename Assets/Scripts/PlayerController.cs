@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody rb;
     private Vector3 movementDirection;
+    
 
     void Start()
     {

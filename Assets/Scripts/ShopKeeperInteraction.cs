@@ -5,16 +5,32 @@ using UnityEngine;
 public class ShopKeeperInteraction : MonoBehaviour
 {
     private bool isPlayerInRange;
-    public GameObject shopUI; // Reference to the shop UI GameObject
-    public ShopUIController shopUIController; // Reference to the ShopUIController script
+    private bool isShopOpen;
+    public ShopUIController shopUIController;
 
     void Update()
     {
         if (isPlayerInRange && Input.GetKeyDown(KeyCode.E))
         {
-            OpenShop();
-            Debug.Log("Player is in range and E button pressed to open shop");
+            if (isShopOpen)
+                CloseShop();
+            else
+                OpenShop();
         }
+    }
+
+    public void OpenShop()
+    {
+        shopUIController.OpenShop();
+        isShopOpen = true;
+        Debug.Log("Shop opened");
+    }
+
+    public void CloseShop()
+    {
+        shopUIController.CloseShop();
+        isShopOpen = false;
+        Debug.Log("Shop closed");
     }
 
     void OnTriggerEnter(Collider other)
@@ -22,10 +38,7 @@ public class ShopKeeperInteraction : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isPlayerInRange = true;
-
-            // Optionally show a prompt (e.g., "Press E to interact")
-            Debug.Log("Player is in range");
-            //this.transform.rotation = Quaternion.Euler(new Vector3(0, 180, 0)); /
+            Debug.Log("Player in range");
         }
     }
 
@@ -34,16 +47,8 @@ public class ShopKeeperInteraction : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isPlayerInRange = false;
-            // Optionally hide the prompt
+            // Auto close if player walks away while shop is open
+            if (isShopOpen) CloseShop();
         }
-        //this.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
-    }
-
-    void OpenShop()
-    {
-        // Use the ShopUIController to open the shop UI
-        shopUIController.OpenShop();
-        // Optionally, you could also directly activate the shop UI if you prefer
-        // shopUI.SetActive(true);
     }
 }
