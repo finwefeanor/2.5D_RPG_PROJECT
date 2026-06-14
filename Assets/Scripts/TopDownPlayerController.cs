@@ -17,7 +17,7 @@ public class TopDownPlayerController : MonoBehaviour
 
     Rigidbody  _rb;
     Vector3    _inputDir;
-    static readonly int SpeedHash = Animator.StringToHash("Speed");
+    static readonly int isMovingHash = Animator.StringToHash("isMoving");
 
     void Awake()
     {
@@ -44,7 +44,7 @@ public class TopDownPlayerController : MonoBehaviour
 
         // Animator integration
         if (animator != null)
-            animator.SetFloat(SpeedHash, _inputDir.magnitude);
+            animator.SetBool(isMovingHash, _inputDir.magnitude > 0.1f);
     }
 
     void FixedUpdate()
