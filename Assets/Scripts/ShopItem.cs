@@ -26,7 +26,7 @@ public class ShopItem : MonoBehaviour
         if (!isPurchased && shopManager.playerGold >= price)
         {
             shopManager.playerGold -= price;
-            shopManager.UpdatePlayerGold();
+            shopManager.UpdateGoldDisplay();
             EquipItem();
             isPurchased = true;
             ShowEquipUnequipButtons();

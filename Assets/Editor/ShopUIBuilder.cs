@@ -99,7 +99,7 @@ public static class ShopUIBuilder
         var shopManager = FindOrWarn<ShopManager>("ShopManager");
         if (shopManager != null)
         {
-            shopManager.playerGoldText = goldLabel.GetComponent<Text>();
+            shopManager.goldText = goldLabel.GetComponent<Text>();
             EditorUtility.SetDirty(shopManager);
         }
 
