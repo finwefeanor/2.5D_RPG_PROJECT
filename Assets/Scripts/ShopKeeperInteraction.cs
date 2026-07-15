@@ -24,7 +24,7 @@ public class ShopKeeperInteraction : MonoBehaviour
         shopUIController.OpenShop();
         
         // uncomment if you want the item list to refresh every time the shop opens
-        shopManager.RefreshShopItems();
+        //shopManager.RefreshShopItems();
         
         isShopOpen = true;
         Debug.Log("Shop opened");
