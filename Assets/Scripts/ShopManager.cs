@@ -58,6 +58,7 @@ public class ShopManager : MonoBehaviour
         foreach (var item in itemsForSale)
         {
             var btnGO  = Instantiate(itemButtonPrefab, itemButtonContainer);
+            btnGO.SetActive(true);
             var btn    = btnGO.GetComponent<Button>();
             var labels = btnGO.GetComponentsInChildren<Text>();
 

@@ -10,16 +10,22 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 {
+    [Header("Movement")]
     public float moveSpeed = 5f;
+
+    [Header("Animation (optional)")]
+    public Animator animator;           // leave empty if no animator
 
     private Rigidbody rb;
     private Vector3 movementDirection;
+
+    static readonly int isMovingHash = Animator.StringToHash("isMoving");
     
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.constraints = RigidbodyConstraints.FreezeRotation; // don't tip over
+        rb.constraints = RigidbodyConstraints.FreezeRotation;// Lock rotation so the capsule doesn't tip over
         rb.interpolation = RigidbodyInterpolation.Interpolate;
     }
 
@@ -39,6 +45,10 @@ public class PlayerController : MonoBehaviour
                 Time.deltaTime * 15f
             );
         }
+
+        // Animator integration
+        if (animator != null)
+            animator.SetBool(isMovingHash, movementDirection.magnitude > 0.1f);
     }
 
     void FixedUpdate()

@@ -89,7 +89,7 @@ public class ShopkeeperInteraction : MonoBehaviour
 // CHANGED FROM 2D: OnTriggerEnter2D/Exit2D → OnTriggerEnter/Exit
 // Music switching + FadeController calls completely unchanged
 
-public class CastleInteraction : MonoBehaviour
+/*public class CastleInteraction : MonoBehaviour
 {
     private bool isPlayerInRange;
     public AudioSource castleMusic;
@@ -123,4 +123,5 @@ public class CastleInteraction : MonoBehaviour
             //fadeController.FadeInAndSwitchCamera(false);
         }
     }
-}
+}*/
+
