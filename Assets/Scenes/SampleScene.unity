@@ -7764,6 +7764,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 462879795}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &480877662 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3222552158803320766, guid: 9a1a73f7bc4922c4b963be1c1a58150a, type: 3}
+  m_PrefabInstance: {fileID: 2059055609}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &490225667
 GameObject:
   m_ObjectHideFlags: 0
@@ -14942,7 +14947,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &935103563
 Transform:
   m_ObjectHideFlags: 0
@@ -14951,7 +14956,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 935103562}
   m_LocalRotation: {x: 0.00000017345423, y: 0.7071066, z: 0.70710707, w: -0.00000048316144}
-  m_LocalPosition: {x: -0.5578679, y: 0, z: 0.020739734}
+  m_LocalPosition: {x: -0.44, y: 0, z: 0.02}
   m_LocalScale: {x: 1, y: 0.23097003, z: 0.088117056}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -18769,7 +18774,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemsForSale:
   - {fileID: 11400000, guid: 8f42d5d457c7ac64382162a1d548791a, type: 2}
-  - {fileID: 11400000, guid: 79f54e2582d5d284e9dd5f3d3115cd97, type: 2}
+  - {fileID: 11400000, guid: 2d8e7e7343c029644b413b199707ca03, type: 2}
+  - {fileID: 11400000, guid: ef20e73e8f0666646b26c79b74d8ad90, type: 2}
+  - {fileID: 11400000, guid: 12588eeb9505dda4fa9aca976db24018, type: 2}
   playerGold: 100
   goldText: {fileID: 1531633751}
   itemButtonContainer: {fileID: 1015432645}
@@ -21139,6 +21146,11 @@ Material:
     - _Color: {r: 0.65, g: 0.5, b: 0.2, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
+--- !u!4 &1307209676 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1998309404489438910, guid: 9a1a73f7bc4922c4b963be1c1a58150a, type: 3}
+  m_PrefabInstance: {fileID: 2059055609}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1316936835
 GameObject:
   m_ObjectHideFlags: 0
@@ -25098,6 +25110,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outfitObject: {fileID: 1848750244}
+  hatObject: {fileID: 480877662}
+  rightHandSocket: {fileID: 403703418}
+  leftHandSocket: {fileID: 1307209676}
 --- !u!114 &1625179211
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31174,9 +31189,25 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 312122692169402946, guid: 9a1a73f7bc4922c4b963be1c1a58150a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3222552158803320766, guid: 9a1a73f7bc4922c4b963be1c1a58150a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5366824067135638384, guid: 9a1a73f7bc4922c4b963be1c1a58150a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8314940524376475072, guid: 9a1a73f7bc4922c4b963be1c1a58150a, type: 3}
       propertyPath: m_Name
       value: MagePlayerVisual
+      objectReference: {fileID: 0}
+    - target: {fileID: 8314940524376475072, guid: 9a1a73f7bc4922c4b963be1c1a58150a, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8660223031584857978, guid: 9a1a73f7bc4922c4b963be1c1a58150a, type: 3}
       propertyPath: m_RootOrder

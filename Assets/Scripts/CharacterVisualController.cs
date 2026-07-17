@@ -11,13 +11,20 @@ using UnityEngine;
 
 public class CharacterVisualController : MonoBehaviour
 {
-    [Header("Outfit Object")]
-    [Tooltip("The child primitive that represents equipped clothing. " +
-             "Disable it by default in the Inspector.")]
+    [Header("Outfit / Hat (built-in rig objects — just toggled)")]
     public GameObject outfitObject;
+    public GameObject hatObject; // e.g. Skeleton_Mage_Hat, drag it in as-is
+
+    [Header("Hand sockets (drag handslot.l / handslot.r Transforms here)")]
+    public Transform rightHandSocket;
+    public Transform leftHandSocket;
 
     private EquipmentManager _equipmentManager;
     private Material _outfitMaterial;
+
+    private GameObject _currentRightHandInstance;
+    private GameObject _currentLeftHandInstance;
+
 
     void Awake()
     {
@@ -35,6 +42,9 @@ public class CharacterVisualController : MonoBehaviour
             if (renderer != null)
                 _outfitMaterial = renderer.material = new Material(renderer.sharedMaterial);
         }
+
+        if (hatObject != null)
+            hatObject.SetActive(false); // hidden by default, same as outfit
 
         // Subscribe to equipment changes
         _equipmentManager.OnEquipmentChanged += RefreshVisuals;
@@ -54,20 +64,54 @@ public class CharacterVisualController : MonoBehaviour
         // Check if any visual slot is filled (Head or Chest)
         var headItem  = _equipmentManager.GetEquipped(EquipSlot.Head);
         var chestItem = _equipmentManager.GetEquipped(EquipSlot.Chest);
+        var rightHandItem = _equipmentManager.GetEquipped(EquipSlot.RightHand); //added
+        var leftHandItem = _equipmentManager.GetEquipped(EquipSlot.LeftHand); //added
 
         // Priority: show chest item color, fallback to head item color
-        ItemData activeItem = chestItem ?? headItem;
-
-        if (activeItem != null)
+        // Outfit color swap (unchanged)
+        if (outfitObject != null)
         {
-            outfitObject.SetActive(true);
-            if (_outfitMaterial != null)
-                _outfitMaterial.color = activeItem.outfitColor;
+            ItemData activeItem = chestItem ?? headItem;
+            if (activeItem != null)
+            {
+                outfitObject.SetActive(true);
+                if (_outfitMaterial != null)
+                    _outfitMaterial.color = activeItem.outfitColor;
+            }
+            else
+            {
+                outfitObject.SetActive(false);
+            }
         }
-        else
+
+        // Hat: simple on/off
+        if (hatObject != null)
+            hatObject.SetActive(headItem != null);
+
+        // Weapons/shield: spawn prefab at socket
+        UpdateHandSlot(rightHandItem, rightHandSocket, ref _currentRightHandInstance);
+        UpdateHandSlot(leftHandItem, leftHandSocket, ref _currentLeftHandInstance);
+
+    }
+
+    void UpdateHandSlot(ItemData item, Transform socket, ref GameObject currentInstance)
+    {
+        if (currentInstance != null)
         {
-            // Nothing equipped — hide outfit
-            outfitObject.SetActive(false);
+            Destroy(currentInstance);
+            currentInstance = null;
+        }
+
+        if (item != null && item.equipPrefab != null && socket != null)
+        {
+            currentInstance = Instantiate(item.equipPrefab, socket);
+            currentInstance.transform.localPosition = item.equipPositionOffset;
+            currentInstance.transform.localRotation = Quaternion.Euler(item.equipRotationOffset);
+            currentInstance.transform.localScale = Vector3.one;
         }
     }
+
+
+
+
 }

@@ -49,9 +49,9 @@ public class TopDownPlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        Vector3 velocity = _inputDir * moveSpeed;
-        velocity.y      = _rb.velocity.y;       // preserve gravity
-        _rb.velocity      = velocity;
+        Vector3 velocity = _inputDir.normalized * moveSpeed;
+        velocity.y = _rb.velocity.y; // preserve gravity
+        _rb.velocity = velocity;
     }
 
     

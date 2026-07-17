@@ -140,4 +140,13 @@ public class ShopManager : MonoBehaviour
             btn.interactable = !owned && canAfford;
         }
     }
+
+    //will be called inside ShopKeeperInteraction.Openshop later 
+    //when dynamic restocking neededn
+    public void RefreshShopItems() 
+    {
+        GenerateItemButtons();
+    }
+
+
 }
