@@ -60,38 +60,32 @@ public class CharacterVisualController : MonoBehaviour
     void RefreshVisuals()
     {
         if (outfitObject == null) return;
-
         // Check if any visual slot is filled (Head or Chest)
-        var headItem  = _equipmentManager.GetEquipped(EquipSlot.Head);
+        var headItem = _equipmentManager.GetEquipped(EquipSlot.Head);
         var chestItem = _equipmentManager.GetEquipped(EquipSlot.Chest);
         var rightHandItem = _equipmentManager.GetEquipped(EquipSlot.RightHand); //added
         var leftHandItem = _equipmentManager.GetEquipped(EquipSlot.LeftHand); //added
 
-        // Priority: show chest item color, fallback to head item color
-        // Outfit color swap (unchanged)
+        // Outfit color swap — driven ONLY by chest slot
         if (outfitObject != null)
         {
-            ItemData activeItem = chestItem ?? headItem;
-            if (activeItem != null)
+            if (chestItem != null)
             {
                 outfitObject.SetActive(true);
                 if (_outfitMaterial != null)
-                    _outfitMaterial.color = activeItem.outfitColor;
+                    _outfitMaterial.color = chestItem.outfitColor;
             }
             else
             {
                 outfitObject.SetActive(false);
             }
         }
-
         // Hat: simple on/off
         if (hatObject != null)
             hatObject.SetActive(headItem != null);
-
         // Weapons/shield: spawn prefab at socket
         UpdateHandSlot(rightHandItem, rightHandSocket, ref _currentRightHandInstance);
         UpdateHandSlot(leftHandItem, leftHandSocket, ref _currentLeftHandInstance);
-
     }
 
     void UpdateHandSlot(ItemData item, Transform socket, ref GameObject currentInstance)
