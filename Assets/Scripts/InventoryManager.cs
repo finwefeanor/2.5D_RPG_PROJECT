@@ -14,6 +14,7 @@ public class InventoryManager : MonoBehaviour
 {
     // All items the player currently owns
     [SerializeField] private List<ItemData> _ownedItems = new List<ItemData>();
+    public IReadOnlyList<ItemData> OwnedItems => _ownedItems;
 
     private EquipmentManager _equipmentManager;
 

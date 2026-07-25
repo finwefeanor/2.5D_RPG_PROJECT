@@ -65,7 +65,9 @@ public class CharacterVisualController : MonoBehaviour
         var chestItem = _equipmentManager.GetEquipped(EquipSlot.Chest);
         var rightHandItem = _equipmentManager.GetEquipped(EquipSlot.RightHand); //added
         var leftHandItem = _equipmentManager.GetEquipped(EquipSlot.LeftHand); //added
-        // Outfit color swap — driven ONLY by chest slot
+
+        // Priority: show chest item color, fallback to head item color
+        // Outfit color swap (unchanged)
         if (outfitObject != null)
         {
             if (chestItem != null)
