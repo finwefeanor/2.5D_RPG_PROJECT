@@ -3,7 +3,11 @@ guid: 0e6f817dec59e864b9d3e4fcc312e0d1
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - outfitObject: {instanceID: 0}
+  - hatObject: {instanceID: 0}
+  - rightHandSocket: {instanceID: 0}
+  - leftHandSocket: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

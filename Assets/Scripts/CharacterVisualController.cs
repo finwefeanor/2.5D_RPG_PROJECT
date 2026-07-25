@@ -66,7 +66,11 @@ public class CharacterVisualController : MonoBehaviour
         var rightHandItem = _equipmentManager.GetEquipped(EquipSlot.RightHand); //added
         var leftHandItem = _equipmentManager.GetEquipped(EquipSlot.LeftHand); //added
 
+<<<<<<< Updated upstream
         // Outfit color swap — driven ONLY by chest slot
+=======
+        // Outfit: driven ONLY by chest slot
+>>>>>>> Stashed changes
         if (outfitObject != null)
         {
             if (chestItem != null)
