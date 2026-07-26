@@ -11,31 +11,49 @@ public class Enemy : MonoBehaviour
     public int attackDamage = 10;
     public float attackRange = 1.0f;
     public float attackRate = 1.0f;
+    public float detectRange = 5f;
+    public float moveSpeed = 3f;
+    public int goldReward = 5;
     public LayerMask playerLayer;
     public AudioSource enemyGetHitSound;
     public AudioSource enemyAttackSound;
     public AudioSource enemyDieSound;
 
     private float nextAttackTime = 0f;
+    private Transform playerTransform;
+
+    void Start()
+    {
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null) playerTransform = playerObj.transform;
+    }
 
     void Update()
     {
-        if (Time.time >= nextAttackTime)
-        {
-            // 3D overlap sphere instead of 2D overlap circle
-            Collider[] hitPlayers = Physics.OverlapSphere(transform.position, attackRange, playerLayer);
+        if (playerTransform == null) return;
 
-            foreach (Collider player in hitPlayers)
+        float distance = Vector3.Distance(transform.position, playerTransform.position);
+
+        if (distance <= attackRange)
+        {
+            if (Time.time >= nextAttackTime)
             {
-                PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
+                PlayerHealth playerHealth = playerTransform.GetComponent<PlayerHealth>();
                 if (playerHealth != null)
                 {
                     playerHealth.TakeDamage(attackDamage);
                     if (enemyAttackSound != null) enemyAttackSound.Play();
                 }
-            }
 
-            nextAttackTime = Time.time + 1f / attackRate;
+                nextAttackTime = Time.time + 1f / attackRate;
+            }
+        }
+        else if (distance <= detectRange)
+        {
+            Vector3 direction = (playerTransform.position - transform.position).normalized;
+            direction.y = 0;
+            transform.position += direction * moveSpeed * Time.deltaTime;
+            transform.rotation = Quaternion.LookRotation(direction);
         }
     }
 
@@ -51,6 +69,12 @@ public class Enemy : MonoBehaviour
 
     void Die()
     {
+        if (playerTransform != null)
+        {
+            InventoryManager inv = playerTransform.GetComponent<InventoryManager>();
+            if (inv != null) inv.AddGold(goldReward);
+        }
+
         if (enemyDieSound != null) enemyDieSound.Play();
         Destroy(gameObject);
         Debug.Log("Enemy died: " + gameObject.name);
@@ -58,8 +82,12 @@ public class Enemy : MonoBehaviour
 
     void OnDrawGizmosSelected()
     {
-        // DrawWireSphere works the same in 3D — no change needed
+        // Red = attack range
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
+
+        // Cyan = detect/chase range
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, detectRange);
     }
 }

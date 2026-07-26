@@ -18,7 +18,7 @@ MonoBehaviour:
   price: 10
   slot: 3
   defenseBonus: 0
-  damageBonus: 0
+  damageBonus: 25
   equipPrefab: {fileID: 919132149155446097, guid: db641bb3151642c41be0bd99704a6e45, type: 3}
   equipPositionOffset: {x: 0, y: 0, z: 0}
   equipRotationOffset: {x: 0, y: 0, z: 0}

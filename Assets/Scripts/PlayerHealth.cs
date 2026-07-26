@@ -12,15 +12,16 @@ using UnityEngine.SceneManagement;
 public class PlayerHealth : MonoBehaviour
 {
     public int health = 100;
-    public int armorReduction = 5;
+    //public int armorReduction = 5; clean it later
     public AudioSource playerHitSound;
     public AudioSource playerDieSound;
 
     private PlayerInventory playerInventory;
+    private EquipmentManager equipmentManager;
 
     void Start()
     {
-        playerInventory = GetComponent<PlayerInventory>();
+        equipmentManager = GetComponent<EquipmentManager>();
     }
 
     // 3D trigger — same logic, just no "2D" suffix
@@ -33,10 +34,13 @@ public class PlayerHealth : MonoBehaviour
     public void TakeDamage(int damage)
     {
         // Armor check via PlayerInventory instead of SpriteRenderer
-        if (playerInventory != null && playerInventory.HasClothesEquipped())
-            damage -= armorReduction;
+        int defense = equipmentManager != null ? equipmentManager.GetTotalDefense() : 0;
 
-        health -= damage;
+
+        int mitigated = Mathf.Max(1, damage - defense); // floor at 1, armor can't grant immunity
+
+
+        health -= mitigated;
         Debug.Log("Player health: " + health);
 
         if (playerHitSound != null) playerHitSound.Play();

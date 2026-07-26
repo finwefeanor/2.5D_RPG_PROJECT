@@ -2,9 +2,9 @@
 //  InventoryManager.cs  —  Assets/Scripts/
 //  Attach to the Player GameObject.
 //
-//  Owns the list of ItemData the player has bought.
-//  Separating "owned items" from "equipped items" means
-//  a player can own a Hat but have it unequipped — same
+//  Owns the list of ItemData the player has bought, and the
+//  player's gold. Separating "owned items" from "equipped items"
+//  means a player can own a Hat but have it unequipped — same
 //  as every real RPG inventory system.
 // ============================================================
 using System.Collections.Generic;
@@ -15,6 +15,9 @@ public class InventoryManager : MonoBehaviour
     // All items the player currently owns
     [SerializeField] private List<ItemData> _ownedItems = new List<ItemData>();
     public IReadOnlyList<ItemData> OwnedItems => _ownedItems;
+
+    [Header("Currency")]
+    public int gold = 100;
 
     private EquipmentManager _equipmentManager;
 
@@ -32,7 +35,28 @@ public class InventoryManager : MonoBehaviour
         //    RemoveItem(GetAllItems()[0]);
     }
 
-    // ── Public API ────────────────────────────────────────────
+    // ── Gold API ──────────────────────────────────────────────
+
+    public void AddGold(int amount)
+    {
+        gold += amount;
+        Debug.Log($"Gold: {gold}");
+    }
+
+    public bool SpendGold(int amount)
+    {
+        if (gold < amount)
+        {
+            Debug.Log($"Not enough gold. Need {amount}, have {gold}.");
+            return false;
+        }
+
+        gold -= amount;
+        Debug.Log($"Gold: {gold}");
+        return true;
+    }
+
+    // ── Item API ──────────────────────────────────────────────
 
     // Called by ShopManager when player buys an item
     public void AddItem(ItemData item)

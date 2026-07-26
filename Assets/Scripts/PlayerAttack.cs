@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
 {
-    public int attackDamage = 10;
+    public int baseAttackDamage = 10;
     public float attackRange = 1.5f;
     public Transform attackPoint;   // child empty GameObject placed in front of player
     public LayerMask enemyLayers;
@@ -17,8 +17,15 @@ public class PlayerAttack : MonoBehaviour
     public ParticleSystem attackEffect;
     [SerializeField] private Animator animator;
 
+    private EquipmentManager equipmentManager;
+
     private static readonly int AttackHash = Animator.StringToHash("Attack");
-    
+
+    void Start()
+    {
+        equipmentManager = GetComponent<EquipmentManager>(); // adjust if it lives elsewhere
+    }
+
 
     void Update()
     {
@@ -35,9 +42,13 @@ public class PlayerAttack : MonoBehaviour
         if (attackSound != null) attackSound.Play();
         if (attackEffect != null) attackEffect.Play();
 
+        int bonus = equipmentManager != null ? equipmentManager.GetTotalDamageBonus() : 0;
+        int totalDamage = baseAttackDamage + bonus;
+
         // 3D sphere overlap instead of 2D circle overlap
         Collider[] hitEnemies = Physics.OverlapSphere(attackPoint.position, attackRange, enemyLayers);
         Debug.Log("Enemies detected: " + hitEnemies.Length);
+
 
         foreach (Collider enemy in hitEnemies)
         {
@@ -45,8 +56,8 @@ public class PlayerAttack : MonoBehaviour
             Enemy enemyComponent = enemy.GetComponent<Enemy>();
             if (enemyComponent != null)
             {
-                enemyComponent.TakeDamage(attackDamage);
-                Debug.Log("Enemy took damage: " + attackDamage);
+                enemyComponent.TakeDamage(totalDamage);
+                Debug.Log("Enemy took damage: " + totalDamage);
             }
         }
     }

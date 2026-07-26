@@ -17,8 +17,8 @@ MonoBehaviour:
   description: Chest Armor for Warrior
   price: 10
   slot: 1
-  defenseBonus: 2
-  damageBonus: 3
+  defenseBonus: 5
+  damageBonus: 0
   equipPrefab: {fileID: 7116785954168059035, guid: 00753511ca6e5d441a67f3ce0966ee41, type: 3}
   equipPositionOffset: {x: 0, y: 0, z: 0}
   equipRotationOffset: {x: 0, y: 0, z: 0}
