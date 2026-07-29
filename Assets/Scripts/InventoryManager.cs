@@ -19,6 +19,8 @@ public class InventoryManager : MonoBehaviour
     [Header("Currency")]
     public int gold = 100;
 
+    public ItemDatabase itemDatabase;
+
     private EquipmentManager _equipmentManager;
 
     void Awake()
@@ -26,6 +28,12 @@ public class InventoryManager : MonoBehaviour
         _equipmentManager = GetComponent<EquipmentManager>();
         if (_equipmentManager == null)
             Debug.LogError("InventoryManager requires EquipmentManager on the same GameObject.");
+    }
+
+    void Start()
+    {
+        if (itemDatabase != null)
+            SaveSystem.Load(this, _equipmentManager, itemDatabase);
     }
 
     // TEMP — for testing only, remove once inventory UI exists

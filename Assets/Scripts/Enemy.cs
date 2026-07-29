@@ -8,6 +8,8 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     public int health = 30;
+    public int maxHealth = 30; // set equal to health at start in Inspector
+    
     public int attackDamage = 10;
     public float attackRange = 1.0f;
     public float attackRate = 1.0f;
@@ -19,13 +21,18 @@ public class Enemy : MonoBehaviour
     public AudioSource enemyAttackSound;
     public AudioSource enemyDieSound;
 
+    public event System.Action<int, int> OnHealthChanged;
+
     private float nextAttackTime = 0f;
     private Transform playerTransform;
+
+    public GameObject goldPickupPrefab; // assign in Inspector
 
     void Start()
     {
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null) playerTransform = playerObj.transform;
+        OnHealthChanged?.Invoke(health, maxHealth);
     }
 
     void Update()
@@ -61,6 +68,7 @@ public class Enemy : MonoBehaviour
     {
         health -= damage;
         Debug.Log("Enemy health: " + health);
+        OnHealthChanged?.Invoke(health, maxHealth);
         if (enemyGetHitSound != null) enemyGetHitSound.Play();
 
         if (health <= 0)
@@ -69,10 +77,21 @@ public class Enemy : MonoBehaviour
 
     void Die()
     {
-        if (playerTransform != null)
+        //if (playerTransform != null)
+        //{
+        //    InventoryManager inv = playerTransform.GetComponent<InventoryManager>();
+        //    if (inv != null) inv.AddGold(goldReward);
+        //}
+
+        //if (enemyDieSound != null) enemyDieSound.Play();
+        //Destroy(gameObject);
+        //Debug.Log("Enemy died: " + gameObject.name);
+
+        if (goldPickupPrefab != null)
         {
-            InventoryManager inv = playerTransform.GetComponent<InventoryManager>();
-            if (inv != null) inv.AddGold(goldReward);
+            GameObject pickup = Instantiate(goldPickupPrefab, transform.position, Quaternion.identity);
+            GoldPickup gp = pickup.GetComponent<GoldPickup>();
+            if (gp != null) gp.amount = goldReward;
         }
 
         if (enemyDieSound != null) enemyDieSound.Play();

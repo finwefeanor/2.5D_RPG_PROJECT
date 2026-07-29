@@ -15,6 +15,13 @@ public class PlayerHealth : MonoBehaviour
     //public int armorReduction = 5; clean it later
     public AudioSource playerHitSound;
     public AudioSource playerDieSound;
+    public int maxHealth = 100;
+    public event System.Action<int, int> OnHealthChanged; // current, max
+
+    [Header("Death UI")]
+    public GameObject deathScreenUI; // simple full-screen panel with "You Died" text, assign in Inspector
+
+    private bool isDead = false;
 
     private PlayerInventory playerInventory;
     private EquipmentManager equipmentManager;
@@ -22,6 +29,7 @@ public class PlayerHealth : MonoBehaviour
     void Start()
     {
         equipmentManager = GetComponent<EquipmentManager>();
+        OnHealthChanged?.Invoke(health, maxHealth); // initial value for UI
     }
 
     // 3D trigger — same logic, just no "2D" suffix
@@ -33,6 +41,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        if (isDead) return; // ignore all damage once death is already triggered
         // Armor check via PlayerInventory instead of SpriteRenderer
         int defense = equipmentManager != null ? equipmentManager.GetTotalDefense() : 0;
 
@@ -42,6 +51,7 @@ public class PlayerHealth : MonoBehaviour
 
         health -= mitigated;
         Debug.Log("Player health: " + health);
+        OnHealthChanged?.Invoke(health, maxHealth);
 
         if (playerHitSound != null) playerHitSound.Play();
 
@@ -51,18 +61,37 @@ public class PlayerHealth : MonoBehaviour
 
     void Die()
     {
+        if (isDead) return;
+        isDead = true;
         Debug.Log("Player has died");
         StartCoroutine(HandleDeath());
     }
 
     IEnumerator HandleDeath()
     {
-        if (playerDieSound != null)
-            playerDieSound.Play();
+        //if (deathScreenUI != null) deathScreenUI.SetActive(true);
 
-        yield return new WaitForSeconds(
-            playerDieSound != null ? playerDieSound.clip.length : 3.0f);
+        //SaveSystem.Save(GetComponent<InventoryManager>(), GetComponent<EquipmentManager>());
 
+
+        //if (playerDieSound != null)
+        //    playerDieSound.Play();
+
+        //yield return new WaitForSeconds(
+        //    playerDieSound != null ? playerDieSound.clip.length : 3.0f);
+
+        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+        if (deathScreenUI != null) deathScreenUI.SetActive(true);
+
+        Time.timeScale = 0f; // freezes enemy movement, attacks, and player input-driven physics
+
+        if (playerDieSound != null) playerDieSound.Play(); // audio isn't affected by timeScale
+
+        float waitTime = playerDieSound != null ? playerDieSound.clip.length : 3.0f;
+        yield return new WaitForSecondsRealtime(waitTime); // must be *Realtime* since timeScale is 0
+
+        Time.timeScale = 1f; // reset before reload, or the new scene loads frozen
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
