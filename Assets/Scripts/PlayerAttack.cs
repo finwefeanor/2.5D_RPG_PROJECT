@@ -20,6 +20,12 @@ public class PlayerAttack : MonoBehaviour
     private EquipmentManager equipmentManager;
 
     private static readonly int AttackHash = Animator.StringToHash("Attack");
+    private static readonly int AttackIndexHash = Animator.StringToHash("AttackIndex");
+
+    [Header("Attack")]
+    [Tooltip("0 = Slice_Horizontal, 1 = Stab — temporary manual override until combo/weapon logic exists")]
+    public int attackIndex = 0;
+
 
     void Start()
     {
@@ -35,7 +41,9 @@ public class PlayerAttack : MonoBehaviour
 
     void Attack()
     {
-        if (animator != null) {
+        if (animator != null)
+        {
+            animator.SetInteger(AttackIndexHash, attackIndex); // 0 = Slice_Horizontal, 1 = Stab, etc.
             animator.SetTrigger(AttackHash);
         }
 

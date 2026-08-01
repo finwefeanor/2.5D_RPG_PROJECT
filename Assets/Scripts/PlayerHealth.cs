@@ -26,6 +26,12 @@ public class PlayerHealth : MonoBehaviour
     private PlayerInventory playerInventory;
     private EquipmentManager equipmentManager;
 
+    [SerializeField] private Animator animator;
+
+    private static readonly int HitHash = Animator.StringToHash("Hit");
+    private static readonly int DeathHash = Animator.StringToHash("Death");
+    private static readonly int isDeadHash = Animator.StringToHash("isDead");
+
     void Start()
     {
         equipmentManager = GetComponent<EquipmentManager>();
@@ -55,6 +61,9 @@ public class PlayerHealth : MonoBehaviour
 
         if (playerHitSound != null) playerHitSound.Play();
 
+        if (playerHitSound != null) playerHitSound.Play();
+        if (animator != null) animator.SetTrigger(HitHash); // only fires if we didn't early-return above
+
         if (health <= 0)
             Die();
     }
@@ -64,6 +73,11 @@ public class PlayerHealth : MonoBehaviour
         if (isDead) return;
         isDead = true;
         Debug.Log("Player has died");
+        if (animator != null)
+        {
+            animator.SetBool(isDeadHash, true);
+            animator.SetTrigger(DeathHash);
+        }
         StartCoroutine(HandleDeath());
     }
 

@@ -19295,6 +19295,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2d8e7e7343c029644b413b199707ca03, type: 2}
   - {fileID: 11400000, guid: ef20e73e8f0666646b26c79b74d8ad90, type: 2}
   - {fileID: 11400000, guid: 12588eeb9505dda4fa9aca976db24018, type: 2}
+  - {fileID: 11400000, guid: 2deb670568d1537479029806ec7d2080, type: 2}
   goldText: {fileID: 1531633751}
   itemButtonContainer: {fileID: 1015432645}
   itemButtonPrefab: {fileID: 201245889}
@@ -26197,11 +26198,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27a342d6357dc9b45a6319e98e6ef050, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 100
+  health: 30
   playerHitSound: {fileID: 0}
   playerDieSound: {fileID: 0}
   maxHealth: 100
   deathScreenUI: {fileID: 880251955}
+  animator: {fileID: 2059055611}
 --- !u!114 &1625179207
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26223,6 +26225,7 @@ MonoBehaviour:
   attackSound: {fileID: 0}
   attackEffect: {fileID: 0}
   animator: {fileID: 2059055611}
+  attackIndex: 0
 --- !u!136 &1625179209
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -26328,6 +26331,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ef20e73e8f0666646b26c79b74d8ad90, type: 2}
   - {fileID: 11400000, guid: 8f42d5d457c7ac64382162a1d548791a, type: 2}
   - {fileID: 11400000, guid: 2d8e7e7343c029644b413b199707ca03, type: 2}
+  - {fileID: 11400000, guid: 2deb670568d1537479029806ec7d2080, type: 2}
 --- !u!1 &1626262542
 GameObject:
   m_ObjectHideFlags: 0
@@ -32979,6 +32983,27 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3373026942746379520, guid: 9a1a73f7bc4922c4b963be1c1a58150a, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3373026942746379520, guid: 9a1a73f7bc4922c4b963be1c1a58150a, type: 3}
+      propertyPath: m_UpdateMode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3373026942746379520, guid: 9a1a73f7bc4922c4b963be1c1a58150a, type: 3}
+      propertyPath: m_WarningMessage
+      value: "\nBinding warning: Some generic clip(s) animate transforms that are
+        already bound by a Humanoid avatar. These transforms can only be changed
+        by Humanoid clips.\n\tTransform 'upperarm.l'\n\tTransform 'upperleg.l'\n\tTransform
+        'upperleg.r'\n\tTransform 'hips'\n\tTransform 'upperarm.r'\n\tTransform 'lowerarm.r'\n\tTransform
+        'upperarm.l'\n\tTransform 'chest'\n\tTransform 'lowerarm.l'\n\tTransform
+        'lowerleg.r'\n\tand more ...\n\tFrom animation clip 'Running_A'"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3373026942746379520, guid: 9a1a73f7bc4922c4b963be1c1a58150a, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3649110996879094370, guid: 9a1a73f7bc4922c4b963be1c1a58150a, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -34356,6 +34381,10 @@ PrefabInstance:
     - target: {fileID: 4733300124434653529, guid: 07a94fd4f2bfb2b46b385e34dc4eb2fb, type: 3}
       propertyPath: m_Name
       value: ItemButtonPrefab
+      objectReference: {fileID: 0}
+    - target: {fileID: 4733300124434653529, guid: 07a94fd4f2bfb2b46b385e34dc4eb2fb, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4733300124434653530, guid: 07a94fd4f2bfb2b46b385e34dc4eb2fb, type: 3}
       propertyPath: m_Pivot.x
