@@ -16,6 +16,9 @@ public class PlayerController : MonoBehaviour
     [Header("Animation (optional)")]
     public Animator animator;           // leave empty if no animator
 
+    [HideInInspector] public bool rootMotionActive = false; // set by CharacterMotor
+
+
     private Rigidbody rb;
     private Vector3 movementDirection;
 
@@ -31,13 +34,11 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // Input is the same — only axis mapping changes (Y axis → Z axis in 3D)
         movementDirection.x = Input.GetAxisRaw("Horizontal");
         movementDirection.z = Input.GetAxisRaw("Vertical");
         movementDirection.y = 0;
 
-        // Rotate character to face movement direction
-        if (movementDirection.sqrMagnitude > 0.01f)
+        if (!rootMotionActive && movementDirection.sqrMagnitude > 0.01f)
         {
             transform.rotation = Quaternion.Slerp(
                 transform.rotation,
@@ -46,15 +47,16 @@ public class PlayerController : MonoBehaviour
             );
         }
 
-        // Animator integration
         if (animator != null)
             animator.SetBool(isMovingHash, movementDirection.magnitude > 0.1f);
     }
 
     void FixedUpdate()
     {
+        if (rootMotionActive) return; // let CharacterMotor drive the Rigidbody instead
+
         Vector3 velocity = movementDirection.normalized * moveSpeed;
-        velocity.y = rb.velocity.y; // preserve gravity
+        velocity.y = rb.velocity.y;
         rb.velocity = velocity;
     }
 }
