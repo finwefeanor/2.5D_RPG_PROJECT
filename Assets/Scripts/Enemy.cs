@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 // CHANGED FROM 2D:
@@ -28,6 +29,16 @@ public class Enemy : MonoBehaviour
 
     public GameObject goldPickupPrefab; // assign in Inspector
 
+    public Animator animator;
+    static readonly int isMovingHash = Animator.StringToHash("isMoving");
+
+    private static readonly int AttackHash = Animator.StringToHash("Attack");
+    private static readonly int AttackIndexHash = Animator.StringToHash("AttackIndex");
+    private static readonly int HitHash = Animator.StringToHash("Hit");
+    private static readonly int DeathHash = Animator.StringToHash("Death");
+    private static readonly int isDeadHash = Animator.StringToHash("isDead");
+    public int attackIndex = 0;
+
     void Start()
     {
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -43,6 +54,8 @@ public class Enemy : MonoBehaviour
 
         if (distance <= attackRange)
         {
+            if (animator != null) animator.SetBool(isMovingHash, false);
+
             if (Time.time >= nextAttackTime)
             {
                 PlayerHealth playerHealth = playerTransform.GetComponent<PlayerHealth>();
@@ -50,6 +63,12 @@ public class Enemy : MonoBehaviour
                 {
                     playerHealth.TakeDamage(attackDamage);
                     if (enemyAttackSound != null) enemyAttackSound.Play();
+                }
+
+                if (animator != null)
+                {
+                    animator.SetInteger(AttackIndexHash, attackIndex);
+                    animator.SetTrigger(AttackHash);
                 }
 
                 nextAttackTime = Time.time + 1f / attackRate;
@@ -61,6 +80,12 @@ public class Enemy : MonoBehaviour
             direction.y = 0;
             transform.position += direction * moveSpeed * Time.deltaTime;
             transform.rotation = Quaternion.LookRotation(direction);
+
+            if (animator != null) animator.SetBool(isMovingHash, true);
+        }
+        else
+        {
+            if (animator != null) animator.SetBool(isMovingHash, false);
         }
     }
 
@@ -70,6 +95,7 @@ public class Enemy : MonoBehaviour
         Debug.Log("Enemy health: " + health);
         OnHealthChanged?.Invoke(health, maxHealth);
         if (enemyGetHitSound != null) enemyGetHitSound.Play();
+        if (animator != null) animator.SetTrigger(HitHash);
 
         if (health <= 0)
             Die();
@@ -77,15 +103,6 @@ public class Enemy : MonoBehaviour
 
     void Die()
     {
-        //if (playerTransform != null)
-        //{
-        //    InventoryManager inv = playerTransform.GetComponent<InventoryManager>();
-        //    if (inv != null) inv.AddGold(goldReward);
-        //}
-
-        //if (enemyDieSound != null) enemyDieSound.Play();
-        //Destroy(gameObject);
-        //Debug.Log("Enemy died: " + gameObject.name);
 
         if (goldPickupPrefab != null)
         {
@@ -95,8 +112,20 @@ public class Enemy : MonoBehaviour
         }
 
         if (enemyDieSound != null) enemyDieSound.Play();
-        Destroy(gameObject);
+        
+        if (animator != null)
+        {
+            animator.SetBool(isDeadHash, true);
+            animator.SetTrigger(DeathHash);
+        }
         Debug.Log("Enemy died: " + gameObject.name);
+        StartCoroutine(HandleEnemyDeath());
+    }
+
+    IEnumerator HandleEnemyDeath()
+    {
+        yield return new WaitForSeconds(2f); // wait for death animation to finish
+        Destroy(gameObject);
     }
 
     void OnDrawGizmosSelected()
