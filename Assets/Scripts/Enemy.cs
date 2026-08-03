@@ -37,6 +37,7 @@ public class Enemy : MonoBehaviour
     private static readonly int HitHash = Animator.StringToHash("Hit");
     private static readonly int DeathHash = Animator.StringToHash("Death");
     private static readonly int isDeadHash = Animator.StringToHash("isDead");
+    private bool isDead = false;
     public int attackIndex = 0;
 
     void Start()
@@ -48,6 +49,8 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
+        if (isDead) return;
+
         if (playerTransform == null) return;
 
         float distance = Vector3.Distance(transform.position, playerTransform.position);
@@ -91,6 +94,8 @@ public class Enemy : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        if (isDead) return; // already dead, ignore further damage entirely
+
         health -= damage;
         Debug.Log("Enemy health: " + health);
         OnHealthChanged?.Invoke(health, maxHealth);
@@ -98,11 +103,18 @@ public class Enemy : MonoBehaviour
         if (animator != null) animator.SetTrigger(HitHash);
 
         if (health <= 0)
+        {
             Die();
+        }
+        else
+        {
+            if (animator != null) animator.SetTrigger(HitHash);
+        }
     }
 
     void Die()
     {
+        isDead = true; // always set, regardless of animator
 
         if (goldPickupPrefab != null)
         {
@@ -124,7 +136,7 @@ public class Enemy : MonoBehaviour
 
     IEnumerator HandleEnemyDeath()
     {
-        yield return new WaitForSeconds(2f); // wait for death animation to finish
+        yield return new WaitForSeconds(10f); // wait for death animation to finish
         Destroy(gameObject);
     }
 

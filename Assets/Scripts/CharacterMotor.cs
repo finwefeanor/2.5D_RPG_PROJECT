@@ -6,32 +6,52 @@ using UnityEngine;
 public class CharacterMotor : MonoBehaviour
 {
     private Animator animator;
-    private Rigidbody rb;             // lives on the parent
-    private PlayerController playerController; // optional, only exists on player
+    private Rigidbody rb;
+    private PlayerController playerController;
     private bool currentStateUsesRootMotion;
+
+    private Vector3 accumulatedDeltaPosition;
+    private Quaternion accumulatedDeltaRotation = Quaternion.identity;
 
     void Awake()
     {
         animator = GetComponent<Animator>();
         rb = GetComponentInParent<Rigidbody>();
-        playerController = GetComponentInParent<PlayerController>(); // null on enemy, that's fine
+        playerController = GetComponentInParent<PlayerController>();
     }
 
     public void SetRootMotionActive(bool active)
     {
         currentStateUsesRootMotion = active;
-        rb.isKinematic = active; // disable physics/gravity while root motion drives position
-
+        rb.isKinematic = active;
         if (playerController != null)
             playerController.rootMotionActive = active;
+
+        if (!active)
+        {
+            accumulatedDeltaPosition = Vector3.zero;
+            accumulatedDeltaRotation = Quaternion.identity;
+        }
     }
 
     void OnAnimatorMove()
     {
         if (!currentStateUsesRootMotion) return;
 
-        Vector3 delta = animator.deltaPosition;
-        rb.MovePosition(rb.position + delta);
-        rb.MoveRotation(rb.rotation * animator.deltaRotation);
+        // Don't apply yet — just collect. FixedUpdate applies the total.
+        accumulatedDeltaPosition += animator.deltaPosition;
+        accumulatedDeltaRotation = animator.deltaRotation * accumulatedDeltaRotation;
+    }
+
+    void FixedUpdate()
+    {
+        if (!currentStateUsesRootMotion) return;
+        if (accumulatedDeltaPosition == Vector3.zero) return;
+
+        rb.MovePosition(rb.position + accumulatedDeltaPosition);
+        rb.MoveRotation(rb.rotation * accumulatedDeltaRotation);
+
+        accumulatedDeltaPosition = Vector3.zero;
+        accumulatedDeltaRotation = Quaternion.identity;
     }
 }
