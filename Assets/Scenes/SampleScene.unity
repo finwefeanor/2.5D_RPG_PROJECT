@@ -25852,6 +25852,7 @@ MonoBehaviour:
   attackEffect: {fileID: 0}
   animator: {fileID: 2059055611}
   attackIndex: 0
+  attackCooldown: 0.6
 --- !u!136 &1625179209
 CapsuleCollider:
   m_ObjectHideFlags: 0

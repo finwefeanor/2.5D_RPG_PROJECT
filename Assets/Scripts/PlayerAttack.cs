@@ -25,6 +25,8 @@ public class PlayerAttack : MonoBehaviour
     [Header("Attack")]
     [Tooltip("0 = Slice_Horizontal, 1 = Stab — temporary manual override until combo/weapon logic exists")]
     public int attackIndex = 0;
+    public float attackCooldown = 1.2f; // slightly under clip length (1.367s) so next attack queues right as swing finishes
+    private float nextAttackTime = 0f;
 
 
     void Start()
@@ -35,8 +37,11 @@ public class PlayerAttack : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && Time.time >= nextAttackTime)
+        {
             Attack();
+            nextAttackTime = Time.time + attackCooldown;
+        }
     }
 
     void Attack()
