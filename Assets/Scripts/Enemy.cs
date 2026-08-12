@@ -115,6 +115,10 @@ public class Enemy : MonoBehaviour
     void Die()
     {
         isDead = true; // always set, regardless of animator
+                       // later if some AoE attack or instant kill method or other player (companion ai etc)
+                       // also damages and kills enemy, therefore calls Die() method and skipping TakeDamage()
+                       //method, we need to put if (isDead) return; here to prevent double enemy death.
+
 
         if (goldPickupPrefab != null)
         {
