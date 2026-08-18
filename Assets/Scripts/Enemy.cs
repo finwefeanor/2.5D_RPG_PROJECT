@@ -140,7 +140,7 @@ public class Enemy : MonoBehaviour
 
     IEnumerator HandleEnemyDeath()
     {
-        yield return new WaitForSeconds(10f); // wait for death animation to finish
+        yield return new WaitForSeconds(2.5f); // wait for death animation to finish
         Destroy(gameObject);
     }
 

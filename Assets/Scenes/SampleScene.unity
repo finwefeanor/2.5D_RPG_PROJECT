@@ -6510,6 +6510,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 386838771}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &392005161 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5936751999796041709, guid: af18841a7bbe8534895cbf5fca60f1a0, type: 3}
+  m_PrefabInstance: {fileID: 2717242060443035194}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &402541226
 GameObject:
   m_ObjectHideFlags: 0
@@ -32998,6 +33003,10 @@ PrefabInstance:
       propertyPath: attackRate
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2110713012232207241, guid: 59c767ce1c031ac4888996f1c57c16cb, type: 3}
+      propertyPath: goldPickupPrefab
+      value: 
+      objectReference: {fileID: 392005161}
     - target: {fileID: 2110713012232207243, guid: 59c767ce1c031ac4888996f1c57c16cb, type: 3}
       propertyPath: m_RootOrder
       value: 2
