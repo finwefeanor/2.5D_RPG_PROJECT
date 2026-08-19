@@ -23,7 +23,9 @@ public class PlayerController : MonoBehaviour
     private Vector3 movementDirection;
 
     static readonly int isMovingHash = Animator.StringToHash("isMoving");
-    
+
+    [SerializeField] private VirtualJoystick joystick; // assign in Inspector
+
 
     void Start()
     {
@@ -32,10 +34,20 @@ public class PlayerController : MonoBehaviour
         rb.interpolation = RigidbodyInterpolation.Interpolate;
     }
 
+
     void Update()
     {
-        movementDirection.x = Input.GetAxisRaw("Horizontal");
-        movementDirection.z = Input.GetAxisRaw("Vertical");
+        float h = Input.GetAxisRaw("Horizontal");
+        float v = Input.GetAxisRaw("Vertical");
+
+        if (joystick != null && Mathf.Abs(h) < 0.01f && Mathf.Abs(v) < 0.01f)
+        {
+            h = joystick.Horizontal;
+            v = joystick.Vertical;
+        }
+
+        movementDirection.x = h;
+        movementDirection.z = v;
         movementDirection.y = 0;
 
         if (!rootMotionActive && movementDirection.sqrMagnitude > 0.01f)
@@ -46,7 +58,6 @@ public class PlayerController : MonoBehaviour
                 Time.deltaTime * 15f
             );
         }
-
         if (animator != null)
             animator.SetBool(isMovingHash, movementDirection.magnitude > 0.1f);
     }

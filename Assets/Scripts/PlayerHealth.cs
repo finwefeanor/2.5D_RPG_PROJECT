@@ -38,34 +38,36 @@ public class PlayerHealth : MonoBehaviour
         OnHealthChanged?.Invoke(health, maxHealth); // initial value for UI
     }
 
-    // 3D trigger — same logic, just no "2D" suffix
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Enemy"))
-            TakeDamage(20);
-    }
-
     public void TakeDamage(int damage)
     {
-        if (isDead) return; // ignore all damage once death is already triggered
-        // Armor check via PlayerInventory instead of SpriteRenderer
+        if (isDead) return;
+
+        Debug.Log($"TakeDamage called at {Time.time:F2}s, damage={damage}"); // ADD THIS
+
         int defense = equipmentManager != null ? equipmentManager.GetTotalDefense() : 0;
-
-
-        int mitigated = Mathf.Max(1, damage - defense); // floor at 1, armor can't grant immunity
-
+        int mitigated = Mathf.Max(1, damage - defense);
 
         health -= mitigated;
         Debug.Log("Player health: " + health);
         OnHealthChanged?.Invoke(health, maxHealth);
 
-        if (playerHitSound != null) playerHitSound.Play();
-
-        if (playerHitSound != null) playerHitSound.Play();
-        if (animator != null) animator.SetTrigger(HitHash); // only fires if we didn't early-return above
+        // Sound removed from here — now fires via Animation Event on the
+        // Hit reaction clip instead (see PlayHitSound() below), so it's
+        // guaranteed to sync with the actual visual flinch, not a code timer.
+        if (animator != null) animator.SetTrigger(HitHash);
 
         if (health <= 0)
             Die();
+    }
+
+    // Wire this to an Animation Event on your Hit reaction clip
+    // (same pattern as Enemy's PlayAttackSound — may need an
+    // AnimationEventRelay on the Animator's GameObject if it's
+    // a separate child object, e.g. MagePlayerVisual).
+    public void PlayHitSound()
+    {
+        Debug.Log($"PlayHitSound (animation event) fired at {Time.time:F2}s"); // ADD THIS
+        if (playerHitSound != null) playerHitSound.Play();
     }
 
     void Die()
@@ -83,29 +85,16 @@ public class PlayerHealth : MonoBehaviour
 
     IEnumerator HandleDeath()
     {
-        //if (deathScreenUI != null) deathScreenUI.SetActive(true);
-
-        //SaveSystem.Save(GetComponent<InventoryManager>(), GetComponent<EquipmentManager>());
-
-
-        //if (playerDieSound != null)
-        //    playerDieSound.Play();
-
-        //yield return new WaitForSeconds(
-        //    playerDieSound != null ? playerDieSound.clip.length : 3.0f);
-
-        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-
         if (deathScreenUI != null) deathScreenUI.SetActive(true);
 
-        Time.timeScale = 0f; // freezes enemy movement, attacks, and player input-driven physics
+        Time.timeScale = 0f;
 
-        if (playerDieSound != null) playerDieSound.Play(); // audio isn't affected by timeScale
+        if (playerDieSound != null) playerDieSound.Play();
 
         float waitTime = playerDieSound != null ? playerDieSound.clip.length : 3.0f;
-        yield return new WaitForSecondsRealtime(waitTime); // must be *Realtime* since timeScale is 0
+        yield return new WaitForSecondsRealtime(waitTime);
 
-        Time.timeScale = 1f; // reset before reload, or the new scene loads frozen
+        Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

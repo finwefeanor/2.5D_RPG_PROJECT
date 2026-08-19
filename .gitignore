@@ -44,3 +44,5 @@ Thumbs.db
 # Visual Studio / local upgrade files
 .vsconfig
 UpgradeLog.htm
+
+Android_Builds/

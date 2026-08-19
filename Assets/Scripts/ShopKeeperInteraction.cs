@@ -12,11 +12,23 @@ public class ShopKeeperInteraction : MonoBehaviour
     {
         if (isPlayerInRange && Input.GetKeyDown(KeyCode.E))
         {
-            if (isShopOpen)
-                CloseShop();
-            else
-                OpenShop();
+            ToggleShop();
         }
+    }
+
+    // Wire this to your on-screen Interact Button's OnClick()
+    public void OnInteractButtonPressed()
+    {
+        if (isPlayerInRange)
+            ToggleShop();
+    }
+
+    private void ToggleShop()
+    {
+        if (isShopOpen)
+            CloseShop();
+        else
+            OpenShop();
     }
 
     public void OpenShop()
