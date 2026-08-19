@@ -16,15 +16,21 @@ public class PlayerAttack : MonoBehaviour
     private static readonly int AttackIndexHash = Animator.StringToHash("AttackIndex");
 
     [Header("Attack")]
-    [Tooltip("0 = Slice_Horizontal, 1 = Stab — temporary manual override until combo/weapon logic exists")]
+    [Tooltip("0 = Slice_Horizontal, 1 = Stab - temporary manual override until combo/weapon logic exists")]
     public int attackIndex = 0;
-    public float attackCooldown = 1.2f;
+
+    [Tooltip("Pause AFTER the swing finishes before the next one may start. " +
+             "Pure design/balance value - nothing to do with clip length. " +
+             "0 = swing again immediately, 0.5 = half-second breather.")]
+    public float attackRecovery = 0.15f;
+
+    private bool isAttacking = false;   // set by PlayerAttackState, not by us
     private float nextAttackTime = 0f;
 
-    // --- Directional attack settings (disabled for now — see Attack() below) ---
     /*
+    // --- Directional attack settings (disabled for now - see DealAttackDamage) ---
     [Header("Directional Hit Check (later stage)")]
-    [Tooltip("Full cone angle in degrees. 90 = must be within 45° left/right of forward)]
+    [Tooltip("Full cone angle in degrees. 90 = must be within 45 deg left/right of forward.")]
     public float attackAngle = 90f;
     */
 
@@ -35,12 +41,11 @@ public class PlayerAttack : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && Time.time >= nextAttackTime)
-        {
+        if (Input.GetKeyDown(KeyCode.Space))
             TryAttack();
-        }
     }
 
+    // Wired to the on-screen AttackButton's OnClick()
     public void OnAttackButtonPressed()
     {
         TryAttack();
@@ -48,59 +53,61 @@ public class PlayerAttack : MonoBehaviour
 
     private void TryAttack()
     {
-        if (Time.time >= nextAttackTime)
-        {
-            Attack();
-            nextAttackTime = Time.time + attackCooldown;
-        }
-    }
+        // While the swing is playing, the animation is in charge - ignore input.
+        if (isAttacking) return;
+        if (Time.time < nextAttackTime) return;
 
-    void Attack()
-    {
         if (animator != null)
         {
             animator.SetInteger(AttackIndexHash, attackIndex);
             animator.SetTrigger(AttackHash);
         }
 
-        // Sound removed from here — now fires via Animation Event at the
-        // swing's contact frame instead (see PlayAttackSound() below),
-        // same pattern as Enemy.cs, so it stays synced even if the swing
-        // gets interrupted (e.g. player gets hit mid-attack).
-
         if (attackEffect != null) attackEffect.Play();
+
+        // NO damage, NO sound, NO timer here - the animation drives all three.
+    }
+
+    // --- called by PlayerAttackState (the StateMachineBehaviour) ---
+    public void OnAttackAnimationStart()
+    {
+        isAttacking = true;
+    }
+
+    public void OnAttackAnimationEnd()
+    {
+        isAttacking = false;
+        nextAttackTime = Time.time + attackRecovery; // clock starts when the swing ENDS
+    }
+
+    // --- called by an Animation Event on the contact frame (frame 8) ---
+    public void DealAttackDamage()
+    {
+        if (attackPoint == null) return;
 
         int bonus = equipmentManager != null ? equipmentManager.GetTotalDamageBonus() : 0;
         int totalDamage = baseAttackDamage + bonus;
 
         Collider[] hitEnemies = Physics.OverlapSphere(attackPoint.position, attackRange, enemyLayers);
-        Debug.Log("Enemies detected: " + hitEnemies.Length);
 
         foreach (Collider enemy in hitEnemies)
         {
             // --- LATER STAGE: directional filter ---
+            // Uncomment to require the enemy be roughly in front of the player.
+            // AoE/whirlwind attacks would call a separate method that skips this.
             /*
             Vector3 dirToEnemy = (enemy.transform.position - transform.position).normalized;
             float angle = Vector3.Angle(transform.forward, dirToEnemy);
-            if (angle > attackAngle / 2f)
-            {
-                continue; // enemy is outside the frontal cone — skip it
-            }
+            if (angle > attackAngle / 2f) continue;
             */
 
-            Debug.Log("Damaging enemy: " + enemy.name);
             Enemy enemyComponent = enemy.GetComponent<Enemy>();
             if (enemyComponent != null)
-            {
                 enemyComponent.TakeDamage(totalDamage);
-                Debug.Log("Enemy took damage: " + totalDamage);
-            }
         }
     }
 
-    // Wire this to an Animation Event on the attack clip's contact frame
-    // (already exists on Melee_1H_Attack_Slice_Horizontal at frame 8 —
-    // no new event needed if you're using that same clip).
+    // --- called by an Animation Event on the contact frame (frame 8) ---
     public void PlayAttackSound()
     {
         if (attackSound != null) attackSound.Play();
@@ -113,3 +120,5 @@ public class PlayerAttack : MonoBehaviour
         Gizmos.DrawWireSphere(attackPoint.position, attackRange);
     }
 }
+
+
