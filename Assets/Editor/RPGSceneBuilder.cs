@@ -311,6 +311,7 @@ public static class RPGSceneBuilder
         body.transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
 
         // Direction indicator (small cube in front so you know which way they face)
+        //TODO indicator exist to identify direction of capsule
         var dir = MakePrimitive(PrimitiveType.Cube, "FacingIndicator", Color.white, player);
         dir.transform.position   = new Vector3(0, 1.15f, 0.4f);
         dir.transform.localScale = new Vector3(0.15f, 0.15f, 0.15f);
