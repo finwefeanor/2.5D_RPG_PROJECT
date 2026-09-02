@@ -67,7 +67,7 @@ public class PlayerController : MonoBehaviour
         if (rootMotionActive) return; // let CharacterMotor drive the Rigidbody instead
 
         Vector3 velocity = movementDirection.normalized * moveSpeed;
-        velocity.y = rb.velocity.y;
-        rb.velocity = velocity;
+        velocity.y = rb.linearVelocity.y;
+        rb.linearVelocity = velocity;
     }
 }

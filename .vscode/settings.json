@@ -60,13 +60,13 @@
         "*.asset": "yaml",
         "*.meta": "yaml",
         "*.prefab": "yaml",
-        "*.unity": "yaml",
+        "*.unity": "yaml"
     },
     "explorer.fileNesting.enabled": true,
     "explorer.fileNesting.patterns": {
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "2d rpg from scratch.slnx",
+    "dotnet.defaultSolution": "2.5D_RPG_PROJECT.slnx",
     "dotnet.enableWorkspaceBasedDevelopment": false
 }
