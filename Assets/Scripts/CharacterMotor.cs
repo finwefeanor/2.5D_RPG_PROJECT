@@ -38,7 +38,7 @@ public class CharacterMotor : MonoBehaviour
     {
         if (!currentStateUsesRootMotion) return;
 
-        // Don't apply yet — just collect. FixedUpdate applies the total.
+        // Don't apply yet ï¿½ just collect. FixedUpdate applies the total.
         accumulatedDeltaPosition += animator.deltaPosition;
         accumulatedDeltaRotation = animator.deltaRotation * accumulatedDeltaRotation;
     }
@@ -46,7 +46,7 @@ public class CharacterMotor : MonoBehaviour
     void FixedUpdate()
     {
         if (!currentStateUsesRootMotion) return;
-        if (accumulatedDeltaPosition == Vector3.zero) return;
+        //if (accumulatedDeltaPosition == Vector3.zero) return;
 
         rb.MovePosition(rb.position + accumulatedDeltaPosition);
         rb.MoveRotation(rb.rotation * accumulatedDeltaRotation);

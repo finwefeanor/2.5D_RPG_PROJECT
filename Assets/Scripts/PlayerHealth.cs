@@ -35,7 +35,7 @@ public class PlayerHealth : MonoBehaviour
     void Start()
     {
         equipmentManager = GetComponent<EquipmentManager>();
-        OnHealthChanged?.Invoke(health, maxHealth); // initial value for UI
+        GameEvents.PlayerHealthChanged(health, maxHealth);// initial value for UI
     }
 
     public void TakeDamage(int damage)
@@ -49,7 +49,7 @@ public class PlayerHealth : MonoBehaviour
 
         health -= mitigated;
         Debug.Log("Player health: " + health);
-        OnHealthChanged?.Invoke(health, maxHealth);
+        GameEvents.PlayerHealthChanged(health, maxHealth);
 
         // Sound removed from here — now fires via Animation Event on the
         // Hit reaction clip instead (see PlayHitSound() below), so it's
@@ -72,14 +72,34 @@ public class PlayerHealth : MonoBehaviour
 
     void Die()
     {
+        // if (isDead) return;
+        // isDead = true;
+
+        // Debug.Log("Player has died");
+        // if (animator != null)
+        // {
+        //     animator.SetBool(isDeadHash, true);
+        //     animator.SetTrigger(DeathHash);
+        // }
+        // StartCoroutine(HandleDeath());
+
         if (isDead) return;
-        isDead = true;
-        Debug.Log("Player has died");
+    isDead = true;
+
+    var refs = GetComponent<PlayerRefs>();
+    if (refs.Controller != null) refs.Controller.enabled = false;
+    if (refs.Attack != null) refs.Attack.enabled = false;
+
+        //if (animator != null) animator.SetTrigger("Death");
+
         if (animator != null)
         {
             animator.SetBool(isDeadHash, true);
             animator.SetTrigger(DeathHash);
         }
+
+        GameEvents.PlayerDied();          // add this to GameEvents
+
         StartCoroutine(HandleDeath());
     }
 
@@ -87,14 +107,14 @@ public class PlayerHealth : MonoBehaviour
     {
         if (deathScreenUI != null) deathScreenUI.SetActive(true);
 
-        Time.timeScale = 0f;
+        //Time.timeScale = 0f;
 
         if (playerDieSound != null) playerDieSound.Play();
 
-        float waitTime = playerDieSound != null ? playerDieSound.clip.length : 3.0f;
+        float waitTime = playerDieSound != null ? playerDieSound.clip.length : 6.0f;
         yield return new WaitForSecondsRealtime(waitTime);
 
-        Time.timeScale = 1f;
+        //Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

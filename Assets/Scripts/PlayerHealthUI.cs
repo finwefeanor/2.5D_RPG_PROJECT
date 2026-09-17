@@ -2,31 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
 public class PlayerHealthUI : MonoBehaviour
 {
-    private Slider slider;
-    private PlayerHealth playerHealth;
+    public Slider slider;
+
+    void OnEnable()  => GameEvents.OnPlayerHealthChanged += UpdateBar;
+    void OnDisable() => GameEvents.OnPlayerHealthChanged -= UpdateBar;
 
     void Start()
     {
-        slider = GetComponent<Slider>();
-        playerHealth = FindObjectOfType<PlayerHealth>();
+        if (slider == null) slider = GetComponentInChildren<Slider>();
 
-        if (playerHealth != null)
-            playerHealth.OnHealthChanged += UpdateBar;
+        var health = GameManager.Instance?.Player?.Health;
+        if (health != null) UpdateBar(health.health, health.maxHealth);
     }
 
     void UpdateBar(int current, int max)
     {
+        if (slider == null) return;
         slider.maxValue = max;
         slider.value = current;
     }
-
-    void OnDestroy()
-    {
-        if (playerHealth != null)
-            playerHealth.OnHealthChanged -= UpdateBar;
-    }
 }
-

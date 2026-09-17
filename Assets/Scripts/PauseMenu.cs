@@ -11,13 +11,16 @@ public class PauseMenu : MonoBehaviour
     private InventoryManager inventoryManager;
     private EquipmentManager equipmentManager;
 
-    void Start()
+        void Start()
     {
-        inventoryManager = FindObjectOfType<InventoryManager>();
-        equipmentManager = FindObjectOfType<EquipmentManager>();
+        var refs = GameManager.Instance != null ? GameManager.Instance.Player : null;
+        if (refs != null)
+        {
+            inventoryManager = refs.Inventory;
+            equipmentManager = refs.Equipment;
+        }
 
-        if (pauseMenuCanvas != null)
-            pauseMenuCanvas.SetActive(false);
+        if (pauseMenuCanvas != null) pauseMenuCanvas.SetActive(false);
     }
 
     void Update()

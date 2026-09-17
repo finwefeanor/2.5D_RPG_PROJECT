@@ -49,20 +49,21 @@ public class InventoryManager : MonoBehaviour
     {
         gold += amount;
         Debug.Log($"Gold: {gold}");
+        GameEvents.GoldChanged(gold);
     }
 
     public bool SpendGold(int amount)
+{
+    if (gold < amount)
     {
-        if (gold < amount)
-        {
-            Debug.Log($"Not enough gold. Need {amount}, have {gold}.");
-            return false;
-        }
+        Debug.Log($"Not enough gold. Need {amount}, have {gold}.");
+        return false;
+    }
 
         gold -= amount;
-        Debug.Log($"Gold: {gold}");
+        GameEvents.GoldChanged(gold);
         return true;
-    }
+}
 
     // ── Item API ──────────────────────────────────────────────
 
@@ -88,6 +89,9 @@ public class InventoryManager : MonoBehaviour
         // swapping out whatever was there before (which stays owned, just unequipped)
         if (item.slot != EquipSlot.None)
             _equipmentManager.Equip(item);
+
+        GameEvents.InventoryChanged();
+
     }
 
     public void RemoveItem(ItemData item)
@@ -99,6 +103,8 @@ public class InventoryManager : MonoBehaviour
             _equipmentManager.Unequip(item.slot);
 
         _ownedItems.Remove(item);
+
+        GameEvents.InventoryChanged();
         Debug.Log($"Removed from inventory: {item.itemName}");
     }
 

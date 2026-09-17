@@ -28,19 +28,19 @@ public class InventoryUIController : MonoBehaviour
 
     void Start()
     {
-        if (inventoryManager == null)
-            inventoryManager = FindObjectOfType<InventoryManager>();
-        if (equipmentManager == null)
-            equipmentManager = FindObjectOfType<EquipmentManager>();
+        var refs = GameManager.Instance != null ? GameManager.Instance.Player : null;
+        if (refs != null)
+        {
+            inventoryManager = refs.Inventory;
+            equipmentManager = refs.Equipment;   // add Equipment to PlayerRefs
+        }
 
-        if (equipmentManager != null)
-            equipmentManager.OnEquipmentChanged += RefreshInventoryUI;
-
-        if (panel != null)
-            panel.SetActive(false); // hidden by default, same convention as outfit/hat
-
+        if (panel != null) panel.SetActive(false);
         RefreshInventoryUI();
     }
+
+    void OnEnable()  => GameEvents.OnInventoryChanged += RefreshInventoryUI;
+    void OnDisable() => GameEvents.OnInventoryChanged -= RefreshInventoryUI;
 
     void OnDestroy()
     {

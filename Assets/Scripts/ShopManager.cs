@@ -27,13 +27,28 @@ public class ShopManager : MonoBehaviour
 
     void Start()
     {
-        _inventoryManager = FindObjectOfType<InventoryManager>();
-        if (_inventoryManager == null)
-            Debug.LogError("ShopManager: No InventoryManager found in scene. " +
-                           "Add it to the Player GameObject.");
+        var refs = GameManager.Instance != null ? GameManager.Instance.Player : null;
+        if (refs == null) { Debug.LogError("ShopManager: no Player registered.", this); return; }
+        _inventoryManager = refs.Inventory;
 
         UpdateGoldDisplay();
         GenerateItemButtons();
+    }
+
+    void OnEnable()
+    {
+        GameEvents.OnGoldChanged += HandleGoldChanged;    
+    }
+
+    void OnDisable()
+    {
+        GameEvents.OnGoldChanged -= HandleGoldChanged;
+    }
+
+    private void HandleGoldChanged(int gold)
+    {
+        if (goldText != null) goldText.text = "Gold: " + gold;
+        RefreshButtonStates();
     }
 
     // ── Generate buttons ──────────────────────────────────────
@@ -71,6 +86,11 @@ public class ShopManager : MonoBehaviour
                 var img = swatch.GetComponent<Image>();
                 if (img != null) img.color = item.outfitColor;
             }
+
+            //----------------------
+            //testing
+            //asdads
+            //-------------------
 
             // Icon
             if (item.icon != null)
@@ -110,7 +130,6 @@ public class ShopManager : MonoBehaviour
             return;
         }
 
-        UpdateGoldDisplay();
         _inventoryManager.AddItem(item);
         RefreshButtonStates();
         Debug.Log($"Bought {item.itemName} for {item.price} gold.");

@@ -67,4 +67,25 @@ public class ShopKeeperInteraction : MonoBehaviour
             if (isShopOpen) CloseShop();
         }
     }
+
+    void OnEnable()
+    {
+        GameEvents.OnInteractPressed += HandleInteract;
+    }
+
+    void OnDisable()
+    {
+        GameEvents.OnInteractPressed -= HandleInteract;
+    }
+
+
+    private void HandleInteract()
+    {
+        if (isPlayerInRange)
+        {
+            ToggleShop();
+        }
+    }
+
+
 }

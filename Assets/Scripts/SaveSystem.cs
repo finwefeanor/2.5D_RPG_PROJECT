@@ -13,11 +13,11 @@ public static class SaveSystem
     {
         PlayerPrefs.SetInt(GoldKey, inventory.gold);
 
-        // Owned items — comma-separated names
+        // Owned items ï¿½ comma-separated names
         string ownedNames = string.Join(",", inventory.GetAllItems().Select(i => i.itemName));
         PlayerPrefs.SetString(OwnedItemsKey, ownedNames);
 
-        // Equipped items — one key per slot
+        // Equipped items ï¿½ one key per slot
         foreach (EquipSlot slot in System.Enum.GetValues(typeof(EquipSlot)))
         {
             if (slot == EquipSlot.None) continue;
@@ -33,7 +33,7 @@ public static class SaveSystem
     {
         if (!PlayerPrefs.HasKey(GoldKey))
         {
-            Debug.Log("No save data found — using defaults.");
+            Debug.Log("No save data found ï¿½ using defaults.");
             return;
         }
 
