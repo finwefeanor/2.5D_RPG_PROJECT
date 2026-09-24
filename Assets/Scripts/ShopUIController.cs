@@ -5,20 +5,23 @@ using UnityEngine.UI;
 
 public class ShopUIController : MonoBehaviour
 {
-    public GameObject shopUI;
+    private GameObject shopUI;
 
     void Start()
     {
-        shopUI.SetActive(false); // Ensure the shop UI is hidden initially
-    }
+        var refs = ShopUIRefs.Instance;
+        if (refs == null)
+        {
+            Debug.LogError("ShopUIController: no ShopCanvas in scene.", this);
+            return;
+        }
 
-    public void OpenShop()
-    {
-        shopUI.SetActive(true);
-    }
-
-    public void CloseShop()
-    {
+        shopUI = refs.shopPanel;
         shopUI.SetActive(false);
     }
+
+    public void OpenShop()  { if (shopUI != null) shopUI.SetActive(true);  }
+    public void CloseShop() { if (shopUI != null) shopUI.SetActive(false); }
+
+
 }

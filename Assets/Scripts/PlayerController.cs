@@ -24,7 +24,7 @@ public class PlayerController : MonoBehaviour
 
     static readonly int isMovingHash = Animator.StringToHash("isMoving");
 
-    [SerializeField] private VirtualJoystick joystick; // assign in Inspector
+    private VirtualJoystick joystick; // assign in Inspector
 
 
     void Start()
@@ -32,6 +32,7 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.constraints = RigidbodyConstraints.FreezeRotation;// Lock rotation so the capsule doesn't tip over
         rb.interpolation = RigidbodyInterpolation.Interpolate;
+        joystick = VirtualJoystick.Instance;
     }
 
 

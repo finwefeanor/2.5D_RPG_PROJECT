@@ -1,8 +1,19 @@
 // ============================================================
 //  ShopUIBuilder.cs  —  Assets/Editor/
-//  Phase 2 — replaces ALL previous versions
 //  Menu: RPG Scene Builder > Build Shop UI
 //        RPG Scene Builder > Clear Shop UI
+//
+//  PHASE 3 (prefab-safe):
+//  This is now a ONE-TIME GENERATOR, not a wiring step.
+//  It builds a fresh ShopCanvas and wires ShopUIRefs (all
+//  references internal to the canvas, so they survive
+//  prefabbing). ShopManager / ShopUIController / InventoryUI
+//  resolve themselves at runtime via ShopUIRefs.Instance —
+//  nothing is wired across prefab boundaries any more.
+//
+//  WARNING: running this DESTROYS the existing ShopCanvas,
+//  including your InventoryPanel and any prefab link. Re-apply
+//  or re-create the Prefabs/Core/ShopCanvas prefab afterwards.
 // ============================================================
 using UnityEngine;
 using UnityEditor;
@@ -11,9 +22,17 @@ using UnityEditor.SceneManagement;
 
 public static class ShopUIBuilder
 {
-    [MenuItem("RPG Scene Builder/Build Shop UI")]
+    [MenuItem("RPG Scene Builder/Build Shop UI", false, 20)]
     public static void BuildShopUI()
     {
+        if (!EditorUtility.DisplayDialog(
+                "Build Shop UI",
+                "This DESTROYS the existing ShopCanvas and builds a fresh one.\n\n" +
+                "You will lose the InventoryPanel and the prefab link to " +
+                "Prefabs/Core/ShopCanvas.\n\nContinue?",
+                "Rebuild", "Cancel"))
+            return;
+
         ClearShopUI();
 
         // ── Canvas ─────────────────────────────────────────────
@@ -33,87 +52,47 @@ public static class ShopUIBuilder
             new Color(0.10f, 0.09f, 0.08f, 0.97f));
         panel.SetActive(false);
 
-        // ── Title ──────────────────────────────────────────────
         MakeText(panel, "TitleText", "SHOP",
             new Vector2(0, 210), new Vector2(380, 50),
             28, FontStyle.Bold, new Color(1f, 0.85f, 0.35f));
 
-        // ── Gold Text ──────────────────────────────────────────
         var goldGO = MakeText(panel, "GoldText", "Gold: 100",
             new Vector2(0, 170), new Vector2(380, 32),
             18, FontStyle.Normal, new Color(0.95f, 0.82f, 0.3f));
 
-        // ── Divider ────────────────────────────────────────────
         MakeDivider(panel, new Vector2(0, 148));
 
-        // ── Item Button Container ──────────────────────────────
         // ShopManager spawns one button per ItemData into this at runtime
         var container = MakeLayoutGroup(panel, "ItemButtonContainer",
             new Vector2(0, 30), new Vector2(380, 200));
 
-        // ── Divider ────────────────────────────────────────────
         MakeDivider(panel, new Vector2(0, -80));
 
-        // ── Close Button ───────────────────────────────────────
-        var closeBtn = MakeButton(panel, "CloseButton", "Close",
+        MakeButton(panel, "CloseButton", "Close",
             new Vector2(0, -180), new Vector2(150, 40),
             new Color(0.35f, 0.33f, 0.30f));
 
-        // ── Item Button Prefab ─────────────────────────────────
-        // Inactive — ShopManager clones this at runtime per item
-        var prefab = MakeItemButtonPrefab(canvasGO);
+        // ── Item Button Prefab (template, cloned at runtime) ───
+        var itemPrefab = MakeItemButtonPrefab(canvasGO);
 
-        // ── Wire ShopUIController ──────────────────────────────
-        var shopUI = Object.FindObjectOfType<ShopUIController>();
-        if (shopUI != null)
-        {
-            shopUI.shopUI = panel;
-            EditorUtility.SetDirty(shopUI);
-            Debug.Log("[ShopUIBuilder] Wired ShopUIController.");
-        }
-        else
-        {
-            Debug.LogWarning("[ShopUIBuilder] ShopUIController not found — wire shopUI manually.");
-        }
-
-        // Wire Close button to ShopUIController
-        if (shopUI != null)
-        {
-            var btn = closeBtn.GetComponent<Button>();
-            btn.onClick.RemoveAllListeners();
-            // Note: runtime wiring only; for editor we just set up the reference
-        }
-
-        // ── Wire ShopManager ───────────────────────────────────
-        var shopManager = Object.FindObjectOfType<ShopManager>();
-        if (shopManager != null)
-        {
-            shopManager.goldText            = goldGO.GetComponent<Text>();
-            shopManager.itemButtonContainer = container.transform;
-            shopManager.itemButtonPrefab    = prefab;
-            EditorUtility.SetDirty(shopManager);
-            Debug.Log("[ShopUIBuilder] Wired ShopManager — goldText, container, prefab all assigned.");
-        }
-        else
-        {
-            Debug.LogWarning("[ShopUIBuilder] ShopManager not found — add it to Merchant first.");
-        }
-
-        // ── Wire ShopkeeperInteraction close toggle ─────────────
-        var shopkeeper = Object.FindObjectOfType<ShopKeeperInteraction>();
-        if (shopkeeper != null)
-        {
-            shopkeeper.shopUIController = shopUI;
-            EditorUtility.SetDirty(shopkeeper);
-            Debug.Log("[ShopUIBuilder] Wired ShopKeeperInteraction.");
-        }
+        // ── Wire ShopUIRefs ────────────────────────────────────
+        // Every reference below is INSIDE this canvas, so it
+        // serializes correctly once the canvas becomes a prefab.
+        var refs = canvasGO.AddComponent<ShopUIRefs>();
+        refs.shopPanel           = panel;
+        refs.goldText            = goldGO.GetComponent<Text>();
+        refs.itemButtonContainer = container.transform;
+        refs.itemButtonPrefab    = itemPrefab;
+        EditorUtility.SetDirty(refs);
 
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
-        Debug.Log("[ShopUIBuilder] Done. Now wire CloseButton OnClick in Inspector: " +
-                  "Merchant -> ShopKeeperInteraction -> CloseShop");
+
+        Debug.Log("[ShopUIBuilder] Built ShopCanvas and wired ShopUIRefs.\n" +
+                  "NEXT: rebuild the InventoryPanel, assign the inventory fields on " +
+                  "ShopUIRefs, then update Prefabs/Core/ShopCanvas.");
     }
 
-    [MenuItem("RPG Scene Builder/Clear Shop UI")]
+    [MenuItem("RPG Scene Builder/Clear Shop UI", false, 21)]
     public static void ClearShopUI()
     {
         var existing = GameObject.Find("ShopCanvas");
@@ -136,16 +115,13 @@ public static class ShopUIBuilder
         rt.sizeDelta = new Vector2(360, 55);
         SetColor(go, new Color(0.20f, 0.18f, 0.16f));
 
-        // Color swatch
         MakeImage(go, "Swatch",
             new Vector2(-140, 0), new Vector2(36, 36), Color.white);
 
-        // Item name label
         MakeText(go, "ItemName", "Item Name",
             new Vector2(20, 10), new Vector2(220, 26),
             15, FontStyle.Bold, Color.white);
 
-        // Price label
         MakeText(go, "PriceText", "Price: 0",
             new Vector2(20, -12), new Vector2(220, 22),
             13, FontStyle.Normal, new Color(0.95f, 0.82f, 0.3f));
@@ -183,7 +159,6 @@ public static class ShopUIBuilder
         txt.fontStyle = style;
         txt.alignment = TextAnchor.MiddleCenter;
         txt.color = color;
-        // Arial works in all Unity versions including 2021
         txt.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
         return go;
     }

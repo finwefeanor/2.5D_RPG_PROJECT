@@ -8,6 +8,36 @@ public class ShopKeeperInteraction : MonoBehaviour
     private bool isShopOpen;
     public ShopUIController shopUIController;
 
+        void Start()
+    {
+        var ui = ShopUIRefs.Instance;
+        if (ui != null && ui.shopCloseButton != null)
+        {
+            ui.shopCloseButton.onClick.RemoveAllListeners();
+            ui.shopCloseButton.onClick.AddListener(CloseShop);
+            Debug.Log("Close button wired");
+        }
+    }
+
+        void OnEnable()
+    {
+        GameEvents.OnInteractPressed += HandleInteract;
+    }
+
+    void OnDisable()
+    {
+        GameEvents.OnInteractPressed -= HandleInteract;
+    }
+
+    private void HandleInteract()
+    {
+        if (isPlayerInRange)
+        {
+            ToggleShop();
+        }
+    }
+    
+
     void Update()
     {
         if (isPlayerInRange && Input.GetKeyDown(KeyCode.E))
@@ -68,24 +98,7 @@ public class ShopKeeperInteraction : MonoBehaviour
         }
     }
 
-    void OnEnable()
-    {
-        GameEvents.OnInteractPressed += HandleInteract;
-    }
 
-    void OnDisable()
-    {
-        GameEvents.OnInteractPressed -= HandleInteract;
-    }
-
-
-    private void HandleInteract()
-    {
-        if (isPlayerInRange)
-        {
-            ToggleShop();
-        }
-    }
 
 
 }

@@ -51,6 +51,16 @@ public class PlayerAttack : MonoBehaviour
         TryAttack();
     }
 
+    void OnEnable()
+    {
+        GameEvents.OnAttackPressed += OnAttackButtonPressed;
+    }
+
+    void OnDisable()
+    {
+        GameEvents.OnAttackPressed -= OnAttackButtonPressed;
+    }
+
     private void TryAttack()
     {
         // While the swing is playing, the animation is in charge - ignore input.

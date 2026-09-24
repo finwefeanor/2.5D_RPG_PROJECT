@@ -17,6 +17,13 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
     public float Horizontal => input.x;
     public float Vertical => input.y;
 
+    public static VirtualJoystick Instance { get; private set; }
+
+    void Awake()
+    {
+        Instance = this;
+    }
+
     public void OnPointerDown(PointerEventData eventData)
     {
         Debug.Log("pointer down");

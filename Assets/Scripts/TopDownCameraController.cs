@@ -9,11 +9,11 @@ public class TopDownCameraController : MonoBehaviour
 {
     [Header("Position")]
     //public Vector3 offset = new Vector3(0, 22, -14);
-    public Vector3 offset = new Vector3(0, 18, -18);
+    public Vector3 offset = new Vector3(0, 22, -14);
     public float smoothSpeed = 8f;
 
     [Header("Rotation")]
-    public float pitchAngle = 45f; // degrees down from horizontal
+    public float pitchAngle = 58f; // degrees down from horizontal
     public bool lockRotation = true;
 
     private Transform target;

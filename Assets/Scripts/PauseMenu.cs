@@ -5,13 +5,13 @@ using UnityEngine.SceneManagement;
 
 public class PauseMenu : MonoBehaviour
 {
-    public GameObject pauseMenuCanvas;
+    private GameObject pauseMenuCanvas;
     private bool isPaused = false;
 
     private InventoryManager inventoryManager;
     private EquipmentManager equipmentManager;
 
-        void Start()
+    void Start()
     {
         var refs = GameManager.Instance != null ? GameManager.Instance.Player : null;
         if (refs != null)
@@ -19,6 +19,10 @@ public class PauseMenu : MonoBehaviour
             inventoryManager = refs.Inventory;
             equipmentManager = refs.Equipment;
         }
+
+        var ui = PauseUIRefs.Instance;
+        if (ui != null) pauseMenuCanvas = ui.pausePanel;
+        else Debug.LogWarning("PauseMenu: no PauseMenuCanvas in scene.", this);
 
         if (pauseMenuCanvas != null) pauseMenuCanvas.SetActive(false);
     }

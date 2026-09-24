@@ -1,17 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
 public static class ItemDatabaseAutoFill
 {
-    [MenuItem("RPG Scene Builder/Refresh Item Database")]
+    [MenuItem("RPG Scene Builder/Refresh Item Database", false, 40)]
     public static void RefreshDatabase()
     {
-        ItemDatabase database = Object.FindObjectOfType<ItemDatabase>();
+        // FindAnyObjectByType replaces the deprecated FindObjectOfType.
+        // Editor-only scene search is fine here — no runtime facade needed.
+        ItemDatabase database = Object.FindAnyObjectByType<ItemDatabase>();
         if (database == null)
         {
-            Debug.LogWarning("No ItemDatabase found in the open scene.");
+            Debug.LogWarning("No ItemDatabase found in the open scene. " +
+                             "It lives on the Player prefab — is the Player in the scene?");
             return;
         }
 

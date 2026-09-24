@@ -26,16 +26,39 @@ public class InventoryUIController : MonoBehaviour
 
     private List<GameObject> _spawnedRows = new List<GameObject>();
 
-    void Start()
+        void Start()
     {
-        var refs = GameManager.Instance != null ? GameManager.Instance.Player : null;
-        if (refs != null)
+        var playerRefs = GameManager.Instance != null ? GameManager.Instance.Player : null;
+        if (playerRefs == null)
         {
-            inventoryManager = refs.Inventory;
-            equipmentManager = refs.Equipment;   // add Equipment to PlayerRefs
+            Debug.LogError("InventoryUIController: no Player registered.", this);
+            return;
+        }
+        inventoryManager = playerRefs.Inventory;
+        equipmentManager = playerRefs.Equipment;
+
+        var ui = ShopUIRefs.Instance;
+        if (ui == null)
+        {
+            Debug.LogError("InventoryUIController: no ShopCanvas in scene.", this);
+            return;
+        }
+        panel        = ui.inventoryPanel;
+        rowContainer = ui.inventoryRowContainer;
+        rowPrefab    = ui.inventoryRowPrefab;
+
+        if (equipmentManager != null)
+            equipmentManager.OnEquipmentChanged += RefreshInventoryUI;
+
+            if (ui.inventoryCloseButton != null)
+        {
+            ui.inventoryCloseButton.onClick.RemoveAllListeners();
+            ui.inventoryCloseButton.onClick.AddListener(TogglePanel);
+            Debug.Log("Close button wired");
         }
 
         if (panel != null) panel.SetActive(false);
+
         RefreshInventoryUI();
     }
 

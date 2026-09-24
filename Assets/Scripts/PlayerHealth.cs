@@ -19,7 +19,7 @@ public class PlayerHealth : MonoBehaviour
     public event System.Action<int, int> OnHealthChanged; // current, max
 
     [Header("Death UI")]
-    public GameObject deathScreenUI; // simple full-screen panel with "You Died" text, assign in Inspector
+    private GameObject deathScreenUI; // simple full-screen panel with "You Died" text, assign in Inspector
 
     private bool isDead = false;
 
@@ -35,6 +35,11 @@ public class PlayerHealth : MonoBehaviour
     void Start()
     {
         equipmentManager = GetComponent<EquipmentManager>();
+
+        var ui = PlayerUIRefs.Instance;
+        if (ui != null) deathScreenUI = ui.deathScreenPanel;
+        else Debug.LogWarning("PlayerHealth: no PlayerHealthBarCanvas in scene.", this);
+        
         GameEvents.PlayerHealthChanged(health, maxHealth);// initial value for UI
     }
 
