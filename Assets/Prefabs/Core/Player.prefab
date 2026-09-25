@@ -103,6 +103,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
+  turnSpeed: 720
   animator: {fileID: 4185621971781387211}
   rootMotionActive: 0
 --- !u!114 &279345262520346713
@@ -177,7 +178,6 @@ MonoBehaviour:
   playerHitSound: {fileID: 0}
   playerDieSound: {fileID: 2272609547113551430}
   maxHealth: 30
-  deathScreenUI: {fileID: 0}
   animator: {fileID: 4185621971781387211}
 --- !u!136 &6031493469010363102
 CapsuleCollider:
@@ -915,6 +915,10 @@ PrefabInstance:
     - target: {fileID: 3373026942746379520, guid: 9a1a73f7bc4922c4b963be1c1a58150a, type: 3}
       propertyPath: m_UpdateMode
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3373026942746379520, guid: 9a1a73f7bc4922c4b963be1c1a58150a, type: 3}
+      propertyPath: m_AnimatePhysics
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3373026942746379520, guid: 9a1a73f7bc4922c4b963be1c1a58150a, type: 3}
       propertyPath: m_WarningMessage
