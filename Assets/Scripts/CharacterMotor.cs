@@ -27,31 +27,16 @@ public class CharacterMotor : MonoBehaviour
         if (playerController != null)
             playerController.rootMotionActive = active;
 
-        if (!active)
-        {
-            accumulatedDeltaPosition = Vector3.zero;
-            accumulatedDeltaRotation = Quaternion.identity;
-        }
     }
 
     void OnAnimatorMove()
     {
         if (!currentStateUsesRootMotion) return;
 
-        // Don't apply yet � just collect. FixedUpdate applies the total.
-        accumulatedDeltaPosition += animator.deltaPosition;
-        accumulatedDeltaRotation = animator.deltaRotation * accumulatedDeltaRotation;
+        rb.MovePosition(rb.position + animator.deltaPosition);
+        rb.MoveRotation(animator.deltaRotation * rb.rotation);
+
     }
 
-    void FixedUpdate()
-    {
-        if (!currentStateUsesRootMotion) return;
-        //if (accumulatedDeltaPosition == Vector3.zero) return;
 
-        rb.MovePosition(rb.position + accumulatedDeltaPosition);
-        rb.MoveRotation(rb.rotation * accumulatedDeltaRotation);
-
-        accumulatedDeltaPosition = Vector3.zero;
-        accumulatedDeltaRotation = Quaternion.identity;
-    }
 }

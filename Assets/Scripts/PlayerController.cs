@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
     public float moveSpeed = 5f;
+    public float turnSpeed = 720f;   // degrees per second
 
     [Header("Animation (optional)")]
     public Animator animator;           // leave empty if no animator
@@ -51,14 +52,8 @@ public class PlayerController : MonoBehaviour
         movementDirection.z = v;
         movementDirection.y = 0;
 
-        if (!rootMotionActive && movementDirection.sqrMagnitude > 0.01f)
-        {
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                Quaternion.LookRotation(movementDirection),
-                Time.deltaTime * 15f
-            );
-        }
+        
+
         if (animator != null)
             animator.SetBool(isMovingHash, movementDirection.magnitude > 0.1f);
     }
@@ -66,6 +61,13 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         if (rootMotionActive) return; // let CharacterMotor drive the Rigidbody instead
+
+        if (movementDirection.sqrMagnitude > 0.01f)
+        {
+            Quaternion target = Quaternion.LookRotation(movementDirection);
+            rb.MoveRotation(Quaternion.RotateTowards(rb.rotation, target, 
+            turnSpeed * Time.fixedDeltaTime));
+        }
 
         Vector3 velocity = movementDirection.normalized * moveSpeed;
         velocity.y = rb.linearVelocity.y;

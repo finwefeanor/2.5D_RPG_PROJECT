@@ -20,8 +20,8 @@ public class Enemy : MonoBehaviour
     // ---------------------------------------------------------------------
 
     [Header("Health")]
-    public int health = 30;
     public int maxHealth = 30;
+    [System.NonSerialized] public int health;
 
     [Header("Combat")]
     public int attackDamage = 1;

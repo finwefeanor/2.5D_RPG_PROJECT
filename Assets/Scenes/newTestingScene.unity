@@ -127,6 +127,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5247200138691231285, guid: c0edb7f0a2629c0afb8f04c2d3883cc9, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6567677700297650951, guid: c0edb7f0a2629c0afb8f04c2d3883cc9, type: 3}
       propertyPath: m_Name
       value: PauseMenuCanvas
@@ -830,6 +834,10 @@ PrefabInstance:
       propertyPath: health
       value: 30
       objectReference: {fileID: 0}
+    - target: {fileID: 2365280467863770232, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
+      propertyPath: m_Interpolate
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2470501650263969863, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.89
@@ -869,6 +877,18 @@ PrefabInstance:
     - target: {fileID: 2470501650263969863, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4185621971781387211, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
+      propertyPath: m_UpdateMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4185621971781387211, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
+      propertyPath: m_CullingMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4185621971781387211, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
+      propertyPath: m_AnimatePhysics
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1064,9 +1084,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60af6d9e785f3334790f4f394270e3b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TopDownCameraController
-  offset: {x: 0, y: 22, z: -14}
+  offset: {x: 0, y: 12, z: -14}
   smoothSpeed: 8
-  pitchAngle: 58
+  pitchAngle: 42
   lockRotation: 1
 --- !u!81 &1530785347
 AudioListener:
