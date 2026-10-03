@@ -39,6 +39,9 @@ public class ItemData : ScriptableObject
     public int defenseBonus     = 0;              // added to armor when equipped
     public int damageBonus      = 0;              // reserved for weapons later
 
+    [Tooltip("Attack this item grants when in the RightHand slot. Null = falls back to unarmed.")]
+    public AbilityDefinition attack;
+
     [Header("Hand-slot visuals (Weapon/Shield only)")]
     [Tooltip("KayKit weapon/shield prefab to spawn at the hand socket. Leave null for Head/Chest items.")]
     public GameObject equipPrefab;

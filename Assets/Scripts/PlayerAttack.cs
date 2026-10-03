@@ -3,7 +3,6 @@ using UnityEngine;
 public class PlayerAttack : MonoBehaviour
 {
     public int baseAttackDamage = 10;
-    public float attackRange = 1.5f;
     public Transform attackPoint;   // child empty GameObject placed in front of player
     public LayerMask enemyLayers;
     public AudioSource attackSound;
@@ -16,9 +15,6 @@ public class PlayerAttack : MonoBehaviour
     private static readonly int AttackIndexHash = Animator.StringToHash("AttackIndex");
 
     [Header("Attack")]
-    [Tooltip("0 = Slice_Horizontal, 1 = Stab - temporary manual override until combo/weapon logic exists")]
-    public int attackIndex = 0;
-
     [Tooltip("Pause AFTER the swing finishes before the next one may start. " +
              "Pure design/balance value - nothing to do with clip length. " +
              "0 = swing again immediately, 0.5 = half-second breather.")]
@@ -26,6 +22,10 @@ public class PlayerAttack : MonoBehaviour
 
     private bool isAttacking = false;   // set by PlayerAttackState, not by us
     private float nextAttackTime = 0f;
+
+    // Snapshot taken when the swing starts. The contact-frame event reads this,
+    // so equipping/unequipping mid-swing can't change which attack lands.
+    private AbilityDefinition activeAttack;
 
     /*
     // --- Directional attack settings (disabled for now - see DealAttackDamage) ---
@@ -67,9 +67,14 @@ public class PlayerAttack : MonoBehaviour
         if (isAttacking) return;
         if (Time.time < nextAttackTime) return;
 
+        AbilityDefinition attack = equipmentManager != null ? equipmentManager.CurrentAttack : null;
+        if (attack == null) return;   // no weapon attack AND no unarmed default assigned
+
+        activeAttack = attack;
+
         if (animator != null)
         {
-            animator.SetInteger(AttackIndexHash, attackIndex);
+            animator.SetInteger(AttackIndexHash, attack.animatorIndex);
             animator.SetTrigger(AttackHash);
         }
 
@@ -93,12 +98,12 @@ public class PlayerAttack : MonoBehaviour
     // --- called by an Animation Event on the contact frame (frame 8) ---
     public void DealAttackDamage()
     {
-        if (attackPoint == null) return;
+        if (attackPoint == null || activeAttack == null) return;
 
         int bonus = equipmentManager != null ? equipmentManager.GetTotalDamageBonus() : 0;
-        int totalDamage = baseAttackDamage + bonus;
+        int totalDamage = Mathf.RoundToInt(baseAttackDamage * activeAttack.damageMultiplier) + bonus;
 
-        Collider[] hitEnemies = Physics.OverlapSphere(attackPoint.position, attackRange, enemyLayers);
+        Collider[] hitEnemies = Physics.OverlapSphere(attackPoint.position, activeAttack.range, enemyLayers);
 
         foreach (Collider enemy in hitEnemies)
         {
@@ -120,14 +125,24 @@ public class PlayerAttack : MonoBehaviour
     // --- called by an Animation Event on the contact frame (frame 8) ---
     public void PlayAttackSound()
     {
-        if (attackSound != null) attackSound.Play();
+        if (attackSound == null) return;
+
+        if (activeAttack != null && activeAttack.sound != null)
+            attackSound.PlayOneShot(activeAttack.sound);
+        else
+            attackSound.Play();
     }
 
     void OnDrawGizmosSelected()
     {
         if (attackPoint == null) return;
+
+        // equipmentManager is only cached in Start(), so resolve it here for edit mode.
+        EquipmentManager eq = equipmentManager != null ? equipmentManager : GetComponent<EquipmentManager>();
+        AbilityDefinition a = eq != null ? eq.CurrentAttack : null;
+
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(attackPoint.position, attackRange);
+        Gizmos.DrawWireSphere(attackPoint.position, a != null ? a.range : 1.5f);
     }
 }
 

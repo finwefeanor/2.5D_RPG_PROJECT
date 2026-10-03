@@ -152,7 +152,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseAttackDamage: 10
-  attackRange: 1.5
   attackPoint: {fileID: 469051793899000565}
   enemyLayers:
     serializedVersion: 2
@@ -160,7 +159,6 @@ MonoBehaviour:
   attackSound: {fileID: 7252764632173276278}
   attackEffect: {fileID: 0}
   animator: {fileID: 4185621971781387211}
-  attackIndex: 0
   attackRecovery: 0.15
 --- !u!114 &1638234075987857564
 MonoBehaviour:
@@ -214,6 +212,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ca1253757bb76f4bb2e78087d35d7f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  unarmedAttack: {fileID: 11400000, guid: f4d7e2f4c961425592e9772c51259028, type: 2}
 --- !u!114 &6681040405265112803
 MonoBehaviour:
   m_ObjectHideFlags: 0

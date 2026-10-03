@@ -19,6 +19,20 @@ public class EquipmentManager : MonoBehaviour
     // CharacterVisualController listens to this
     public event System.Action OnEquipmentChanged;
 
+    [Header("Attack")]
+    [Tooltip("Used when the RightHand slot is empty or its item grants no attack.")]
+    [SerializeField] private AbilityDefinition unarmedAttack;
+
+    // The ONE place that decides weapon attack vs unarmed fallback.
+    public AbilityDefinition CurrentAttack
+    {
+        get
+        {
+            ItemData weapon = GetEquipped(EquipSlot.RightHand);
+            return (weapon != null && weapon.attack != null) ? weapon.attack : unarmedAttack;
+        }
+    }
+
     // ── Public API ────────────────────────────────────────────
 
     public void Equip(ItemData item)
