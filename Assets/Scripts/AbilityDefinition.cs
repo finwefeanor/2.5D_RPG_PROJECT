@@ -21,6 +21,11 @@ public class AbilityDefinition : ScriptableObject
              "transition inside Attacks_SubState. 0-9 = 1H, 10-19 = unarmed.")]
     public int animatorIndex = 0;
 
+    [Tooltip("Playback speed of THIS attack's clip. 1 = as authored, 1.5 = 50% faster. " +
+             "Animation Events are normalized, so contact frames scale with it.")]
+    [Range(0.25f, 3f)]
+    public float animationSpeed = 1f;
+
     [Header("Hit")]
     [Tooltip("Multiplies PlayerAttack.baseAttackDamage. Unarmed < 1, heavy weapons > 1.")]
     public float damageMultiplier = 1f;

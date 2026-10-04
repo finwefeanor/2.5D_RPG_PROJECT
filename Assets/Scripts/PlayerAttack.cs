@@ -13,8 +13,14 @@ public class PlayerAttack : MonoBehaviour
 
     private static readonly int AttackHash = Animator.StringToHash("Attack");
     private static readonly int AttackIndexHash = Animator.StringToHash("AttackIndex");
+    private static readonly int AttackSpeedHash = Animator.StringToHash("AttackSpeed");
 
     [Header("Attack")]
+    [Tooltip("Character-wide attack speed. Multiplies every ability's animationSpeed. " +
+             "Later this comes from class stats / items (e.g. +10% attack speed ring).")]
+    [Range(0.25f, 3f)]
+    public float attackSpeed = 1f;
+
     [Tooltip("Pause AFTER the swing finishes before the next one may start. " +
              "Pure design/balance value - nothing to do with clip length. " +
              "0 = swing again immediately, 0.5 = half-second breather.")]
@@ -74,6 +80,7 @@ public class PlayerAttack : MonoBehaviour
 
         if (animator != null)
         {
+            animator.SetFloat(AttackSpeedHash, attack.animationSpeed * attackSpeed);
             animator.SetInteger(AttackIndexHash, attack.animatorIndex);
             animator.SetTrigger(AttackHash);
         }
