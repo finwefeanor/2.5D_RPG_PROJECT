@@ -34,6 +34,18 @@ public class AbilityDefinition : ScriptableObject
     public float range = 1.5f;
 
     [Header("Audio")]
-    [Tooltip("Optional. Null = play the attack AudioSource's own clip.")]
-    public AudioClip sound;
+    [Tooltip("Played on every swing, hit or miss. One picked at random. Empty = silent swing.")]
+    public AudioClip[] swingSounds;
+
+    [Tooltip("Played only when the swing hits something. One picked at random. " +
+             "Empty = the attack AudioSource's own clip (currently sword-slice).")]
+    public AudioClip[] hitSounds;
+
+    // Random clip from a set, or null if the set is empty.
+    public static AudioClip Pick(AudioClip[] clips)
+    {
+        if (clips == null || clips.Length == 0) return null;
+        return clips[Random.Range(0, clips.Length)];
+    }
+
 }

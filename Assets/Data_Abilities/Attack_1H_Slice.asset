@@ -16,4 +16,12 @@ MonoBehaviour:
   animationSpeed: 1.3
   damageMultiplier: 1
   range: 1.5
-  sound: {fileID: 0}
+  swingSounds:
+  - {fileID: 8300000, guid: 48922161dc8877f94b19cda718325b73, type: 3}
+  - {fileID: 8300000, guid: 1fb56c0767443c6d897b23385da92ec6, type: 3}
+  - {fileID: 8300000, guid: 523896b749bacee2ab42382da5d5673d, type: 3}
+  hitSounds:
+  - {fileID: 8300000, guid: d2f352c25b09a07b7a6483b90ec7732e, type: 3}
+  - {fileID: 8300000, guid: 01d0bc5c769625e8eb8483fe762dc730, type: 3}
+  - {fileID: 8300000, guid: 3c86597206ea1a648ab76d2d197a4994, type: 3}
+  - {fileID: 8300000, guid: c7161795d67489849acccc1dbddc5532, type: 3}

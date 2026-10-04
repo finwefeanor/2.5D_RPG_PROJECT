@@ -13,6 +13,16 @@ MonoBehaviour:
   m_Name: Unarmed_Kick
   m_EditorClassIdentifier: 
   animatorIndex: 11
+  animationSpeed: 1
   damageMultiplier: 0.7
   range: 1.4
-  sound: {fileID: 0}
+  swingSounds:
+  - {fileID: 8300000, guid: eab2a53c6b09d96efa620fef631d9197, type: 3}
+  - {fileID: 8300000, guid: 0e28c0b6717be11658622ae1684d589a, type: 3}
+  - {fileID: 8300000, guid: 8fc9628be3f0a181a8ed41c89a330e1b, type: 3}
+  - {fileID: 8300000, guid: 4d85196ae15e3a2318f7e3d348db89ab, type: 3}
+  hitSounds:
+  - {fileID: 8300000, guid: 302757fdeff67c04cb51cffa3c0ad32b, type: 3}
+  - {fileID: 8300000, guid: c49620c4588f6eda29b744541fafd033, type: 3}
+  - {fileID: 8300000, guid: 5ddba1c630242a6feaf2c5096259adcc, type: 3}
+  - {fileID: 8300000, guid: d7d6795769b81c19f97e190eecd2af8f, type: 3}

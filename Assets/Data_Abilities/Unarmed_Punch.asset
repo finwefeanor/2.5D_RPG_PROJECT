@@ -13,6 +13,13 @@ MonoBehaviour:
   m_Name: Unarmed_Punch
   m_EditorClassIdentifier: 
   animatorIndex: 10
+  animationSpeed: 1.15
   damageMultiplier: 0.5
   range: 1.2
-  sound: {fileID: 0}
+  swingSounds:
+  - {fileID: 8300000, guid: eab2a53c6b09d96efa620fef631d9197, type: 3}
+  - {fileID: 8300000, guid: 0e28c0b6717be11658622ae1684d589a, type: 3}
+  - {fileID: 8300000, guid: 8fc9628be3f0a181a8ed41c89a330e1b, type: 3}
+  hitSounds:
+  - {fileID: 8300000, guid: ed672cd283be4783cb647e5dc7c9f31e, type: 3}
+  - {fileID: 8300000, guid: 302757fdeff67c04cb51cffa3c0ad32b, type: 3}

@@ -228,6 +228,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2110713012232207241, guid: 59c767ce1c031ac4888996f1c57c16cb, type: 3}
+      propertyPath: maxHealth
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 2110713012232207241, guid: 59c767ce1c031ac4888996f1c57c16cb, type: 3}
+      propertyPath: enemyAttackSound
+      value: 
+      objectReference: {fileID: 737145477}
     - target: {fileID: 2110713012232207243, guid: 59c767ce1c031ac4888996f1c57c16cb, type: 3}
       propertyPath: m_LocalPosition.x
       value: 11.22
@@ -276,6 +284,10 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3808736605849714670, guid: 59c767ce1c031ac4888996f1c57c16cb, type: 3}
+      propertyPath: m_Resource
+      value: 
+      objectReference: {fileID: 8300000, guid: d2f352c25b09a07b7a6483b90ec7732e, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -491,6 +503,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b7a755076589de5899ee6b1561a48838, type: 3}
+--- !u!82 &737145477 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 3808736605849714670, guid: 59c767ce1c031ac4888996f1c57c16cb, type: 3}
+  m_PrefabInstance: {fileID: 182677626}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &758297967
 GameObject:
   m_ObjectHideFlags: 0
@@ -761,6 +778,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2b90959cf30fb21daa679f52c4fddc67, type: 3}
+--- !u!82 &909332234 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 3111409405808741662, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
+  m_PrefabInstance: {fileID: 1007952974}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &909384871
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -834,6 +856,10 @@ PrefabInstance:
       propertyPath: health
       value: 30
       objectReference: {fileID: 0}
+    - target: {fileID: 1638234075987857564, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
+      propertyPath: playerHitSound
+      value: 
+      objectReference: {fileID: 909332234}
     - target: {fileID: 2365280467863770232, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
       propertyPath: m_Interpolate
       value: 0

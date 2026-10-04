@@ -13,6 +13,15 @@ MonoBehaviour:
   m_Name: Attack_1H_JumpChop
   m_EditorClassIdentifier: Assembly-CSharp::AbilityDefinition
   animatorIndex: 1
+  animationSpeed: 1
   damageMultiplier: 1.5
   range: 1.6
-  sound: {fileID: 0}
+  swingSounds:
+  - {fileID: 8300000, guid: 523896b749bacee2ab42382da5d5673d, type: 3}
+  - {fileID: 8300000, guid: 1fb56c0767443c6d897b23385da92ec6, type: 3}
+  hitSounds:
+  - {fileID: 8300000, guid: 159561b2ad8cad67fb0bb19445593612, type: 3}
+  - {fileID: 8300000, guid: e255fe797f3c34fef81e142cd55b2c23, type: 3}
+  - {fileID: 8300000, guid: e00d96fdf6ce4ce21af3643e9861904c, type: 3}
+  - {fileID: 8300000, guid: 6a7417553fe7fdc5ebbf4be8fb905820, type: 3}
+  - {fileID: 8300000, guid: e32361dd987e99a7faa89d35a59bb397, type: 3}

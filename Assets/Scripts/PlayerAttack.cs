@@ -6,6 +6,11 @@ public class PlayerAttack : MonoBehaviour
     public Transform attackPoint;   // child empty GameObject placed in front of player
     public LayerMask enemyLayers;
     public AudioSource attackSound;
+
+    [Tooltip("Random pitch offset per swing (±). 0.05 = ±5%. Stops repeated hits sounding robotic.")]
+    [Range(0f, 0.2f)]
+    public float pitchVariation = 0.05f;
+
     public ParticleSystem attackEffect;
     [SerializeField] private Animator animator;
 
@@ -112,6 +117,8 @@ public class PlayerAttack : MonoBehaviour
 
         Collider[] hitEnemies = Physics.OverlapSphere(attackPoint.position, activeAttack.range, enemyLayers);
 
+        bool hitSomething = false;
+
         foreach (Collider enemy in hitEnemies)
         {
             // --- LATER STAGE: directional filter ---
@@ -125,19 +132,43 @@ public class PlayerAttack : MonoBehaviour
 
             Enemy enemyComponent = enemy.GetComponent<Enemy>();
             if (enemyComponent != null)
+            {
                 enemyComponent.TakeDamage(totalDamage);
+                hitSomething = true;
+            }
+
         }
+
+        // Once per swing, not once per enemy - a cleave through 3 skeletons is one impact.
+        if (hitSomething) PlayHitSound();
+
     }
 
     // --- called by an Animation Event on the contact frame (frame 8) ---
+        // Contact-frame event: the SWING sound, hit or miss.
+    // The AudioSource's own clip is an impact sound, so no fallback here.
+    // Contact-frame event: the SWING sound, hit or miss.
     public void PlayAttackSound()
+    {
+        if (attackSound == null || activeAttack == null) return;
+
+        // One random pitch per swing. The hit sound fires on the same frame and shares it,
+        // so changing pitch here can't bend a sound that's already playing.
+        attackSound.pitch = 1f + Random.Range(-pitchVariation, pitchVariation);
+
+        AudioClip swing = AbilityDefinition.Pick(activeAttack.swingSounds);
+        if (swing != null) attackSound.PlayOneShot(swing);
+    }
+
+    // Called from DealAttackDamage only when something was hit.
+    // Called from DealAttackDamage only when something was hit.
+    private void PlayHitSound()
     {
         if (attackSound == null) return;
 
-        if (activeAttack != null && activeAttack.sound != null)
-            attackSound.PlayOneShot(activeAttack.sound);
-        else
-            attackSound.Play();
+        AudioClip hit = activeAttack != null ? AbilityDefinition.Pick(activeAttack.hitSounds) : null;
+        if (hit != null) attackSound.PlayOneShot(hit);
+        else attackSound.Play();   // fallback: AudioSource's own clip (sword-slice)
     }
 
     void OnDrawGizmosSelected()
