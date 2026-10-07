@@ -142,7 +142,7 @@ GameObject:
   - component: {fileID: 3808736605849714670}
   - component: {fileID: 4852495460155879043}
   m_Layer: 7
-  m_Name: Enemy_0_with_sword
+  m_Name: Enemy_0_with_sword_boss
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -158,7 +158,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
   m_LocalPosition: {x: 11.22, y: 0, z: 4.3}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 684294074936405461}
@@ -199,11 +199,11 @@ MonoBehaviour:
   flinchImmunity: 1.2
   neverFlinch: 0
   attackRecovery: 0.4
-  attackAngle: 60
-  hitAngle: 120
+  attackAngle: 90
+  hitAngle: 270
   dodgeMargin: 0.5
   turnSpeed: 360
-  detectRange: 3.5
+  detectRange: 5
   moveSpeed: 3
   playerLayer:
     serializedVersion: 2

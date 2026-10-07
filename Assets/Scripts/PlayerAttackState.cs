@@ -4,7 +4,7 @@ using UnityEngine;
 // (click the state box > Add Behaviour > PlayerAttackState).
 //
 // The Animator lives on MagePlayerVisual while PlayerAttack.cs lives on the
-// parent Player object, so this walks up to find it — same reason
+// parent Player object, so this walks up to find it ï¿½ same reason
 // PlayerAnimationEventRelay exists.
 public class PlayerAttackState : StateMachineBehaviour
 {
@@ -19,7 +19,15 @@ public class PlayerAttackState : StateMachineBehaviour
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         PlayerAttack playerAttack = Get(animator);
-        if (playerAttack != null) playerAttack.OnAttackAnimationStart();
+        if (playerAttack != null) playerAttack.OnAttackAnimationStart(stateInfo.fullPathHash);
+    }
+
+    // Feeds the swing's progress (0-1) to PlayerAttack so it knows when the combo window opens.
+    public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+        PlayerAttack playerAttack = Get(animator);
+        if (playerAttack != null)
+            playerAttack.OnAttackAnimationUpdate(stateInfo.fullPathHash, stateInfo.normalizedTime);
     }
 
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)

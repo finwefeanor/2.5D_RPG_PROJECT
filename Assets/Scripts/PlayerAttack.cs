@@ -19,6 +19,7 @@ public class PlayerAttack : MonoBehaviour
     private static readonly int AttackHash = Animator.StringToHash("Attack");
     private static readonly int AttackIndexHash = Animator.StringToHash("AttackIndex");
     private static readonly int AttackSpeedHash = Animator.StringToHash("AttackSpeed");
+    private static readonly int ComboNextHash = Animator.StringToHash("ComboNext");
 
     [Header("Attack")]
     [Tooltip("Character-wide attack speed. Multiplies every ability's animationSpeed. " +
@@ -31,12 +32,22 @@ public class PlayerAttack : MonoBehaviour
              "0 = swing again immediately, 0.5 = half-second breather.")]
     public float attackRecovery = 0.15f;
 
-    private bool isAttacking = false;   // set by PlayerAttackState, not by us
+    // How many attack states are playing. Normally 0 or 1; it is 2 for a moment while one
+    // combo step crossfades into the next (Unity enters the new state BEFORE exiting the old).
+    private int attackStatesActive = 0;
+    private bool IsAttacking => attackStatesActive > 0;
     private float nextAttackTime = 0f;
 
     // Snapshot taken when the swing starts. The contact-frame event reads this,
     // so equipping/unequipping mid-swing can't change which attack lands.
     private AbilityDefinition activeAttack;
+
+    // --- Combo state ---
+    private AbilityDefinition comboRoot;   // first attack of the current chain (weapon / unarmed head)
+    private int currentSwingHash;          // the newest attack state - the one whose time counts
+    private float swingTime;               // its normalized time (0-1), fed by PlayerAttackState
+    private bool comboQueued;              // a press was remembered during this swing
+    private bool chainPending;             // ComboNext sent, waiting for the next state to enter
 
     /*
     // --- Directional attack settings (disabled for now - see DealAttackDamage) ---
@@ -74,20 +85,32 @@ public class PlayerAttack : MonoBehaviour
 
     private void TryAttack()
     {
-        // While the swing is playing, the animation is in charge - ignore input.
-        if (isAttacking) return;
+        // Mid-swing the animation is in charge. A press can only queue the next combo step.
+        if (IsAttacking)
+        {
+            QueueComboInput();
+            return;
+        }
         if (Time.time < nextAttackTime) return;
 
         AbilityDefinition attack = equipmentManager != null ? equipmentManager.CurrentAttack : null;
         if (attack == null) return;   // no weapon attack AND no unarmed default assigned
 
+        comboRoot = attack;           // a fresh press always starts at the head of the chain
+        StartAttack(attack, AttackHash);
+    }
+
+    // Shared by a fresh attack (Attack trigger) and a combo step (ComboNext trigger).
+    private void StartAttack(AbilityDefinition attack, int triggerHash)
+    {
         activeAttack = attack;
+        comboQueued = false;
 
         if (animator != null)
         {
             animator.SetFloat(AttackSpeedHash, attack.animationSpeed * attackSpeed);
             animator.SetInteger(AttackIndexHash, attack.animatorIndex);
-            animator.SetTrigger(AttackHash);
+            animator.SetTrigger(triggerHash);
         }
 
         if (attackEffect != null) attackEffect.Play();
@@ -95,16 +118,62 @@ public class PlayerAttack : MonoBehaviour
         // NO damage, NO sound, NO timer here - the animation drives all three.
     }
 
-    // --- called by PlayerAttackState (the StateMachineBehaviour) ---
-    public void OnAttackAnimationStart()
+    private void QueueComboInput()
     {
-        isAttacking = true;
+        if (chainPending || activeAttack == null || activeAttack.nextInCombo == null) return;
+        if (swingTime < activeAttack.comboInputOpens) return;   // too early: mashing, ignored
+
+        comboQueued = true;
+        TryChainCombo();   // already past comboChainAt? chain right now
+    }
+
+    // Runs on a press and every frame of the swing: fires the queued step once the swing
+    // reaches comboChainAt (always after the contact frame, so this swing's hit still lands).
+    private void TryChainCombo()
+    {
+        if (!comboQueued || chainPending || activeAttack == null) return;
+        if (swingTime < activeAttack.comboChainAt) return;
+
+        // Weapon swapped mid-combo: the chain belongs to the old weapon, drop it.
+        AbilityDefinition head = equipmentManager != null ? equipmentManager.CurrentAttack : null;
+        if (head != comboRoot)
+        {
+            comboQueued = false;
+            return;
+        }
+
+        chainPending = true;
+        StartAttack(activeAttack.nextInCombo, ComboNextHash);
+    }
+
+    // --- called by PlayerAttackState (the StateMachineBehaviour) ---
+    public void OnAttackAnimationStart(int stateHash)
+    {
+        attackStatesActive++;
+        currentSwingHash = stateHash;
+        swingTime = 0f;
+        chainPending = false;
+    }
+
+    public void OnAttackAnimationUpdate(int stateHash, float normalizedTime)
+    {
+        // During a combo crossfade BOTH attack states update; only the newest one counts.
+        if (stateHash != currentSwingHash || chainPending) return;
+
+        swingTime = normalizedTime;
+        TryChainCombo();
     }
 
     public void OnAttackAnimationEnd()
     {
-        isAttacking = false;
-        nextAttackTime = Time.time + attackRecovery; // clock starts when the swing ENDS
+        attackStatesActive = Mathf.Max(0, attackStatesActive - 1);
+        if (attackStatesActive > 0) return;   // old half of a combo crossfade - the chain goes on
+
+        // The chain is over: finished normally, or interrupted (Hit_A, death).
+        comboQueued = false;
+        chainPending = false;
+        if (animator != null) animator.ResetTrigger(ComboNextHash);   // never let it fire later
+        nextAttackTime = Time.time + attackRecovery; // clock starts when the LAST swing ends
     }
 
     // --- called by an Animation Event on the contact frame (frame 8) ---
@@ -144,10 +213,8 @@ public class PlayerAttack : MonoBehaviour
 
     }
 
-    // --- called by an Animation Event on the contact frame (frame 8) ---
-        // Contact-frame event: the SWING sound, hit or miss.
-    // The AudioSource's own clip is an impact sound, so no fallback here.
     // Contact-frame event: the SWING sound, hit or miss.
+    // The AudioSource's own clip is an impact sound, so no fallback here.
     public void PlayAttackSound()
     {
         if (attackSound == null || activeAttack == null) return;
@@ -160,7 +227,6 @@ public class PlayerAttack : MonoBehaviour
         if (swing != null) attackSound.PlayOneShot(swing);
     }
 
-    // Called from DealAttackDamage only when something was hit.
     // Called from DealAttackDamage only when something was hit.
     private void PlayHitSound()
     {

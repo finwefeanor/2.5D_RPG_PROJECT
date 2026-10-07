@@ -33,6 +33,21 @@ public class AbilityDefinition : ScriptableObject
     [Tooltip("Radius of the hit sphere around PlayerAttack.attackPoint.")]
     public float range = 1.5f;
 
+    [Header("Combo")]
+    [Tooltip("Attack that follows if the player presses again during this swing. " +
+             "Null = no combo. Must use a DIFFERENT clip than this one.")]
+    public AbilityDefinition nextInCombo;
+
+    [Tooltip("Normalized time (0-1) from which a press during this swing is remembered. " +
+             "Earlier presses are ignored, so mashing from the first frame doesn't chain.")]
+    [Range(0f, 1f)]
+    public float comboInputOpens = 0.2f;
+
+    [Tooltip("Normalized time (0-1) at which a remembered press starts the next attack. " +
+             "Keep it AFTER this clip's contact frame, or this swing's hit is skipped.")]
+    [Range(0f, 1f)]
+    public float comboChainAt = 0.5f;
+
     [Header("Audio")]
     [Tooltip("Played on every swing, hit or miss. One picked at random. Empty = silent swing.")]
     public AudioClip[] swingSounds;

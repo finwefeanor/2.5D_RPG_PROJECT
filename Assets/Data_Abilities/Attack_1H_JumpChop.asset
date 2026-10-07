@@ -16,6 +16,9 @@ MonoBehaviour:
   animationSpeed: 1
   damageMultiplier: 1.5
   range: 1.6
+  nextInCombo: {fileID: 0}
+  comboInputOpens: 0.2
+  comboChainAt: 0.5
   swingSounds:
   - {fileID: 8300000, guid: 523896b749bacee2ab42382da5d5673d, type: 3}
   - {fileID: 8300000, guid: 1fb56c0767443c6d897b23385da92ec6, type: 3}

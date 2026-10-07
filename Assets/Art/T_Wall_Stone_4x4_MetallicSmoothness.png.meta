@@ -1,0 +1,1053 @@
+fileFormatVersion: 2
+guid: a75e317a8d4697a7abc877919b1740c0
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 3732779745792164251
+    second: T_Wall_Stone_4x4_MetallicSmoothness_0
+  - first:
+      213: 2916274810813773979
+    second: T_Wall_Stone_4x4_MetallicSmoothness_1
+  - first:
+      213: -4469607055295445417
+    second: T_Wall_Stone_4x4_MetallicSmoothness_2
+  - first:
+      213: 1484861075651015817
+    second: T_Wall_Stone_4x4_MetallicSmoothness_3
+  - first:
+      213: 2413008391213035716
+    second: T_Wall_Stone_4x4_MetallicSmoothness_4
+  - first:
+      213: 5256896588844649462
+    second: T_Wall_Stone_4x4_MetallicSmoothness_5
+  - first:
+      213: 7481106514027372896
+    second: T_Wall_Stone_4x4_MetallicSmoothness_6
+  - first:
+      213: -5490578690295986191
+    second: T_Wall_Stone_4x4_MetallicSmoothness_7
+  - first:
+      213: -8437510156284606000
+    second: T_Wall_Stone_4x4_MetallicSmoothness_8
+  - first:
+      213: 7072857837867048464
+    second: T_Wall_Stone_4x4_MetallicSmoothness_9
+  - first:
+      213: -3200830317850323861
+    second: T_Wall_Stone_4x4_MetallicSmoothness_10
+  - first:
+      213: -4960193679170190077
+    second: T_Wall_Stone_4x4_MetallicSmoothness_11
+  - first:
+      213: -3495161228402057454
+    second: T_Wall_Stone_4x4_MetallicSmoothness_12
+  - first:
+      213: 8094525647728333946
+    second: T_Wall_Stone_4x4_MetallicSmoothness_13
+  - first:
+      213: 2237714974601534146
+    second: T_Wall_Stone_4x4_MetallicSmoothness_14
+  - first:
+      213: 1320089071739605850
+    second: T_Wall_Stone_4x4_MetallicSmoothness_15
+  - first:
+      213: 3676845383586750883
+    second: T_Wall_Stone_4x4_MetallicSmoothness_16
+  - first:
+      213: 6209761850067076216
+    second: T_Wall_Stone_4x4_MetallicSmoothness_17
+  - first:
+      213: 582977780508680806
+    second: T_Wall_Stone_4x4_MetallicSmoothness_18
+  - first:
+      213: 4004622082545971428
+    second: T_Wall_Stone_4x4_MetallicSmoothness_19
+  - first:
+      213: 7807888441055607136
+    second: T_Wall_Stone_4x4_MetallicSmoothness_20
+  - first:
+      213: -6291880163250541532
+    second: T_Wall_Stone_4x4_MetallicSmoothness_21
+  - first:
+      213: -9204696544379833140
+    second: T_Wall_Stone_4x4_MetallicSmoothness_22
+  - first:
+      213: 389288699483424002
+    second: T_Wall_Stone_4x4_MetallicSmoothness_23
+  - first:
+      213: 7796634708610879218
+    second: T_Wall_Stone_4x4_MetallicSmoothness_24
+  - first:
+      213: -5199342194860958809
+    second: T_Wall_Stone_4x4_MetallicSmoothness_25
+  - first:
+      213: -6494437523425473736
+    second: T_Wall_Stone_4x4_MetallicSmoothness_26
+  - first:
+      213: 6345483644438096941
+    second: T_Wall_Stone_4x4_MetallicSmoothness_27
+  - first:
+      213: -7045648979781939163
+    second: T_Wall_Stone_4x4_MetallicSmoothness_28
+  - first:
+      213: 5903181793663263362
+    second: T_Wall_Stone_4x4_MetallicSmoothness_29
+  - first:
+      213: -4973927432655252247
+    second: T_Wall_Stone_4x4_MetallicSmoothness_30
+  - first:
+      213: 7505797801738539039
+    second: T_Wall_Stone_4x4_MetallicSmoothness_31
+  - first:
+      213: -3579498264531592362
+    second: T_Wall_Stone_4x4_MetallicSmoothness_32
+  - first:
+      213: -7780852817838107076
+    second: T_Wall_Stone_4x4_MetallicSmoothness_33
+  - first:
+      213: 3913424956144577491
+    second: T_Wall_Stone_4x4_MetallicSmoothness_34
+  - first:
+      213: -5156800909827442703
+    second: T_Wall_Stone_4x4_MetallicSmoothness_35
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 0
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_0
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 902
+        width: 117
+        height: 116
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b9107b4d66f7dc330800000000000000
+      internalID: 3732779745792164251
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_1
+      rect:
+        serializedVersion: 2
+        x: 136
+        y: 904
+        width: 240
+        height: 113
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b9879f54d70b87820800000000000000
+      internalID: 2916274810813773979
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_2
+      rect:
+        serializedVersion: 2
+        x: 392
+        y: 904
+        width: 240
+        height: 113
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 756098f6014c8f1c0800000000000000
+      internalID: -4469607055295445417
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_3
+      rect:
+        serializedVersion: 2
+        x: 649
+        y: 905
+        width: 237
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 984bbfaf7494b9410800000000000000
+      internalID: 1484861075651015817
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_4
+      rect:
+        serializedVersion: 2
+        x: 902
+        y: 903
+        width: 114
+        height: 114
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c03a4ed85abc7120800000000000000
+      internalID: 2413008391213035716
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_5
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 775
+        width: 242
+        height: 115
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6fb4c07689f34f840800000000000000
+      internalID: 5256896588844649462
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_6
+      rect:
+        serializedVersion: 2
+        x: 261
+        y: 772
+        width: 246
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0616677ecba32d760800000000000000
+      internalID: 7481106514027372896
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_7
+      rect:
+        serializedVersion: 2
+        x: 518
+        y: 774
+        width: 243
+        height: 116
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1f7049185cb8dc3b0800000000000000
+      internalID: -5490578690295986191
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_8
+      rect:
+        serializedVersion: 2
+        x: 775
+        y: 773
+        width: 242
+        height: 118
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d9c7e97731f7ea80800000000000000
+      internalID: -8437510156284606000
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_9
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 649
+        width: 111
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 01e17ecdab6d72260800000000000000
+      internalID: 7072857837867048464
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_10
+      rect:
+        serializedVersion: 2
+        x: 134
+        y: 645
+        width: 244
+        height: 119
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b641b3ed8cd5493d0800000000000000
+      internalID: -3200830317850323861
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_11
+      rect:
+        serializedVersion: 2
+        x: 389
+        y: 646
+        width: 244
+        height: 116
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3054ce7012ad92bb0800000000000000
+      internalID: -4960193679170190077
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_12
+      rect:
+        serializedVersion: 2
+        x: 645
+        y: 645
+        width: 245
+        height: 118
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 21f90648161be7fc0800000000000000
+      internalID: -3495161228402057454
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_13
+      rect:
+        serializedVersion: 2
+        x: 900
+        y: 645
+        width: 118
+        height: 118
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a74d222a038855070800000000000000
+      internalID: 8094525647728333946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_14
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 518
+        width: 240
+        height: 115
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ca52b9d9e5fd0f10800000000000000
+      internalID: 2237714974601534146
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_15
+      rect:
+        serializedVersion: 2
+        x: 261
+        y: 516
+        width: 245
+        height: 119
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a531ae04406e15210800000000000000
+      internalID: 1320089071739605850
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_16
+      rect:
+        serializedVersion: 2
+        x: 518
+        y: 518
+        width: 244
+        height: 116
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a129b64567c60330800000000000000
+      internalID: 3676845383586750883
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_17
+      rect:
+        serializedVersion: 2
+        x: 774
+        y: 517
+        width: 244
+        height: 118
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 874450d70818d2650800000000000000
+      internalID: 6209761850067076216
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_18
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 392
+        width: 112
+        height: 112
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6626a2fd337271800800000000000000
+      internalID: 582977780508680806
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_19
+      rect:
+        serializedVersion: 2
+        x: 133
+        y: 388
+        width: 246
+        height: 121
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4e076d11196439730800000000000000
+      internalID: 4004622082545971428
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_20
+      rect:
+        serializedVersion: 2
+        x: 389
+        y: 388
+        width: 246
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0697ffe4b213b5c60800000000000000
+      internalID: 7807888441055607136
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_21
+      rect:
+        serializedVersion: 2
+        x: 645
+        y: 389
+        width: 245
+        height: 118
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 42cef1cc350cea8a0800000000000000
+      internalID: -6291880163250541532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_22
+      rect:
+        serializedVersion: 2
+        x: 901
+        y: 389
+        width: 118
+        height: 118
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc479fee249524080800000000000000
+      internalID: -9204696544379833140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_23
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 262
+        width: 242
+        height: 115
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20588c77208076500800000000000000
+      internalID: 389288699483424002
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_24
+      rect:
+        serializedVersion: 2
+        x: 263
+        y: 263
+        width: 241
+        height: 114
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2fe8b3a85f5333c60800000000000000
+      internalID: 7796634708610879218
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_25
+      rect:
+        serializedVersion: 2
+        x: 518
+        y: 261
+        width: 244
+        height: 118
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7abdc9132d938d7b0800000000000000
+      internalID: -5199342194860958809
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_26
+      rect:
+        serializedVersion: 2
+        x: 776
+        y: 263
+        width: 241
+        height: 114
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 83bc1404b7f1fd5a0800000000000000
+      internalID: -6494437523425473736
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_27
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 135
+        width: 113
+        height: 114
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d2ca8ca31cfaf0850800000000000000
+      internalID: 6345483644438096941
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_28
+      rect:
+        serializedVersion: 2
+        x: 133
+        y: 132
+        width: 246
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 52011041593d83e90800000000000000
+      internalID: -7045648979781939163
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_29
+      rect:
+        serializedVersion: 2
+        x: 390
+        y: 133
+        width: 243
+        height: 118
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2822adf90905ce150800000000000000
+      internalID: 5903181793663263362
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_30
+      rect:
+        serializedVersion: 2
+        x: 646
+        y: 133
+        width: 245
+        height: 118
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e4530e5a5f09fab0800000000000000
+      internalID: -4973927432655252247
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_31
+      rect:
+        serializedVersion: 2
+        x: 902
+        y: 134
+        width: 115
+        height: 116
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f1098805553f92860800000000000000
+      internalID: 7505797801738539039
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_32
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 4
+        width: 246
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 65b977c1b41135ec0800000000000000
+      internalID: -3579498264531592362
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_33
+      rect:
+        serializedVersion: 2
+        x: 261
+        y: 4
+        width: 245
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c36992f369bd40490800000000000000
+      internalID: -7780852817838107076
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_34
+      rect:
+        serializedVersion: 2
+        x: 516
+        y: 4
+        width: 247
+        height: 120
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3db652e63474f4630800000000000000
+      internalID: 3913424956144577491
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: T_Wall_Stone_4x4_MetallicSmoothness_35
+      rect:
+        serializedVersion: 2
+        x: 774
+        y: 6
+        width: 244
+        height: 116
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1f7f258f4ec5f68b0800000000000000
+      internalID: -5156800909827442703
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      T_Wall_Stone_4x4_MetallicSmoothness_0: 3732779745792164251
+      T_Wall_Stone_4x4_MetallicSmoothness_1: 2916274810813773979
+      T_Wall_Stone_4x4_MetallicSmoothness_10: -3200830317850323861
+      T_Wall_Stone_4x4_MetallicSmoothness_11: -4960193679170190077
+      T_Wall_Stone_4x4_MetallicSmoothness_12: -3495161228402057454
+      T_Wall_Stone_4x4_MetallicSmoothness_13: 8094525647728333946
+      T_Wall_Stone_4x4_MetallicSmoothness_14: 2237714974601534146
+      T_Wall_Stone_4x4_MetallicSmoothness_15: 1320089071739605850
+      T_Wall_Stone_4x4_MetallicSmoothness_16: 3676845383586750883
+      T_Wall_Stone_4x4_MetallicSmoothness_17: 6209761850067076216
+      T_Wall_Stone_4x4_MetallicSmoothness_18: 582977780508680806
+      T_Wall_Stone_4x4_MetallicSmoothness_19: 4004622082545971428
+      T_Wall_Stone_4x4_MetallicSmoothness_2: -4469607055295445417
+      T_Wall_Stone_4x4_MetallicSmoothness_20: 7807888441055607136
+      T_Wall_Stone_4x4_MetallicSmoothness_21: -6291880163250541532
+      T_Wall_Stone_4x4_MetallicSmoothness_22: -9204696544379833140
+      T_Wall_Stone_4x4_MetallicSmoothness_23: 389288699483424002
+      T_Wall_Stone_4x4_MetallicSmoothness_24: 7796634708610879218
+      T_Wall_Stone_4x4_MetallicSmoothness_25: -5199342194860958809
+      T_Wall_Stone_4x4_MetallicSmoothness_26: -6494437523425473736
+      T_Wall_Stone_4x4_MetallicSmoothness_27: 6345483644438096941
+      T_Wall_Stone_4x4_MetallicSmoothness_28: -7045648979781939163
+      T_Wall_Stone_4x4_MetallicSmoothness_29: 5903181793663263362
+      T_Wall_Stone_4x4_MetallicSmoothness_3: 1484861075651015817
+      T_Wall_Stone_4x4_MetallicSmoothness_30: -4973927432655252247
+      T_Wall_Stone_4x4_MetallicSmoothness_31: 7505797801738539039
+      T_Wall_Stone_4x4_MetallicSmoothness_32: -3579498264531592362
+      T_Wall_Stone_4x4_MetallicSmoothness_33: -7780852817838107076
+      T_Wall_Stone_4x4_MetallicSmoothness_34: 3913424956144577491
+      T_Wall_Stone_4x4_MetallicSmoothness_35: -5156800909827442703
+      T_Wall_Stone_4x4_MetallicSmoothness_4: 2413008391213035716
+      T_Wall_Stone_4x4_MetallicSmoothness_5: 5256896588844649462
+      T_Wall_Stone_4x4_MetallicSmoothness_6: 7481106514027372896
+      T_Wall_Stone_4x4_MetallicSmoothness_7: -5490578690295986191
+      T_Wall_Stone_4x4_MetallicSmoothness_8: -8437510156284606000
+      T_Wall_Stone_4x4_MetallicSmoothness_9: 7072857837867048464
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
