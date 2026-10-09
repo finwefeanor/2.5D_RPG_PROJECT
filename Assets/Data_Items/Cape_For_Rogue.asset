@@ -10,16 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9a637943dfcb01848bbfe45f5f466506, type: 3}
-  m_Name: Hat_Armor
-  m_EditorClassIdentifier: 
-  itemName: Hat_Armor
+  m_Name: Cape_For_Rogue
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemName: Cape_For_Rogue
   icon: {fileID: 0}
-  description: Chest Armor for Warrior
+  description: 
   price: 10
-  slot: 1
-  defenseBonus: 5
+  slot: 2
+  defenseBonus: 0
   damageBonus: 0
-  equipPrefab: {fileID: 7116785954168059035, guid: 00753511ca6e5d441a67f3ce0966ee41, type: 3}
+  attack: {fileID: 0}
+  allowedClasses:
+  - {fileID: 11400000, guid: c37b050b18674ac68da161c8d7acb3ad, type: 2}
+  equipPrefab: {fileID: 0}
   equipPositionOffset: {x: 0, y: 0, z: 0}
   equipRotationOffset: {x: 0, y: 0, z: 0}
   outfitColor: {r: 1, g: 1, b: 1, a: 1}

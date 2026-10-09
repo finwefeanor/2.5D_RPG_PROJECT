@@ -1,10 +1,10 @@
 // ============================================================
-//  CharacterVisual.cs  —  Assets/Scripts/
+//  CharacterVisual.cs  -  Assets/Scripts/
 //
 //  Sits on the ROOT of each class's visual prefab
 //  (MagePlayerVisual, BarbarianPlayerVisual, ...).
 //
-//  Holds references to things INSIDE this visual prefab only —
+//  Holds references to things INSIDE this visual prefab only -
 //  same rule as PlayerRefs / ShopUIRefs. PlayerClass hands these
 //  to the Player-root scripts after spawning the visual, so no
 //  script on the Player root needs a drag-link into the visual.
@@ -13,6 +13,7 @@
 //  Animator and the KayKit hand sockets (handslot.r / handslot.l).
 // ============================================================
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class CharacterVisual : MonoBehaviour
 {
@@ -22,12 +23,16 @@ public class CharacterVisual : MonoBehaviour
     public Transform rightHandSocket;
     public Transform leftHandSocket;
 
-    [Header("Optional — class-specific equipment visuals")]
-    [Tooltip("Body piece recoloured / shown when chest armour is equipped. Leave empty if this model has none.")]
-    public GameObject outfitObject;
+    [Header("Equipment pieces - built into THIS model, hidden until that slot is filled")]
+    [Tooltip("Shown while a Head item is equipped. Mage: Skeleton_Mage_Hat, " +
+             "Barbarian: Skeleton_Warrior_Helmet, Rogue: Skeleton_Rogue_Hood. Empty = no head piece.")]
+    [FormerlySerializedAs("hatObject")]
+    public GameObject headPiece;
 
-    [Tooltip("Hat shown when a head item is equipped. Leave empty if this model has none.")]
-    public GameObject hatObject;
+    [Tooltip("Shown while a Chest item is equipped, tinted by the item's Outfit Color (white = original). " +
+             "Barbarian: Skeleton_Warrior_Cloak, Rogue: Skeleton_Rogue_Cape. Empty = no chest piece.")]
+    [FormerlySerializedAs("outfitObject")]
+    public GameObject chestPiece;
 
     void Reset()
     {

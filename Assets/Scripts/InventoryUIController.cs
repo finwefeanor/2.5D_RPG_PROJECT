@@ -108,8 +108,10 @@ public class InventoryUIController : MonoBehaviour
             bool isEquipped = equipmentManager != null &&
                                equipmentManager.GetEquipped(item.slot) == item;
 
+            bool canUse = equipmentManager == null || equipmentManager.CanUse(item);
+
             if (labels.Length >= 2)
-                labels[1].text = isEquipped ? "Equipped" : "";
+                labels[1].text = isEquipped ? "Equipped" : (canUse ? "" : item.AllowedClassNames() + " only");
 
             var swatch = rowGO.transform.Find("Swatch");
             if (swatch != null)

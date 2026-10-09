@@ -23,6 +23,20 @@ public class EquipmentManager : MonoBehaviour
     [Tooltip("Used when the RightHand slot is empty or its item grants no attack.")]
     [SerializeField] private AbilityDefinition unarmedAttack;
 
+    private PlayerClass _playerClass;
+
+    void Awake()
+    {
+        _playerClass = GetComponent<PlayerClass>();
+    }
+
+    // The ONE place that answers "may this player use this item?" (shop + equip + inventory UI).
+    public bool CanUse(ItemData item)
+    {
+        if (item == null) return false;
+        return item.CanBeUsedBy(_playerClass != null ? _playerClass.Definition : null);
+    }
+
     // Called by PlayerClass: each class brings its own unarmed attack.
     public void SetUnarmedAttack(AbilityDefinition attack) => unarmedAttack = attack;
 
@@ -43,6 +57,12 @@ public class EquipmentManager : MonoBehaviour
         if (item == null || item.slot == EquipSlot.None)
         {
             Debug.LogWarning("EquipmentManager: Tried to equip null or non-equippable item.");
+            return;
+        }
+
+        if (!CanUse(item))
+        {
+            Debug.Log($"EquipmentManager: {item.itemName} is for {item.AllowedClassNames()} only.");
             return;
         }
 

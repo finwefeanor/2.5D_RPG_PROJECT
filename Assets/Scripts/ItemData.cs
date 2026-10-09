@@ -42,6 +42,27 @@ public class ItemData : ScriptableObject
     [Tooltip("Attack this item grants when in the RightHand slot. Null = falls back to unarmed.")]
     public AbilityDefinition attack;
 
+    [Tooltip("Classes that may use this item. EMPTY = every class (weapons, shields, generic armour).")]
+    public CharacterClassDefinition[] allowedClasses;
+
+    // True if the given class may use this item. A player with no class assigned is never blocked.
+    public bool CanBeUsedBy(CharacterClassDefinition playerClass)
+    {
+        if (allowedClasses == null || allowedClasses.Length == 0) return true;
+        if (playerClass == null) return true;
+        return System.Array.IndexOf(allowedClasses, playerClass) >= 0;
+    }
+
+    // "Barbarian" / "Mage, Rogue" - for shop labels.
+    public string AllowedClassNames()
+    {
+        if (allowedClasses == null || allowedClasses.Length == 0) return "Any";
+        var names = new System.Collections.Generic.List<string>();
+        foreach (var c in allowedClasses)
+            if (c != null) names.Add(c.className);
+        return string.Join(", ", names);
+    }
+
     [Header("Hand-slot visuals (Weapon/Shield only)")]
     [Tooltip("KayKit weapon/shield prefab to spawn at the hand socket. Leave null for Head/Chest items.")]
     public GameObject equipPrefab;

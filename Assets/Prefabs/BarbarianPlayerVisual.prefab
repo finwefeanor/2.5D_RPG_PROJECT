@@ -92,6 +92,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -5515783359193845756, guid: 1898a629f3777d24c8539b49b502d70e, type: 3}
   m_PrefabInstance: {fileID: 4468372647550308781}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &3562449154579242284 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -8110273064344171391, guid: 1898a629f3777d24c8539b49b502d70e, type: 3}
+  m_PrefabInstance: {fileID: 4468372647550308781}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &3657961860638174460 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 1898a629f3777d24c8539b49b502d70e, type: 3}
@@ -124,8 +129,8 @@ MonoBehaviour:
   animator: {fileID: 8027750544637324348}
   rightHandSocket: {fileID: 970201903398101417}
   leftHandSocket: {fileID: 6493136663187586946}
-  outfitObject: {fileID: 0}
-  hatObject: {fileID: 0}
+  headPiece: {fileID: 6514023274239728827}
+  chestPiece: {fileID: 3562449154579242284}
 --- !u!114 &1647578043929001481
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -141,6 +146,11 @@ MonoBehaviour:
 --- !u!4 &6493136663187586946 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7214371169738337839, guid: 1898a629f3777d24c8539b49b502d70e, type: 3}
+  m_PrefabInstance: {fileID: 4468372647550308781}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6514023274239728827 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -1989275365836501738, guid: 1898a629f3777d24c8539b49b502d70e, type: 3}
   m_PrefabInstance: {fileID: 4468372647550308781}
   m_PrefabAsset: {fileID: 0}
 --- !u!95 &8027750544637324348 stripped

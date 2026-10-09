@@ -2122,8 +2122,8 @@ MonoBehaviour:
   animator: {fileID: 3373026942746379520}
   rightHandSocket: {fileID: 5535473465500731541}
   leftHandSocket: {fileID: 1998309404489438910}
-  outfitObject: {fileID: 1848750244}
-  hatObject: {fileID: 3222552158803320766}
+  headPiece: {fileID: 3222552158803320766}
+  chestPiece: {fileID: 0}
 --- !u!1 &8327572502170130005
 GameObject:
   m_ObjectHideFlags: 0

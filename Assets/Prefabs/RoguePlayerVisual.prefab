@@ -18,7 +18,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -10
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
       propertyPath: m_LocalRotation.w
@@ -92,6 +92,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7214371169738337839, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
   m_PrefabInstance: {fileID: 7529973211187725045}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1648450509240121358 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9124204593878465275, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+  m_PrefabInstance: {fileID: 7529973211187725045}
+  m_PrefabAsset: {fileID: 0}
 --- !u!95 &4113267590247087972 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
@@ -134,8 +139,8 @@ MonoBehaviour:
   animator: {fileID: 4113267590247087972}
   rightHandSocket: {fileID: 6560573674178491121}
   leftHandSocket: {fileID: 892080952944094426}
-  outfitObject: {fileID: 0}
-  hatObject: {fileID: 0}
+  headPiece: {fileID: 1648450509240121358}
+  chestPiece: {fileID: 7676712358779094468}
 --- !u!114 &5552862839462667307
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -148,3 +153,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f5a099f89c93be458c7ad266fe7de9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimationEventRelay
+--- !u!1 &7676712358779094468 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 213639004123055921, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+  m_PrefabInstance: {fileID: 7529973211187725045}
+  m_PrefabAsset: {fileID: 0}

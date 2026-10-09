@@ -10,15 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9a637943dfcb01848bbfe45f5f466506, type: 3}
-  m_Name: Chest_Armor
-  m_EditorClassIdentifier: 
-  itemName: Chest_Armor
+  m_Name: Hood_For_Rogue
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemName: Hood_For_Rogue
   icon: {fileID: 0}
-  description: Chest Armor for Warrior
+  description: 
   price: 10
-  slot: 2
-  defenseBonus: 2
-  damageBonus: 3
+  slot: 1
+  defenseBonus: 0
+  damageBonus: 0
+  attack: {fileID: 0}
+  allowedClasses:
+  - {fileID: 11400000, guid: c37b050b18674ac68da161c8d7acb3ad, type: 2}
   equipPrefab: {fileID: 0}
   equipPositionOffset: {x: 0, y: 0, z: 0}
   equipRotationOffset: {x: 0, y: 0, z: 0}

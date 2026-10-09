@@ -1,26 +1,29 @@
 // ============================================================
-//  CharacterVisualController.cs  —  Assets/Scripts/
+//  CharacterVisualController.cs  -  Assets/Scripts/
 //  Attach to the Player GameObject.
 //
 //  Listens to EquipmentManager.OnEquipmentChanged and
 //  updates the 3D outfit child object accordingly.
-//  This is the ONLY script that touches the visual —
+//  This is the ONLY script that touches the visual -
 //  no other script should enable/disable the outfit directly.
 // ============================================================
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class CharacterVisualController : MonoBehaviour
 {
-    [Header("Outfit / Hat (built-in rig objects — just toggled)")]
-    public GameObject outfitObject;
-    public GameObject hatObject; // e.g. Skeleton_Mage_Hat, drag it in as-is
+    [Header("Equipment pieces (filled at runtime by PlayerClass from the CharacterVisual)")]
+    [FormerlySerializedAs("hatObject")]
+    public GameObject headPiece;
+    [FormerlySerializedAs("outfitObject")]
+    public GameObject chestPiece;
 
     [Header("Hand sockets (drag handslot.l / handslot.r Transforms here)")]
     public Transform rightHandSocket;
     public Transform leftHandSocket;
 
     private EquipmentManager _equipmentManager;
-    private Material _outfitMaterial;
+    private Material _chestMaterial;
 
     private GameObject _currentRightHandInstance;
     private GameObject _currentLeftHandInstance;
@@ -30,8 +33,8 @@ public class CharacterVisualController : MonoBehaviour
     // so the material caching below already sees the spawned visual's outfit.
     public void BindVisual(CharacterVisual v)
     {
-        outfitObject    = v.outfitObject;
-        hatObject       = v.hatObject;
+        headPiece       = v.headPiece;
+        chestPiece      = v.chestPiece;
         rightHandSocket = v.rightHandSocket;
         leftHandSocket  = v.leftHandSocket;
     }
@@ -45,16 +48,18 @@ public class CharacterVisualController : MonoBehaviour
             return;
         }
 
-        // Cache a material instance so we don't modify the shared asset
-        if (outfitObject != null)
+        // Own material copy for the chest piece, so tinting it doesn't recolour the
+        // whole shared KayKit 'skeleton' material (every skeleton in the scene uses it).
+        if (chestPiece != null)
         {
-            var renderer = outfitObject.GetComponent<Renderer>();
+            var renderer = chestPiece.GetComponent<Renderer>();
             if (renderer != null)
-                _outfitMaterial = renderer.material = new Material(renderer.sharedMaterial);
+                _chestMaterial = renderer.material = new Material(renderer.sharedMaterial);
         }
 
-        if (hatObject != null)
-            hatObject.SetActive(false); // hidden by default, same as outfit
+        // Pieces are part of the model and visible by default - hide until equipped.
+        if (headPiece  != null) headPiece.SetActive(false);
+        if (chestPiece != null) chestPiece.SetActive(false);
 
         // Subscribe to equipment changes
         _equipmentManager.OnEquipmentChanged += RefreshVisuals;
@@ -77,24 +82,18 @@ public class CharacterVisualController : MonoBehaviour
         var rightHandItem = _equipmentManager.GetEquipped(EquipSlot.RightHand); //added
         var leftHandItem = _equipmentManager.GetEquipped(EquipSlot.LeftHand); //added
 
-        // Priority: show chest item color, fallback to head item color
-        // Outfit color swap (unchanged)
-        if (outfitObject != null)
+        // Chest piece: shown while a Chest item is equipped, tinted by its outfitColor.
+        if (chestPiece != null)
         {
-            if (chestItem != null)
-            {
-                outfitObject.SetActive(true);
-                if (_outfitMaterial != null)
-                    _outfitMaterial.color = chestItem.outfitColor;
-            }
-            else
-            {
-                outfitObject.SetActive(false);
-            }
+            chestPiece.SetActive(chestItem != null);
+            if (chestItem != null && _chestMaterial != null)
+                _chestMaterial.color = chestItem.outfitColor;
         }
-        // Hat: simple on/off
-        if (hatObject != null)
-            hatObject.SetActive(headItem != null);
+
+        // Head piece: shown while a Head item is equipped.
+        if (headPiece != null)
+            headPiece.SetActive(headItem != null);
+
         // Weapons/shield: spawn prefab at socket
         UpdateHandSlot(rightHandItem, rightHandSocket, ref _currentRightHandInstance);
         UpdateHandSlot(leftHandItem, leftHandSocket, ref _currentLeftHandInstance);
