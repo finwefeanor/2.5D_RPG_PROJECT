@@ -146,6 +146,9 @@ public class PlayerAttack : MonoBehaviour
         StartAttack(activeAttack.nextInCombo, ComboNextHash);
     }
 
+    // Called by PlayerClass after it spawns the class's visual.
+    public void SetAnimator(Animator a) => animator = a;
+
     // --- called by PlayerAttackState (the StateMachineBehaviour) ---
     public void OnAttackAnimationStart(int stateHash)
     {

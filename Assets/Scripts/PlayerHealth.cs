@@ -28,6 +28,9 @@ public class PlayerHealth : MonoBehaviour
 
     [SerializeField] private Animator animator;
 
+    // Called by PlayerClass after it spawns the class's visual.
+    public void SetAnimator(Animator a) => animator = a;
+
     private static readonly int HitHash = Animator.StringToHash("Hit");
     private static readonly int DeathHash = Animator.StringToHash("Death");
     private static readonly int isDeadHash = Animator.StringToHash("isDead");

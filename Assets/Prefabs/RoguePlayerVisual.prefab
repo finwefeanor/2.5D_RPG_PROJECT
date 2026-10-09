@@ -1,0 +1,150 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &7529973211187725045
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -10
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+      propertyPath: m_Name
+      value: RoguePlayerVisual
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 7265d10725f3e3b4489dd52abdc6f81e, type: 2}
+    - target: {fileID: 5866666021909216657, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+      propertyPath: m_CullingMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+      propertyPath: m_AnimatePhysics
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+      propertyPath: m_WarningMessage
+      value: "\nBinding warning: Some generic clip(s) animate transforms that are
+        already bound by a Humanoid avatar. These transforms can only be changed
+        by Humanoid clips.\n\tTransform 'upperarm.l'\n\tTransform 'upperleg.l'\n\tTransform
+        'upperleg.r'\n\tTransform 'hips'\n\tTransform 'upperarm.r'\n\tTransform 'lowerarm.r'\n\tTransform
+        'upperarm.l'\n\tTransform 'chest'\n\tTransform 'lowerarm.l'\n\tTransform
+        'lowerleg.r'\n\tand more ...\n\tFrom animation clip 'Running_A'"
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9135975249547951904}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2643712016769637526}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5552862839462667307}
+  m_SourcePrefab: {fileID: 100100000, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+--- !u!4 &892080952944094426 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7214371169738337839, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+  m_PrefabInstance: {fileID: 7529973211187725045}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &4113267590247087972 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+  m_PrefabInstance: {fileID: 7529973211187725045}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6560573674178491121 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -5515783359193845756, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+  m_PrefabInstance: {fileID: 7529973211187725045}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &7259450122377920420 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 4b5f2795dc4715c4aae8985f74212e54, type: 3}
+  m_PrefabInstance: {fileID: 7529973211187725045}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &9135975249547951904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7259450122377920420}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47e7b7c1fdd238848869530f55757696, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterMotor
+--- !u!114 &2643712016769637526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7259450122377920420}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00424705f7c246d3a1d8c741fd42b45b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterVisual
+  animator: {fileID: 4113267590247087972}
+  rightHandSocket: {fileID: 6560573674178491121}
+  leftHandSocket: {fileID: 892080952944094426}
+  outfitObject: {fileID: 0}
+  hatObject: {fileID: 0}
+--- !u!114 &5552862839462667307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7259450122377920420}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f5a099f89c93be458c7ad266fe7de9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimationEventRelay

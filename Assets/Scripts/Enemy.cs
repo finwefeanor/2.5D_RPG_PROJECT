@@ -113,7 +113,7 @@ public class Enemy : MonoBehaviour
     // Unity lifecycle
     // ---------------------------------------------------------------------
 
-  void Start()
+    void Start()
     {
         health = maxHealth;
         bodyRadius = WorldRadius(this);
@@ -302,7 +302,7 @@ public class Enemy : MonoBehaviour
         health -= damage;
         OnHealthChanged?.Invoke(health, maxHealth);
 
-          if (health <= 0)
+        if (health <= 0)
         {
             Die();
             return;

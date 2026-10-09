@@ -10,6 +10,7 @@ public class PlayerRefs : MonoBehaviour
     public Animator Animator { get; private set; }
 
     public EquipmentManager Equipment { get; private set; }
+    public PlayerClass Class { get; private set; }
 
 // PlayerRefs.cs — registration moves to Awake
 void Awake()
@@ -23,6 +24,7 @@ void Awake()
     GameManager.Instance.RegisterPlayer(this);   // lazy getter finds GM even if its Awake hasn't run
     
     Equipment = GetComponent<EquipmentManager>();
+    Class     = GetComponent<PlayerClass>();
 }
 
     // PlayerRefs.cs — temporary verification

@@ -26,6 +26,16 @@ public class CharacterVisualController : MonoBehaviour
     private GameObject _currentLeftHandInstance;
 
 
+    // Called by PlayerClass (execution order -100) BEFORE this Awake runs,
+    // so the material caching below already sees the spawned visual's outfit.
+    public void BindVisual(CharacterVisual v)
+    {
+        outfitObject    = v.outfitObject;
+        hatObject       = v.hatObject;
+        rightHandSocket = v.rightHandSocket;
+        leftHandSocket  = v.leftHandSocket;
+    }
+
     void Awake()
     {
         _equipmentManager = GetComponent<EquipmentManager>();
@@ -59,7 +69,8 @@ public class CharacterVisualController : MonoBehaviour
 
     void RefreshVisuals()
     {
-        if (outfitObject == null) return;
+        // No early return on a missing outfit: models without one (Barbarian, Rogue)
+        // must still show weapons. Every block below null-checks its own object.
         // Check if any visual slot is filled (Head or Chest)
         var headItem = _equipmentManager.GetEquipped(EquipSlot.Head);
         var chestItem = _equipmentManager.GetEquipped(EquipSlot.Chest);

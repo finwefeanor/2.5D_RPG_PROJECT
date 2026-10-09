@@ -23,6 +23,9 @@ public class EquipmentManager : MonoBehaviour
     [Tooltip("Used when the RightHand slot is empty or its item grants no attack.")]
     [SerializeField] private AbilityDefinition unarmedAttack;
 
+    // Called by PlayerClass: each class brings its own unarmed attack.
+    public void SetUnarmedAttack(AbilityDefinition attack) => unarmedAttack = attack;
+
     // The ONE place that decides weapon attack vs unarmed fallback.
     public AbilityDefinition CurrentAttack
     {
