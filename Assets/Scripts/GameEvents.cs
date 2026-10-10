@@ -11,6 +11,9 @@ public static class GameEvents
 
     public static event Action<int> OnGoldChanged;
 
+    public static event Action<CharacterClassDefinition> OnPlayerClassChanged;
+    public static void PlayerClassChanged(CharacterClassDefinition c) => OnPlayerClassChanged?.Invoke(c);
+
     public static event Action OnInteractPressed;
     public static event Action OnAttackPressed;
     public static void AttackPressed() => OnAttackPressed?.Invoke();

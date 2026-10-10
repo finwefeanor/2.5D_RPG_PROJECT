@@ -1,10 +1,10 @@
 // ============================================================
-//  InventoryManager.cs  —  Assets/Scripts/
+//  InventoryManager.cs  -  Assets/Scripts/
 //  Attach to the Player GameObject.
 //
 //  Owns the list of ItemData the player has bought, and the
 //  player's gold. Separating "owned items" from "equipped items"
-//  means a player can own a Hat but have it unequipped — same
+//  means a player can own a Hat but have it unequipped - same
 //  as every real RPG inventory system.
 // ============================================================
 using System.Collections.Generic;
@@ -15,43 +15,45 @@ public class InventoryManager : MonoBehaviour
     // All items the player currently owns
     [SerializeField] private List<ItemData> _ownedItems = new List<ItemData>();
     public IReadOnlyList<ItemData> OwnedItems => _ownedItems;
-
+ 
     [Header("Currency")]
     public int gold = 100;
-
+ 
     public ItemDatabase itemDatabase;
-
+ 
     private EquipmentManager _equipmentManager;
-
+ 
     void Awake()
     {
         _equipmentManager = GetComponent<EquipmentManager>();
         if (_equipmentManager == null)
             Debug.LogError("InventoryManager requires EquipmentManager on the same GameObject.");
     }
-
+ 
     void Start()
     {
         if (itemDatabase != null)
             SaveSystem.Load(this, _equipmentManager, itemDatabase);
+ 
+        GameEvents.GoldChanged(gold);   // announce the starting / loaded gold to the HUD
     }
-
-    // TEMP — for testing only, remove once inventory UI exists
+ 
+    // TEMP - for testing only, remove once inventory UI exists
     void Update()
     {
         //if (Input.GetKeyDown(KeyCode.U) && GetAllItems().Count > 0)
         //    RemoveItem(GetAllItems()[0]);
     }
-
-    // ── Gold API ──────────────────────────────────────────────
-
+ 
+    // -- Gold API ----------------------------------------------
+ 
     public void AddGold(int amount)
     {
         gold += amount;
         Debug.Log($"Gold: {gold}");
         GameEvents.GoldChanged(gold);
     }
-
+ 
     public bool SpendGold(int amount)
 {
     if (gold < amount)
@@ -59,67 +61,67 @@ public class InventoryManager : MonoBehaviour
         Debug.Log($"Not enough gold. Need {amount}, have {gold}.");
         return false;
     }
-
+ 
         gold -= amount;
         GameEvents.GoldChanged(gold);
         return true;
 }
-
-    // ── Item API ──────────────────────────────────────────────
-
+ 
+    // -- Item API ----------------------------------------------
+ 
     // Called by ShopManager when player buys an item
     public void AddItem(ItemData item)
     {
         if (item == null) return;
-
+ 
         if (_ownedItems.Contains(item))
         {
             Debug.Log($"Already own: {item.itemName}");
             return;
         }
-
+ 
         _ownedItems.Add(item);
         Debug.Log($"Added to inventory: {item.itemName}");
-
+ 
         //// Auto-equip on purchase if the slot is empty
         //if (item.slot != EquipSlot.None && !_equipmentManager.IsSlotFilled(item.slot))
         //    _equipmentManager.Equip(item);
-
+ 
         // Buying a new item for a slot always equips it,
         // swapping out whatever was there before (which stays owned, just unequipped)
         if (item.slot != EquipSlot.None)
             _equipmentManager.Equip(item);
-
+ 
         GameEvents.InventoryChanged();
-
+ 
     }
-
+ 
     public void RemoveItem(ItemData item)
     {
         if (item == null || !_ownedItems.Contains(item)) return;
-
-        // If it's currently equipped, unequip it first (nothing auto-replaces it — yet)
+ 
+        // If it's currently equipped, unequip it first (nothing auto-replaces it - yet)
         if (_equipmentManager.GetEquipped(item.slot) == item)
             _equipmentManager.Unequip(item.slot);
-
+ 
         _ownedItems.Remove(item);
-
+ 
         GameEvents.InventoryChanged();
         Debug.Log($"Removed from inventory: {item.itemName}");
     }
-
+ 
     // For a future "Equip" button in an inventory UI
     public void EquipOwnedItem(ItemData item)
     {
         if (item == null || !_ownedItems.Contains(item)) return;
         _equipmentManager.Equip(item);
     }
-
+ 
     public bool OwnsItem(ItemData item)
     {
         return _ownedItems.Contains(item);
     }
-
+ 
     public List<ItemData> GetAllItems()
     {
         return _ownedItems;

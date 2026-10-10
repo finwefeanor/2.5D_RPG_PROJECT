@@ -37,6 +37,21 @@ public class EquipmentManager : MonoBehaviour
         return item.CanBeUsedBy(_playerClass != null ? _playerClass.Definition : null);
     }
 
+    // After a class switch: unequip anything the new class can't use (it stays owned).
+    public void UnequipUnusable()
+    {
+        bool changed = false;
+        foreach (EquipSlot slot in new List<EquipSlot>(_equipped.Keys))
+        {
+            if (!CanUse(_equipped[slot]))
+            {
+                _equipped.Remove(slot);
+                changed = true;
+            }
+        }
+        if (changed) OnEquipmentChanged?.Invoke();
+    }
+
     // Called by PlayerClass: each class brings its own unarmed attack.
     public void SetUnarmedAttack(AbilityDefinition attack) => unarmedAttack = attack;
 

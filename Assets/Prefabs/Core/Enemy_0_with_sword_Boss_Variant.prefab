@@ -13,12 +13,44 @@ PrefabInstance:
       value: 270
       objectReference: {fileID: 0}
     - target: {fileID: 2110713012232207241, guid: 59c767ce1c031ac4888996f1c57c16cb, type: 3}
+      propertyPath: maxHealth
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 2110713012232207241, guid: 59c767ce1c031ac4888996f1c57c16cb, type: 3}
+      propertyPath: moveSpeed
+      value: 2.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2110713012232207241, guid: 59c767ce1c031ac4888996f1c57c16cb, type: 3}
+      propertyPath: turnSpeed
+      value: 240
+      objectReference: {fileID: 0}
+    - target: {fileID: 2110713012232207241, guid: 59c767ce1c031ac4888996f1c57c16cb, type: 3}
+      propertyPath: goldReward
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 2110713012232207241, guid: 59c767ce1c031ac4888996f1c57c16cb, type: 3}
       propertyPath: attackAngle
       value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 2110713012232207241, guid: 59c767ce1c031ac4888996f1c57c16cb, type: 3}
+      propertyPath: attackRange
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2110713012232207241, guid: 59c767ce1c031ac4888996f1c57c16cb, type: 3}
       propertyPath: detectRange
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2110713012232207241, guid: 59c767ce1c031ac4888996f1c57c16cb, type: 3}
+      propertyPath: neverFlinch
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2110713012232207241, guid: 59c767ce1c031ac4888996f1c57c16cb, type: 3}
+      propertyPath: attackDamage
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2110713012232207241, guid: 59c767ce1c031ac4888996f1c57c16cb, type: 3}
+      propertyPath: attackRecovery
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 2110713012232207243, guid: 59c767ce1c031ac4888996f1c57c16cb, type: 3}
       propertyPath: m_LocalScale.x

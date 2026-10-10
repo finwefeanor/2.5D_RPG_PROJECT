@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.AI;
 
 /// <summary>
 /// Enemy AI: chase, attack, take damage, die.
@@ -76,6 +77,8 @@ public class Enemy : MonoBehaviour
     public AudioSource enemyAttackSound;
     public AudioSource enemyDieSound;
 
+    private NavMeshAgent navMeshAgent;
+
     // ---------------------------------------------------------------------
     // Events
     // ---------------------------------------------------------------------
@@ -117,13 +120,36 @@ public class Enemy : MonoBehaviour
     {
         health = maxHealth;
         bodyRadius = WorldRadius(this);
+
+        navMeshAgent = GetComponent<NavMeshAgent>();
+
+
         ResolvePlayer();
+
+        if (navMeshAgent != null)
+        {
+            navMeshAgent.speed        = moveSpeed;   // boss's slower moveSpeed still applies
+            navMeshAgent.angularSpeed = turnSpeed;
+            navMeshAgent.autoBraking  = true;
+
+            // The agent measures centre-to-centre, our attackRange is edge-to-edge.
+            // Stop where the bodies are attackRange apart - never inside the player.
+            // Mathf.Max keeps a gap even if attackRange is 0 or negative.
+            navMeshAgent.stoppingDistance =
+                Mathf.Max(attackRange, 0.05f) + bodyRadius + playerRadius;
+        }
+
+
         OnHealthChanged?.Invoke(health, maxHealth);
     }
 
     void Update()
     {
-        if (isDead || playerDead || playerTransform == null) return;
+        if (isDead || playerDead || playerTransform == null)
+        {
+            StopMoving();   // otherwise the agent keeps walking to its last destination
+            return;
+        }
 
         // While the swing is playing, the animation is in charge. Don't touch anything.
         if (isAttacking) return;
@@ -134,7 +160,7 @@ public class Enemy : MonoBehaviour
 
         if (distance <= attackRange)      TickAttack();
         else if (distance <= detectRange) TickChase();
-        else                              SetMoving(false);
+        else                              StopMoving();
     }
 
     // ---------------------------------------------------------------------
@@ -204,13 +230,30 @@ public class Enemy : MonoBehaviour
 
     private void TickChase()
     {
-        Vector3 direction = (playerTransform.position - transform.position).normalized;
-        direction.y = 0;
 
-        transform.position += direction * moveSpeed * Time.deltaTime;
-        transform.rotation = Quaternion.LookRotation(direction);
+        if (navMeshAgent == null || !navMeshAgent.isOnNavMesh) return;
+
+        navMeshAgent.isStopped = false;
+
+
+        navMeshAgent.SetDestination(playerTransform.position);
+
 
         SetMoving(true);
+
+    }
+
+    // Halts the agent in place and tells the Animator we're idle.
+    private void StopMoving()
+    {
+        if (navMeshAgent != null && navMeshAgent.isOnNavMesh)
+        {
+            navMeshAgent.isStopped = true;
+            navMeshAgent.ResetPath();
+            navMeshAgent.velocity  = Vector3.zero;   // halt now - no sliding into the player
+        }
+        SetMoving(false);
+
     }
 
     private void SetMoving(bool moving)
@@ -325,6 +368,7 @@ public class Enemy : MonoBehaviour
         // companion-AI paths may call Die() directly, skipping TakeDamage().
         if (isDead) return;
         isDead = true;
+        StopMoving();
 
         DropGold();
 

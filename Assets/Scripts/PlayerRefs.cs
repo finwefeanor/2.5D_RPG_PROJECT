@@ -8,11 +8,14 @@ public class PlayerRefs : MonoBehaviour
     public PlayerController Controller { get; private set; }
     public InventoryManager Inventory { get; private set; }
     public Animator Animator { get; private set; }
-
+ 
     public EquipmentManager Equipment { get; private set; }
     public PlayerClass Class { get; private set; }
-
-// PlayerRefs.cs — registration moves to Awake
+ 
+    // Called by PlayerClass when it swaps the visual at runtime.
+    public void SetAnimator(Animator a) => Animator = a;
+ 
+// PlayerRefs.cs - registration moves to Awake
 void Awake()
 {
     Health     = GetComponent<PlayerHealth>();
@@ -20,14 +23,14 @@ void Awake()
     Controller = GetComponent<PlayerController>();
     Inventory  = GetComponent<InventoryManager>();
     Animator   = GetComponentInChildren<Animator>();
-
+ 
     GameManager.Instance.RegisterPlayer(this);   // lazy getter finds GM even if its Awake hasn't run
     
     Equipment = GetComponent<EquipmentManager>();
     Class     = GetComponent<PlayerClass>();
 }
-
-    // PlayerRefs.cs — temporary verification
+ 
+    // PlayerRefs.cs - temporary verification
     void Start()
     {
         Debug.Log($"[PlayerRefs] Registered. Health={Health != null}, Attack={Attack != null}, " +

@@ -73,6 +73,10 @@ PrefabInstance:
         'upperarm.l'\n\tTransform 'chest'\n\tTransform 'lowerarm.l'\n\tTransform
         'lowerleg.r'\n\tand more ...\n\tFrom animation clip 'Running_A'"
       objectReference: {fileID: 0}
+    - target: {fileID: 7746471577276131153, guid: 1898a629f3777d24c8539b49b502d70e, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: a20335483ee6fb24285d696a904f7fc9, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

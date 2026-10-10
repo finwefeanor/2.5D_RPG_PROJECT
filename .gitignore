@@ -46,3 +46,4 @@ Thumbs.db
 UpgradeLog.htm
 
 Android_Builds/
+*.slnx

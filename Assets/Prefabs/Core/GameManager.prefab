@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 198048744868883466}
-  - component: {fileID: 4751629412930472316}
   - component: {fileID: 6928606781893461082}
+  - component: {fileID: 2554084293475002905}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -33,19 +33,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4751629412930472316
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1273893659659257554}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5218acd786422b548aba62f31a34c8b0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pauseMenuCanvas: {fileID: 0}
 --- !u!114 &6928606781893461082
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58,3 +45,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4aab54f1aa377eb72b6a04b4feb136f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+--- !u!114 &2554084293475002905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1273893659659257554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa52838b48c9485389b439342f43bd16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  classes:
+  - {fileID: 11400000, guid: 48c73d9eb82a4008bc846273a8459ba2, type: 2}
+  - {fileID: 11400000, guid: 1b585408c03b4d4c8ea055b11055c552, type: 2}
+  - {fileID: 11400000, guid: c37b050b18674ac68da161c8d7acb3ad, type: 2}
+  showOnStart: 1
+  reopenKey: 99

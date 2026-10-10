@@ -62,8 +62,20 @@ public class InventoryUIController : MonoBehaviour
         RefreshInventoryUI();
     }
 
-    void OnEnable()  => GameEvents.OnInventoryChanged += RefreshInventoryUI;
-    void OnDisable() => GameEvents.OnInventoryChanged -= RefreshInventoryUI;
+    void OnEnable()
+    {
+        GameEvents.OnInventoryChanged   += RefreshInventoryUI;
+        GameEvents.OnPlayerClassChanged += HandleClassChanged;
+    }
+
+    void OnDisable()
+    {
+        GameEvents.OnInventoryChanged   -= RefreshInventoryUI;
+        GameEvents.OnPlayerClassChanged -= HandleClassChanged;
+    }
+
+    // "Mage only" labels depend on the class - redraw after a switch.
+    private void HandleClassChanged(CharacterClassDefinition _) => RefreshInventoryUI();
 
     void OnDestroy()
     {

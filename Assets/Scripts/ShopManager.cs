@@ -45,12 +45,20 @@ public class ShopManager : MonoBehaviour
 
     void OnEnable()
     {
-        GameEvents.OnGoldChanged += HandleGoldChanged;    
+        GameEvents.OnGoldChanged        += HandleGoldChanged;
+        GameEvents.OnPlayerClassChanged += HandleClassChanged;
     }
 
     void OnDisable()
     {
-        GameEvents.OnGoldChanged -= HandleGoldChanged;
+        GameEvents.OnGoldChanged        -= HandleGoldChanged;
+        GameEvents.OnPlayerClassChanged -= HandleClassChanged;
+    }
+
+    // "Price" vs "Barbarian only" labels depend on the class - rebuild after a switch.
+    private void HandleClassChanged(CharacterClassDefinition _)
+    {
+        if (_inventoryManager != null) GenerateItemButtons();
     }
 
     private void HandleGoldChanged(int gold)

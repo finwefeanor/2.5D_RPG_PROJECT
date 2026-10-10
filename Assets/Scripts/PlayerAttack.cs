@@ -149,6 +149,18 @@ public class PlayerAttack : MonoBehaviour
     // Called by PlayerClass after it spawns the class's visual.
     public void SetAnimator(Animator a) => animator = a;
 
+    // Called by PlayerClass on a runtime class switch: the old Animator is destroyed,
+    // so its OnStateExit never arrives. Clear everything a swing could have left behind.
+    public void ResetAttackState()
+    {
+        attackStatesActive = 0;
+        comboQueued        = false;
+        chainPending       = false;
+        swingTime          = 0f;
+        activeAttack       = null;
+        nextAttackTime     = 0f;
+    }
+
     // --- called by PlayerAttackState (the StateMachineBehaviour) ---
     public void OnAttackAnimationStart(int stateHash)
     {

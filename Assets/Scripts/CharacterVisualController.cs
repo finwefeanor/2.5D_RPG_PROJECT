@@ -29,27 +29,18 @@ public class CharacterVisualController : MonoBehaviour
     private GameObject _currentLeftHandInstance;
 
 
-    // Called by PlayerClass (execution order -100) BEFORE this Awake runs,
-    // so the material caching below already sees the spawned visual's outfit.
+    // Called by PlayerClass: once at startup (before this Awake) and again on every
+    // runtime class switch. Takes over the new model's pieces and sockets.
     public void BindVisual(CharacterVisual v)
     {
         headPiece       = v.headPiece;
         chestPiece      = v.chestPiece;
         rightHandSocket = v.rightHandSocket;
         leftHandSocket  = v.leftHandSocket;
-    }
-
-    void Awake()
-    {
-        _equipmentManager = GetComponent<EquipmentManager>();
-        if (_equipmentManager == null)
-        {
-            Debug.LogError("CharacterVisualController requires EquipmentManager on the same GameObject.");
-            return;
-        }
 
         // Own material copy for the chest piece, so tinting it doesn't recolour the
         // whole shared KayKit 'skeleton' material (every skeleton in the scene uses it).
+        _chestMaterial = null;
         if (chestPiece != null)
         {
             var renderer = chestPiece.GetComponent<Renderer>();
@@ -60,6 +51,21 @@ public class CharacterVisualController : MonoBehaviour
         // Pieces are part of the model and visible by default - hide until equipped.
         if (headPiece  != null) headPiece.SetActive(false);
         if (chestPiece != null) chestPiece.SetActive(false);
+    }
+
+    // Re-applies everything equipped to the current model (after a class switch).
+    public void Refresh() => RefreshVisuals();
+
+    void Awake()
+    {
+        _equipmentManager = GetComponent<EquipmentManager>();
+        if (_equipmentManager == null)
+        {
+            Debug.LogError("CharacterVisualController requires EquipmentManager on the same GameObject.");
+            return;
+        }
+
+        // Piece setup (material copy, hiding) happens in BindVisual.
 
         // Subscribe to equipment changes
         _equipmentManager.OnEquipmentChanged += RefreshVisuals;
