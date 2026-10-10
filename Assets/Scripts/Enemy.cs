@@ -211,7 +211,7 @@ public class Enemy : MonoBehaviour
 
     private void TickAttack()
     {
-        SetMoving(false);
+        StopMoving();
         FacePlayer();   // keep turning toward the player while in range (not mid-swing:
                         // Update() returns early while isAttacking, so swings stay committed)
 

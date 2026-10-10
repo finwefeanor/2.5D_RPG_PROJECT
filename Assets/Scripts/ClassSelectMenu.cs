@@ -47,9 +47,11 @@ public class ClassSelectMenu : MonoBehaviour
 
     void Update()
     {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
         if (reopenKey == KeyCode.None || !Input.GetKeyDown(reopenKey)) return;
         if (isOpen) Close();
         else Open();
+#endif
     }
 
     public void Open()
