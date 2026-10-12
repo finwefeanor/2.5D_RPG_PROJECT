@@ -7,6 +7,8 @@ public class PlayerAttack : MonoBehaviour
     public LayerMask enemyLayers;
     public AudioSource attackSound;
 
+    public Transform playerPosition;
+
     [Tooltip("Random pitch offset per swing (±). 0.05 = ±5%. Stops repeated hits sounding robotic.")]
     [Range(0f, 0.2f)]
     public float pitchVariation = 0.05f;
@@ -201,6 +203,11 @@ public class PlayerAttack : MonoBehaviour
 
         Collider[] hitEnemies = Physics.OverlapSphere(attackPoint.position, activeAttack.range, enemyLayers);
 
+        Vector3 playerForwardVector = new Vector3(playerPosition.position.x - attackPoint.position.x, 0, 
+        playerPosition.position.z - attackPoint.position.z);
+
+
+
         bool hitSomething = false;
 
         foreach (Collider enemy in hitEnemies)
@@ -217,8 +224,22 @@ public class PlayerAttack : MonoBehaviour
             Enemy enemyComponent = enemy.GetComponent<Enemy>();
             if (enemyComponent != null)
             {
-                enemyComponent.TakeDamage(totalDamage);
-                hitSomething = true;
+                Vector3 enemyDirectionVector = new Vector3(playerPosition.position.x - enemy.transform.position.x, 0, 
+                playerPosition.position.z - enemy.transform.position.z);
+
+                float enemyFacing = Vector3.Dot(enemyDirectionVector , playerForwardVector);
+                Debug.Log("enemyFacing " + enemyFacing);
+                    
+
+                if (enemyFacing >= 0.4f)
+                {
+                    enemyComponent.TakeDamage(totalDamage);
+                    hitSomething = true;
+                    
+                }
+
+
+                
             }
 
         }

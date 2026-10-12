@@ -15,7 +15,7 @@ MonoBehaviour:
   animatorIndex: 0
   animationSpeed: 1.3
   damageMultiplier: 1
-  range: 1.5
+  range: 3
   nextInCombo: {fileID: 0}
   comboInputOpens: 0.2
   comboChainAt: 0.5
