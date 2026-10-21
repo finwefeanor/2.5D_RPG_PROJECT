@@ -51,6 +51,11 @@ public class PlayerAttack : MonoBehaviour
     private bool comboQueued;              // a press was remembered during this swing
     private bool chainPending;             // ComboNext sent, waiting for the next state to enter
 
+
+    private LineRenderer lineRenderer;
+
+    
+
     /*
     // --- Directional attack settings (disabled for now - see DealAttackDamage) ---
     [Header("Directional Hit Check (later stage)")]
@@ -58,15 +63,43 @@ public class PlayerAttack : MonoBehaviour
     public float attackAngle = 90f;
     */
 
+    
+    void Awake()
+    {
+        enemyLayers = LayerMask.GetMask("Wall", "Character");
+    }
+
     void Start()
     {
         equipmentManager = GetComponent<EquipmentManager>();
+    }
+
+    void FixedUpdate()
+    {
+        RaycastHit hit;
+        // Does the ray intersect any objects excluding the player layer
+        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, Mathf.Infinity, enemyLayers))
+
+        {
+            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.yellow);
+            Debug.Log("Did Hit");
+        }
+        else
+        {
+            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 1000, Color.white);
+            Debug.Log("Did not Hit");
+        }
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
             TryAttack();
+    }
+
+    private void DrawProjectile()
+    {
+        
     }
 
     // Wired to the on-screen AttackButton's OnClick()
@@ -85,7 +118,7 @@ public class PlayerAttack : MonoBehaviour
         GameEvents.OnAttackPressed -= OnAttackButtonPressed;
     }
 
-    private void TryAttack()
+    public void TryAttack()
     {
         // Mid-swing the animation is in charge. A press can only queue the next combo step.
         if (IsAttacking)
@@ -237,7 +270,6 @@ public class PlayerAttack : MonoBehaviour
                     hitSomething = true;
                     
                 }
-
 
                 
             }

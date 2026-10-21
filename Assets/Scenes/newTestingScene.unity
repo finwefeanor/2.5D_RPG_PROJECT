@@ -397,6 +397,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c0edb7f0a2629c0afb8f04c2d3883cc9, type: 3}
+--- !u!1 &156050343 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 102258945551000686, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
+  m_PrefabInstance: {fileID: 1007952974}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &182677626
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1689,6 +1694,20 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2470501650263969863, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
   m_PrefabInstance: {fileID: 1007952974}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &909332266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 156050343}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62abe1e2cb774f3ab9d6b7a902f89272, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FireProjectile
+  projectile: {fileID: 1490004887742315023, guid: 210e1abb4d8828a17963e1668c0b1b47, type: 3}
+  speed: 4
 --- !u!1001 &922729863
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1876,7 +1895,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2470501650263969863, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1072218384}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 102258945551000686, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 909332266}
   m_SourcePrefab: {fileID: 100100000, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
 --- !u!1001 &1018984624
 PrefabInstance:
@@ -3215,6 +3237,14 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5404406143711829978, guid: 656a1ee3c28196336b6a28b00407de94, type: 3}
+      propertyPath: itemsForSale.Array.size
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5404406143711829978, guid: 656a1ee3c28196336b6a28b00407de94, type: 3}
+      propertyPath: 'itemsForSale.Array.data[9]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 64c5d384591ea7285b5dd904fabf387f, type: 2}
     - target: {fileID: 8018612272566832871, guid: 656a1ee3c28196336b6a28b00407de94, type: 3}
       propertyPath: m_IsTrigger
       value: 1
