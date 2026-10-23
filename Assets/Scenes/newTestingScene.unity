@@ -1854,6 +1854,14 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3212231996760859216, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
+      propertyPath: firePoint
+      value: 
+      objectReference: {fileID: 1007952975}
+    - target: {fileID: 3212231996760859216, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
+      propertyPath: arrowPrefab
+      value: 
+      objectReference: {fileID: 313180771127780996, guid: 210e1abb4d8828a17963e1668c0b1b47, type: 3}
+    - target: {fileID: 3212231996760859216, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
       propertyPath: playerPosition
       value: 
       objectReference: {fileID: 909332250}
@@ -1900,6 +1908,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 909332266}
   m_SourcePrefab: {fileID: 100100000, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
+--- !u!4 &1007952975 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 469051793899000565, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
+  m_PrefabInstance: {fileID: 1007952974}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1018984624
 PrefabInstance:
   m_ObjectHideFlags: 0

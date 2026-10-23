@@ -4,7 +4,18 @@ public class PlayerAttack : MonoBehaviour
 {
     public int baseAttackDamage = 10;
     public Transform attackPoint;   // child empty GameObject placed in front of player
-    public LayerMask enemyLayers;
+   
+    [SerializeField] public LayerMask enemyLayers;    
+    [SerializeField] private float attackRange = 2f;
+    [SerializeField] private float attackCooldown = 0.5f;
+    [SerializeField] private float rayHeight = 1f;
+    [SerializeField] private int rayDamage = 10;
+
+    [SerializeField] private ArrowProjectile arrowPrefab;
+    [SerializeField] private Transform firePoint;   // empty child in front of the player at chest height
+
+
+
     public AudioSource attackSound;
 
     public Transform playerPosition;
@@ -74,27 +85,16 @@ public class PlayerAttack : MonoBehaviour
         equipmentManager = GetComponent<EquipmentManager>();
     }
 
-    void FixedUpdate()
-    {
-        RaycastHit hit;
-        // Does the ray intersect any objects excluding the player layer
-        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, Mathf.Infinity, enemyLayers))
-
-        {
-            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.yellow);
-            Debug.Log("Did Hit");
-        }
-        else
-        {
-            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 1000, Color.white);
-            Debug.Log("Did not Hit");
-        }
-    }
+    
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
+        {
             TryAttack();
+            OnRangedRelease();
+        }
+
     }
 
     private void DrawProjectile()
@@ -118,6 +118,39 @@ public class PlayerAttack : MonoBehaviour
         GameEvents.OnAttackPressed -= OnAttackButtonPressed;
     }
 
+    void FixedUpdate()
+    {
+
+    }
+
+    public void OnRangedRelease()
+    {
+        RaycastHit hit;
+        Vector3 origin = transform.position + Vector3.up * rayHeight;
+        Vector3 direction = transform.forward; 
+        // Does the ray intersect any objects excluding the player layer
+        if (Physics.Raycast(origin, direction, out hit, attackRange, enemyLayers))
+
+        {
+            Debug.DrawRay(origin, direction * hit.distance, Color.yellow, 0.5f);
+            if (hit.collider.TryGetComponent(out Enemy enemyHealth))
+            {
+                Debug.Log("Did Hit");
+                enemyHealth.TakeDamage(rayDamage);
+            }
+            
+        }
+        else
+        {
+            Debug.DrawRay(origin, direction * attackRange, Color.white, 0.5f);
+            Debug.Log("Did not Hit");
+        }
+
+         ArrowProjectile arrow = Instantiate(arrowPrefab, firePoint.position, Quaternion.LookRotation(transform.forward));
+         arrow.Initialize(rayDamage, gameObject);
+        
+    }
+
     public void TryAttack()
     {
         // Mid-swing the animation is in charge. A press can only queue the next combo step.
@@ -132,7 +165,9 @@ public class PlayerAttack : MonoBehaviour
         if (attack == null) return;   // no weapon attack AND no unarmed default assigned
 
         comboRoot = attack;           // a fresh press always starts at the head of the chain
-        StartAttack(attack, AttackHash);
+        StartAttack(attack, AttackHash);       
+        
+        
     }
 
     // Shared by a fresh attack (Attack trigger) and a combo step (ComboNext trigger).
