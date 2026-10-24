@@ -4,21 +4,23 @@ public class PlayerAttack : MonoBehaviour
 {
     public int baseAttackDamage = 10;
     public Transform attackPoint;   // child empty GameObject placed in front of player
-   
-    [SerializeField] public LayerMask enemyLayers;    
-    [SerializeField] private float attackRange = 2f;
-    [SerializeField] private float attackCooldown = 0.5f;
-    [SerializeField] private float rayHeight = 1f;
-    [SerializeField] private int rayDamage = 10;
 
-    [SerializeField] private ArrowProjectile arrowPrefab;
-    [SerializeField] private Transform firePoint;   // empty child in front of the player at chest height
+    public LayerMask enemyLayers;   // set on the Player prefab (Enemy layer) - never in code
+
+    [Tooltip("Where projectiles spawn. Empty child of the Player root, in front at chest height.")]
+    [SerializeField] private Transform firePoint;
+
+
+
+    [Tooltip("Melee only: full arc in front of the player that can be hit. " +
+             "120 = 60 deg left/right of forward. 360 = all around.")]
+    [Range(0f, 360f)]
+    public float meleeHitAngle = 120f;
 
 
 
     public AudioSource attackSound;
 
-    public Transform playerPosition;
 
     [Tooltip("Random pitch offset per swing (±). 0.05 = ±5%. Stops repeated hits sounding robotic.")]
     [Range(0f, 0.2f)]
@@ -45,6 +47,12 @@ public class PlayerAttack : MonoBehaviour
              "0 = swing again immediately, 0.5 = half-second breather.")]
     public float attackRecovery = 0.15f;
 
+    [Tooltip("A press made up to this many seconds before the next attack is allowed is " +
+            "remembered and fires as soon as it can. 0 = off (press must be exactly on time).")]
+    public float inputBuffer = 0.3f;
+
+    private float bufferedPressTime = -1f;   // < 0 = nothing remembered
+
     // How many attack states are playing. Normally 0 or 1; it is 2 for a moment while one
     // combo step crossfades into the next (Unity enters the new state BEFORE exiting the old).
     private int attackStatesActive = 0;
@@ -63,8 +71,6 @@ public class PlayerAttack : MonoBehaviour
     private bool chainPending;             // ComboNext sent, waiting for the next state to enter
 
 
-    private LineRenderer lineRenderer;
-
     
 
     /*
@@ -75,11 +81,6 @@ public class PlayerAttack : MonoBehaviour
     */
 
     
-    void Awake()
-    {
-        enemyLayers = LayerMask.GetMask("Wall", "Character");
-    }
-
     void Start()
     {
         equipmentManager = GetComponent<EquipmentManager>();
@@ -90,16 +91,20 @@ public class PlayerAttack : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
-        {
             TryAttack();
-            OnRangedRelease();
-        }
-
+        else
+            TryBufferedAttack();
     }
 
-    private void DrawProjectile()
+    // Fires a remembered press once attacking is allowed again - only if the press is
+    // recent, so an old press can't fire a surprise shot seconds later.
+    private void TryBufferedAttack()
     {
-        
+        if (bufferedPressTime < 0f || IsAttacking || Time.time < nextAttackTime) return;
+
+        bool fresh = Time.time - bufferedPressTime <= inputBuffer;
+        bufferedPressTime = -1f;
+        if (fresh) TryAttack();
     }
 
     // Wired to the on-screen AttackButton's OnClick()
@@ -118,56 +123,30 @@ public class PlayerAttack : MonoBehaviour
         GameEvents.OnAttackPressed -= OnAttackButtonPressed;
     }
 
-    void FixedUpdate()
+
+    private void TryAttack()
     {
-
-    }
-
-    public void OnRangedRelease()
-    {
-        RaycastHit hit;
-        Vector3 origin = transform.position + Vector3.up * rayHeight;
-        Vector3 direction = transform.forward; 
-        // Does the ray intersect any objects excluding the player layer
-        if (Physics.Raycast(origin, direction, out hit, attackRange, enemyLayers))
-
-        {
-            Debug.DrawRay(origin, direction * hit.distance, Color.yellow, 0.5f);
-            if (hit.collider.TryGetComponent(out Enemy enemyHealth))
-            {
-                Debug.Log("Did Hit");
-                enemyHealth.TakeDamage(rayDamage);
-            }
-            
-        }
-        else
-        {
-            Debug.DrawRay(origin, direction * attackRange, Color.white, 0.5f);
-            Debug.Log("Did not Hit");
-        }
-
-         ArrowProjectile arrow = Instantiate(arrowPrefab, firePoint.position, Quaternion.LookRotation(transform.forward));
-         arrow.Initialize(rayDamage, gameObject);
-        
-    }
-
-    public void TryAttack()
-    {
-        // Mid-swing the animation is in charge. A press can only queue the next combo step.
+        // Mid-swing the animation is in charge.
         if (IsAttacking)
         {
-            QueueComboInput();
+            // Attack with a combo: the press may chain (QueueComboInput's rules).
+            // Attack without one (crossbow): remember it for when the swing is over.
+            if (activeAttack != null && activeAttack.nextInCombo != null) QueueComboInput();
+            else bufferedPressTime = Time.time;
             return;
         }
-        if (Time.time < nextAttackTime) return;
+        if (Time.time < nextAttackTime)
+        {
+            bufferedPressTime = Time.time;   // still in recovery: fire when it ends
+            return;
+        }
 
         AbilityDefinition attack = equipmentManager != null ? equipmentManager.CurrentAttack : null;
         if (attack == null) return;   // no weapon attack AND no unarmed default assigned
 
+        bufferedPressTime = -1f;
         comboRoot = attack;           // a fresh press always starts at the head of the chain
-        StartAttack(attack, AttackHash);       
-        
-        
+        StartAttack(attack, AttackHash);
     }
 
     // Shared by a fresh attack (Attack trigger) and a combo step (ComboNext trigger).
@@ -229,6 +208,7 @@ public class PlayerAttack : MonoBehaviour
         swingTime          = 0f;
         activeAttack       = null;
         nextAttackTime     = 0f;
+        bufferedPressTime  = -1f;   // a press made before a class switch must not fire after it
     }
 
     // --- called by PlayerAttackState (the StateMachineBehaviour) ---
@@ -264,17 +244,24 @@ public class PlayerAttack : MonoBehaviour
     // --- called by an Animation Event on the contact frame (frame 8) ---
     public void DealAttackDamage()
     {
-        if (attackPoint == null || activeAttack == null) return;
+
+        Debug.Log($"DealAttackDamage: {(activeAttack != null ? activeAttack.name : "null")} " +
+          $"delivery={(activeAttack != null ? activeAttack.delivery.ToString() : "-")}");
+
+        if (activeAttack == null) return;
 
         int bonus = equipmentManager != null ? equipmentManager.GetTotalDamageBonus() : 0;
         int totalDamage = Mathf.RoundToInt(baseAttackDamage * activeAttack.damageMultiplier) + bonus;
 
+        if (activeAttack.delivery == AbilityDelivery.Projectile)
+        {
+            FireProjectile(activeAttack, totalDamage);
+            return;   // the arrow plays the hit sound when (if) it lands
+        }
+
+        if (attackPoint == null) return;
+
         Collider[] hitEnemies = Physics.OverlapSphere(attackPoint.position, activeAttack.range, enemyLayers);
-
-        Vector3 playerForwardVector = new Vector3(playerPosition.position.x - attackPoint.position.x, 0, 
-        playerPosition.position.z - attackPoint.position.z);
-
-
 
         bool hitSomething = false;
 
@@ -289,32 +276,49 @@ public class PlayerAttack : MonoBehaviour
             if (angle > attackAngle / 2f) continue;
             */
 
+           Vector3 toEnemy = enemy.transform.position - transform.position;
+            toEnemy.y = 0f;
+            if (toEnemy.sqrMagnitude > 0.0001f &&
+                Vector3.Angle(transform.forward, toEnemy) > meleeHitAngle / 2f)
+                continue;
+
             Enemy enemyComponent = enemy.GetComponent<Enemy>();
             if (enemyComponent != null)
             {
-                Vector3 enemyDirectionVector = new Vector3(playerPosition.position.x - enemy.transform.position.x, 0, 
-                playerPosition.position.z - enemy.transform.position.z);
-
-                float enemyFacing = Vector3.Dot(enemyDirectionVector , playerForwardVector);
-                Debug.Log("enemyFacing " + enemyFacing);
-                    
-
-                if (enemyFacing >= 0.4f)
-                {
-                    enemyComponent.TakeDamage(totalDamage);
-                    hitSomething = true;
-                    
-                }
-
-                
+                enemyComponent.TakeDamage(totalDamage);
+                hitSomething = true;
             }
 
         }
 
         // Once per swing, not once per enemy - a cleave through 3 skeletons is one impact.
-        if (hitSomething) PlayHitSound();
+        if (hitSomething) PlayHitSound(activeAttack);
 
     }
+
+        private void FireProjectile(AbilityDefinition ability, int damage)
+    {
+        if (ability.projectilePrefab == null)
+        {
+            Debug.LogWarning($"{ability.name}: delivery is Projectile but projectilePrefab is empty.");
+            return;
+        }
+
+        Transform origin = firePoint != null ? firePoint : transform;
+
+        // Flat forward: the arrow flies parallel to the ground at fire-point height.
+        Vector3 forward = transform.forward;
+        forward.y = 0f;
+
+        // Rotation is set by Launch (direction + the prefab's model offset).
+        ArrowProjectile arrow = Instantiate(ability.projectilePrefab, origin.position, Quaternion.identity);
+                Debug.Log($"Arrow spawned at {origin.position}", arrow);
+        arrow.Launch(this, ability, damage, forward);
+    }
+
+    // Called by ArrowProjectile on an enemy hit. The arrow may land after the next swing
+    // started, so it passes its own ability instead of us reading activeAttack.
+    public void OnProjectileHit(AbilityDefinition ability) => PlayHitSound(ability);
 
     // Contact-frame event: the SWING sound, hit or miss.
     // The AudioSource's own clip is an impact sound, so no fallback here.
@@ -331,11 +335,11 @@ public class PlayerAttack : MonoBehaviour
     }
 
     // Called from DealAttackDamage only when something was hit.
-    private void PlayHitSound()
+    private void PlayHitSound(AbilityDefinition ability)
     {
         if (attackSound == null) return;
 
-        AudioClip hit = activeAttack != null ? AbilityDefinition.Pick(activeAttack.hitSounds) : null;
+        AudioClip hit = ability != null ? AbilityDefinition.Pick(ability.hitSounds) : null;
         if (hit != null) attackSound.PlayOneShot(hit);
         else attackSound.Play();   // fallback: AudioSource's own clip (sword-slice)
     }

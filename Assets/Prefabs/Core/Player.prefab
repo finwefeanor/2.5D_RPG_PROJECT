@@ -48,6 +48,7 @@ Transform:
   - {fileID: 7851601355446966705}
   - {fileID: 1943959348551103013}
   - {fileID: 469051793899000565}
+  - {fileID: 3619396250297471601}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4246792283235495731
@@ -170,6 +171,8 @@ MonoBehaviour:
   enemyLayers:
     serializedVersion: 2
     m_Bits: 128
+  firePoint: {fileID: 3619396250297471601}
+  meleeHitAngle: 120
   attackSound: {fileID: 7252764632173276278}
   pitchVariation: 0.05
   attackEffect: {fileID: 0}
@@ -258,8 +261,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e6f817dec59e864b9d3e4fcc312e0d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  outfitObject: {fileID: 1502292576350271087}
-  hatObject: {fileID: 4062802386694052213}
+  headPiece: {fileID: 4062802386694052213}
+  chestPiece: {fileID: 1502292576350271087}
   rightHandSocket: {fileID: 6343536584635469406}
   leftHandSocket: {fileID: 1108550657868796021}
 --- !u!82 &3111409405808741662
@@ -677,6 +680,37 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &6012016759071825341
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3619396250297471601}
+  m_Layer: 0
+  m_Name: FirePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3619396250297471601
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6012016759071825341}
+  serializedVersion: 2
+  m_LocalRotation: {x: 1.7763568e-15, y: -0.000000119209275, z: -2.1175824e-22, w: 1}
+  m_LocalPosition: {x: 0.1, y: 0.899, z: 0.361}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2470501650263969863}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8892506726582519777
 GameObject:
   m_ObjectHideFlags: 0

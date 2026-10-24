@@ -12,10 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3789f0ad930c4913b278008d7bcfaf11, type: 3}
   m_Name: Ranged_Bow_Release
   m_EditorClassIdentifier: Assembly-CSharp::AbilityDefinition
+  delivery: 1
+  projectilePrefab: {fileID: 260173596256112808, guid: 2a684bdcb6cea4385beab48aa9046651, type: 3}
   animatorIndex: 2
   animationSpeed: 1
   damageMultiplier: 1
   range: 1.5
+  projectileSpeed: 15
+  projectileRange: 15
   nextInCombo: {fileID: 0}
   comboInputOpens: 0.2
   comboChainAt: 0.5
