@@ -72,15 +72,6 @@ public class PlayerAttack : MonoBehaviour
 
 
     
-
-    /*
-    // --- Directional attack settings (disabled for now - see DealAttackDamage) ---
-    [Header("Directional Hit Check (later stage)")]
-    [Tooltip("Full cone angle in degrees. 90 = must be within 45 deg left/right of forward.")]
-    public float attackAngle = 90f;
-    */
-
-    
     void Start()
     {
         equipmentManager = GetComponent<EquipmentManager>();
@@ -241,7 +232,8 @@ public class PlayerAttack : MonoBehaviour
         nextAttackTime = Time.time + attackRecovery; // clock starts when the LAST swing ends
     }
 
-    // --- called by an Animation Event on the contact frame (frame 8) ---
+     // --- called by an Animation Event on the contact frame ---
+    // The clip decides WHEN, the ability's delivery decides HOW.
     public void DealAttackDamage()
     {
 
@@ -267,14 +259,8 @@ public class PlayerAttack : MonoBehaviour
 
         foreach (Collider enemy in hitEnemies)
         {
-            // --- LATER STAGE: directional filter ---
-            // Uncomment to require the enemy be roughly in front of the player.
-            // AoE/whirlwind attacks would call a separate method that skips this.
-            /*
-            Vector3 dirToEnemy = (enemy.transform.position - transform.position).normalized;
-            float angle = Vector3.Angle(transform.forward, dirToEnemy);
-            if (angle > attackAngle / 2f) continue;
-            */
+            // Front arc only. Flat direction + Vector3.Angle = a real angle, independent of
+            // distance. An enemy standing inside the player (zero vector) always counts.
 
            Vector3 toEnemy = enemy.transform.position - transform.position;
             toEnemy.y = 0f;
@@ -312,7 +298,6 @@ public class PlayerAttack : MonoBehaviour
 
         // Rotation is set by Launch (direction + the prefab's model offset).
         ArrowProjectile arrow = Instantiate(ability.projectilePrefab, origin.position, Quaternion.identity);
-                Debug.Log($"Arrow spawned at {origin.position}", arrow);
         arrow.Launch(this, ability, damage, forward);
     }
 

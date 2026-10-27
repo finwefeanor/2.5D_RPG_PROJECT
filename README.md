@@ -6,7 +6,7 @@ models and animations. Branch: `upgrade/unity6`.
 This document explains how the code is organised, why it is organised that way, and how each
 system works. Read sections 1-4 once; after that, use it as a reference.
 
-> Written against commit `3d8180a` + the class-select / HUD patch + the local NavMesh enemy work.
+> Written against commit `f1f153e` + the class-select / HUD patch + the local NavMesh enemy work.
 > When the code and this guide disagree, the code wins - fix the guide in the same commit.
 
 ---
@@ -203,7 +203,9 @@ Player  (prefab: Prefabs/Core/Player)          <- all LOGIC lives here
   CharacterVisualController  shows equipment on the model
   InventoryUIController   inventory panel rows
   ItemDatabase            name -> ItemData lookup (for loading saves)
-  AttackPoint (child)     centre of the attack hit sphere
+  AttackPoint (child)     centre of the attack hit sphere  
+  FirePoint (child)       where projectiles spawn (chest height). Must stay on the ROOT:
+                          the visual is destroyed on a class switch, and anything inside it dies too
 
   <ClassName>PlayerVisual  (spawned at runtime by PlayerClass)  <- all VISUALS live here
     Animator  (MageAnimationController - shared by every class)
@@ -349,10 +351,14 @@ every skeleton sharing the KayKit material.
 
 | Field | Meaning |
 |---|---|
-| `animatorIndex` | Written to Animator int `AttackIndex`; picks the clip inside `Attacks_SubState`. 0-9 = one-handed, 10-19 = unarmed |
+| `animatorIndex` | Written to Animator int `AttackIndex`; picks the clip inside `Attacks_SubState`. 0-9 = one-handed / ranged, 10-19 = unarmed  |
 | `animationSpeed` | Clip playback speed. Multiplied by the class's `attackSpeed` and written to Animator float `AttackSpeed` |
 | `damageMultiplier` | x `PlayerAttack.baseAttackDamage` |
-| `range` | Radius of the hit sphere around `AttackPoint` |
+| `range` | Melee only: radius of the hit sphere around `AttackPoint` |
+| `delivery` | What the contact-frame event does. `Melee` = hit sphere + front arc (`PlayerAttack.meleeHitAngle`). `Projectile` = spawns `projectilePrefab` at `FirePoint` |
+| `projectilePrefab` | `ArrowProjectile` prefab (Projectile only) |
+| `projectileSpeed` | Metres per second |
+| `projectileRange` | Metres flown before the projectile is removed |
 | `nextInCombo` | Attack that follows if the player presses again mid-swing (null = no combo). Must use a different clip |
 | `comboInputOpens` | Normalized time (0-1) from which a press is remembered. Earlier presses are ignored, so mashing doesn't chain |
 | `comboChainAt` | Normalized time at which a remembered press starts the next attack. Keep it **after** the contact frame |
@@ -376,6 +382,7 @@ Base Layer
   Attacks_SubState   (has the PlayerAttackState behaviour on the sub-state node)
      Entry --AttackIndex==0--> Melee_1H_Attack_Slice_Horizontal
      Entry --AttackIndex==1--> Melee_1H_Attack_Jump_Chop
+     Entry --AttackIndex==2--> Ranged_Bow_Release      (crossbow, events at 0.125)
      Entry --AttackIndex==10-> Melee_Unarmed_Attack_Punch_A
      Entry --AttackIndex==11-> Melee_Unarmed_Attack_Kick
      every state: Speed multiplier = AttackSpeed parameter
@@ -390,8 +397,10 @@ Clip import settings for attacks: root transform rotation / position Y / positio
 ```
 Space / Attack button
   -> PlayerAttack.TryAttack()
-       already attacking?  -> QueueComboInput()  (see 7.4)
-       still in recovery?  -> ignore
+       already attacking?  -> combo attack: QueueComboInput()  (see 7.4)
+                              no combo:     remember the press (inputBuffer)
+       still in recovery?  -> remember the press (inputBuffer)
+       a remembered press fires as soon as attacking is allowed, if it is <= inputBuffer s old
        attack = EquipmentManager.CurrentAttack
   -> StartAttack(attack, "Attack")
        activeAttack = attack                        (snapshot - equipping mid-swing can't change it)
@@ -408,13 +417,24 @@ Contact frame (Animation Events on the clip)
   -> PlayerAnimationEventRelay.PlayAttackSound  -> PlayerAttack.PlayAttackSound   (swing sound, random pitch)
   -> PlayerAnimationEventRelay.DealAttackDamage -> PlayerAttack.DealAttackDamage
        damage = round(baseAttackDamage * activeAttack.damageMultiplier) + sum(item.damageBonus)
-       Physics.OverlapSphere(AttackPoint, activeAttack.range, enemyLayers)
-       Enemy.TakeDamage(damage) on each hit
-       hit anything? -> one hit sound (once per swing, not per enemy)
-
+       delivery == Projectile:
+         FireProjectile: Instantiate(projectilePrefab) at FirePoint,
+                         Launch(owner, ability, damage, flat forward)
+         ArrowProjectile flies (Rigidbody, no gravity, ContinuousDynamic), ignores the player's colliders
+         OnCollisionEnter: Enemy? -> TakeDamage + owner.OnProjectileHit (hit sound). Destroyed on anything solid
+                           or after projectileRange metres
+       delivery == Melee:
+         Physics.OverlapSphere(AttackPoint, activeAttack.range, enemyLayers)
+         skip enemies outside the meleeHitAngle front arc (flat Vector3.Angle - distance independent)
+         Enemy.TakeDamage(damage) on each hit
+         hit anything? -> one hit sound (once per swing, not per enemy)
 Animator leaves the attack state
   -> PlayerAttackState.OnStateExit -> PlayerAttack.OnAttackAnimationEnd()
        nextAttackTime = now + attackRecovery     (recovery starts when the LAST swing ends)
+
+       `ArrowProjectile.modelRotation` turns the mesh so its tip leads (KayKit arrow is modelled tip-down:
+270, 0, 0). The spawn rotation is set in `Launch`, not on the prefab root - `Instantiate` would
+overwrite a root rotation.
 ```
 
 ### 7.4 Combos
@@ -680,6 +700,7 @@ outlive scene reloads, so a missing `-=` keeps a destroyed object subscribed.
 | Unarmed_Kick | 11 | 1.0 | 0.7 | 1.4 | -> Unarmed_Punch (at 0.55) |
 | Attack_1H_Slice | 0 | 1.3 | 1.0 | 1.5 | none |
 | Attack_1H_JumpChop | 1 | 1.0 | 1.5 | 1.6 | none |
+| Ranged_Bow_Release | 2 | 1.0 | 1.0 | Projectile: speed 15, range 15 | none |
 
 ### Items (all price 10)
 
@@ -694,6 +715,7 @@ outlive scene reloads, so a missing `-=` keeps a destroyed object subscribed.
 | Cloak_For_Warrior | Chest | 5 | 0 | - | Barbarian |
 | Hood_For_Rogue | Head | 0 | 0 | - | Rogue |
 | Cape_For_Rogue | Chest | 0 | 0 | - | Rogue |
+| Crossbow | RightHand | 0 | 0 | Ranged_Bow_Release | Rogue |
 
 > Balance note: the Axe's `damageBonus 25` is huge compared to base damage 9-14. Expect it to be
 > retuned when the progression phase adds stat growth.
@@ -842,6 +864,7 @@ Claude reviews by cloning the branch - it never pushes to the repo.
 | `UsesRootMotion.cs` + `CharacterMotor.cs` | Root-motion experiment. `UsesRootMotion` is on no state, so `CharacterMotor` never activates. Attacks use Bake Into Pose instead |
 | `MusicManager.cs` | Not in any scene |
 | `Prefabs/Enemy_0.prefab`, `Enemy_0_backup.prefab`, `SampleScene_backup.unity` | Old copies |
+| Assets/README.md | Old note for the greybox RPGSceneBuilder. Not this guide |
 
 **Known issues:**
 
@@ -858,7 +881,7 @@ Claude reviews by cloning the branch - it never pushes to the repo.
   `Packages/manifest.json`.
 - Death always reloads the scene; there is no respawn point or game-over menu.
 - The class is not saved; the picker appears on every start.
-- The directional hit cone for player attacks is written but commented out in `PlayerAttack`.
+- A dying enemy keeps its collider for 2.5 s, so bolts stop on corpses (fixed in the VFX step).
 
 ---
 
@@ -872,6 +895,7 @@ Claude reviews by cloning the branch - it never pushes to the repo.
 | NavMesh enemies | NavMeshAgent chase, obstacle avoidance, no pushing | Done locally |
 | Class select + HUD | Class picker, class + gold under the health bar | Done |
 | **B - Progression** | `CharacterProgression` (level, XP, `GainXP`, `OnLevelUp`), `XPCurve` asset, per-class stat growth, `Enemy.xpReward`, level + XP bar on HUD, save class / level / XP | Next |
+| **B - In Progress** | `ClassIdentity` (locomotion, delivery types, crossbow, staff, VFX) |
 | C - Skills | Ability loadout / skill bar, `requiredLevel`, resources (mana / rage / energy) | |
 | D - Ranged | Projectile system: crossbow, mage staff, VFX | |
 | E - Enemy variety | Enemies using `AbilityDefinition`, archers, summoners | |
@@ -884,6 +908,7 @@ Claude reviews by cloning the branch - it never pushes to the repo.
 |---|---|---|
 | `AbilityDefinition` | asset | One attack: clip index, speed, damage, range, combo, sounds |
 | `AnimationEventRelay` | enemy visual | Forwards Animation Events to `Enemy` |
+| `ArrowProjectile` | projectile prefab | Flies straight, damages the first Enemy it touches, removed on contact or after projectileRange |
 | `AttackButtonRelay` | HUDCanvas | Attack button -> `GameEvents.AttackPressed` |
 | `AttackStateLogger` | - | Legacy debug behaviour |
 | `CharacterClassDefinition` | asset | One class: visual, stats, unarmed attack |

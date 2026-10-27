@@ -11,7 +11,6 @@
 //  Later (progression phase): cooldown, resource cost,
 //  requiredLevel, summon prefab.
 // ============================================================
-using System.ComponentModel;
 using UnityEngine;
 
 public enum AbilityDelivery {Melee, Projectile}
@@ -25,12 +24,19 @@ public class AbilityDefinition : ScriptableObject
              "Projectile = spawns projectilePrefab at PlayerAttack.firePoint.")]
     public AbilityDelivery delivery = AbilityDelivery.Melee;
 
+
+    [Tooltip("Metres per second.")]
+    public float projectileSpeed = 25f;
+
+    [Tooltip("Metres the projectile flies before it is removed.")]
+    public float projectileRange = 15f;
+
     [Header("Projectile (delivery = Projectile)")]
     public ArrowProjectile projectilePrefab;
 
     [Header("Animation")]
     [Tooltip("Written to the Animator's AttackIndex parameter. Must match an Entry " +
-             "transition inside Attacks_SubState. 0-9 = 1H, 10-19 = unarmed.")]
+             "change “0-9 = 1H, 10-19 = unarmed” to “0-9 = 1H / ranged, 10-19 = unarmed")]
     public int animatorIndex = 0;
 
     [Tooltip("Playback speed of THIS attack's clip. 1 = as authored, 1.5 = 50% faster. " +
@@ -45,11 +51,7 @@ public class AbilityDefinition : ScriptableObject
     [Tooltip("Melee only: radius of the hit sphere around PlayerAttack.attackPoint.")]
     public float range = 1.5f;
 
-    [Tooltip("Metres per second.")]
-    public float projectileSpeed = 25f;
-
-    [Tooltip("Metres the projectile flies before it is removed.")]
-    public float projectileRange = 15f;
+    
 
     [Header("Combo")]
     [Tooltip("Attack that follows if the player presses again during this swing. " +

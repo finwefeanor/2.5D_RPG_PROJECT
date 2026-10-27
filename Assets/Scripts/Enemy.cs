@@ -298,7 +298,6 @@ public class Enemy : MonoBehaviour
 
         playerHealth.TakeDamage(attackDamage);
 
-
     }
 
     private void FacePlayer()

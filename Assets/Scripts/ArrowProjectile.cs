@@ -12,8 +12,8 @@ public class ArrowProjectile : MonoBehaviour
     [SerializeField] private GameObject impactEffect;
 
     [Tooltip("Rotation that makes the model's tip point along the flight direction. " +
-            "KayKit arrow (fbx(unity)) is modelled tip-down (-Y): use (-90, 0, 0).")]
-    [SerializeField] private Vector3 modelRotation = new Vector3(-90f, 0f, 0f);
+            "KayKit arrow (fbx(unity)) is modelled tip-down (-Y): use (270, 0, 0).")]
+    [SerializeField] private Vector3 modelRotation = new Vector3(270f, 0f, 0f);
 
     private Rigidbody rb;
     private PlayerAttack owner;
@@ -57,7 +57,6 @@ public class ArrowProjectile : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-                Debug.Log($"Arrow hit {collision.collider.name} at {transform.position}", collision.collider);
                 
         if (spent) return;
         spent = true;
