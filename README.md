@@ -74,6 +74,7 @@ Assets/
   Animators/          MageAnimationController (shared by ALL player visuals),
                       EnemyAnimationController
   Prefabs/
+    |VFX/ | | | | | | VFX_HitSpark and VFX_*_Mat
     Core/             everything Build MVP Scene spawns:
                       GameManager, Player, Merchant, Enemy_0_with_sword (+ Boss_Variant),
                       ShopCanvas, PlayerHealthBarCanvas, PauseMenuCanvas, HUDCanvas, GlobalVolume

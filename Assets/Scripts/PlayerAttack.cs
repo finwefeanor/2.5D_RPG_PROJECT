@@ -237,9 +237,6 @@ public class PlayerAttack : MonoBehaviour
     public void DealAttackDamage()
     {
 
-        Debug.Log($"DealAttackDamage: {(activeAttack != null ? activeAttack.name : "null")} " +
-          $"delivery={(activeAttack != null ? activeAttack.delivery.ToString() : "-")}");
-
         if (activeAttack == null) return;
 
         int bonus = equipmentManager != null ? equipmentManager.GetTotalDamageBonus() : 0;

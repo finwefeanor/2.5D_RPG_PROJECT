@@ -14,14 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AbilityDefinition
   delivery: 1
   projectilePrefab: {fileID: 260173596256112808, guid: 2a684bdcb6cea4385beab48aa9046651, type: 3}
+  projectileSpeed: 15
+  projectileRange: 15
   animatorIndex: 2
   animationSpeed: 1
   damageMultiplier: 1
   range: 1.5
-  projectileSpeed: 15
-  projectileRange: 15
   nextInCombo: {fileID: 0}
   comboInputOpens: 0.2
   comboChainAt: 0.5
-  swingSounds: []
-  hitSounds: []
+  swingSounds:
+  - {fileID: 8300000, guid: 1afd7775acc8ab28ea3a256639f54eb0, type: 3}
+  - {fileID: 8300000, guid: 9930782efdf1d04b3a591b74182408e6, type: 3}
+  - {fileID: 8300000, guid: 30f11c4b3ad1ee860958d33acbf45cfc, type: 3}
+  hitSounds:
+  - {fileID: 8300000, guid: 9dfd905e6acb5be0d82aac67d461e49f, type: 3}
+  - {fileID: 8300000, guid: aa9e21252cf31e1f9b73e12d98fab6b5, type: 3}
+  - {fileID: 8300000, guid: 7f241fe94c16616608334954cdbc5834, type: 3}

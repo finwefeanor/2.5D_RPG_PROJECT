@@ -25,19 +25,20 @@ public class AbilityDefinition : ScriptableObject
     public AbilityDelivery delivery = AbilityDelivery.Melee;
 
 
-    [Tooltip("Metres per second.")]
+
+    [Header("Projectile (delivery = Projectile)")]
+    public ArrowProjectile projectilePrefab;
+
+        [Tooltip("Metres per second.")]
     public float projectileSpeed = 25f;
 
     [Tooltip("Metres the projectile flies before it is removed.")]
     public float projectileRange = 15f;
 
-    [Header("Projectile (delivery = Projectile)")]
-    public ArrowProjectile projectilePrefab;
-
     [Header("Animation")]
     [Tooltip("Written to the Animator's AttackIndex parameter. Must match an Entry " +
-             "change “0-9 = 1H, 10-19 = unarmed” to “0-9 = 1H / ranged, 10-19 = unarmed")]
-    public int animatorIndex = 0;
+                "transition inside Attacks_SubState. 0-9 = 1H / ranged, 10-19 = unarmed.")]
+       public int animatorIndex = 0;
 
     [Tooltip("Playback speed of THIS attack's clip. 1 = as authored, 1.5 = 50% faster. " +
              "Animation Events are normalized, so contact frames scale with it.")]

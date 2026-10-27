@@ -294,8 +294,6 @@ public class Enemy : MonoBehaviour
         dirToPlayer.y = 0;
         if (Vector3.Angle(transform.forward, dirToPlayer) > hitAngle / 2f) return;
 
-        Debug.Log("dirToPlayer " + dirToPlayer + " Hit Angle " + hitAngle);
-
         playerHealth.TakeDamage(attackDamage);
 
     }

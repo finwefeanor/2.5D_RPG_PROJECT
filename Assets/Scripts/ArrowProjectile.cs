@@ -15,6 +15,12 @@ public class ArrowProjectile : MonoBehaviour
             "KayKit arrow (fbx(unity)) is modelled tip-down (-Y): use (270, 0, 0).")]
     [SerializeField] private Vector3 modelRotation = new Vector3(270f, 0f, 0f);
 
+    [Tooltip("Optional TrailRenderer on a CHILD object of the bolt. Detached on despawn so it " +
+             "fades out instead of vanishing together with the bolt.")]
+    [SerializeField] private TrailRenderer trail;
+
+    private float despawnTime;   // out-of-range time, set in Launch
+
     private Rigidbody rb;
     private PlayerAttack owner;
     private AbilityDefinition ability;
@@ -26,6 +32,11 @@ public class ArrowProjectile : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
         rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+    }
+
+    void Update()
+    {
+        if (!spent && Time.time >= despawnTime) Despawn();   // flew projectileRange metres
     }
 
     // Called once, right after Instantiate.
@@ -53,6 +64,9 @@ public class ArrowProjectile : MonoBehaviour
         float speed = Mathf.Max(0.1f, ability.projectileSpeed);
         rb.linearVelocity = direction * speed;
         Destroy(gameObject, ability.projectileRange / speed);
+
+        // Not Destroy(gameObject, t): a timed Destroy would skip Despawn and kill the trail.
+        despawnTime = Time.time + ability.projectileRange / speed;
     }
 
     void OnCollisionEnter(Collision collision)
@@ -69,8 +83,40 @@ public class ArrowProjectile : MonoBehaviour
         }
 
         if (impactEffect != null)
-            Instantiate(impactEffect, transform.position, transform.rotation);
+        {
+            // Spawn at the real contact point, facing out of the surface that was hit.
+            Vector3 point = transform.position;
+            Quaternion facing = Quaternion.identity;
+            if (collision.contactCount > 0)
+            {
+                ContactPoint contact = collision.GetContact(0);
+                point = contact.point;
+                facing = Quaternion.LookRotation(contact.normal);
+            }
+            Instantiate(impactEffect, point, facing);
+        }
+
+        Despawn();
+    }
+
+
+    // The one exit for both endings (hit / out of range). The trail is detached so it
+    // fades out on its own; autodestruct removes it once its last point has faded.
+    private void Despawn()
+    {
+        spent = true;
+
+        if (trail != null)
+        {
+            trail.transform.SetParent(null, true);
+            trail.emitting = false;
+            trail.autodestruct = true;
+        }
 
         Destroy(gameObject);
     }
+
+
+
+
 }
