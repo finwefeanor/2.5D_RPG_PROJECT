@@ -2,29 +2,36 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// CHANGED FROM 2D:
-//   OnTriggerEnter2D  → OnTriggerEnter
-//   OnTriggerExit2D   → OnTriggerExit  (not used here but good habit)
-//   SpriteRenderer clothesRenderer → PlayerInventory reference
-//     In 3D, "has armor" is tracked by PlayerInventory.HasClothesEquipped()
-//     instead of checking if a SpriteRenderer is active
-
+// Player health: armour mitigation, flinch, death.
+// Lives on the Player root. The hurt sound normally comes from the Hit_A clip's
+// PlayHitSound Animation Event (so it matches the visible flinch); when a hit does
+// NOT flinch, TakeDamage plays it directly instead.
 public class PlayerHealth : MonoBehaviour
 {
     public int health = 100;
-    //public int armorReduction = 5; clean it later
+    public int maxHealth = 100;
     public AudioSource playerHitSound;
     public AudioSource playerDieSound;
-    public int maxHealth = 100;
-    public event System.Action<int, int> OnHealthChanged; // current, max
+    // Health UI listens to GameEvents.OnPlayerHealthChanged (the old per-player event was unused).
+
+    [Header("Flinch (stun-lock protection)")]
+    [Tooltip("After a flinch, further hits still deal damage but don't play Hit_A again for " +
+             "this long. Stops a crowd from stun-locking the player. 0 = flinch on every hit.")]
+    public float flinchImmunity = 1.5f;
+
+    [Tooltip("Off = hits taken during an attack animation never interrupt it (hyper armour); " +
+             "the damage still lands. On = any hit can cancel a swing.")]
+    public bool flinchWhileAttacking = false;
+
+    private float nextFlinchTime = 0f;
 
     [Header("Death UI")]
-    private GameObject deathScreenUI; // simple full-screen panel with "You Died" text, assign in Inspector
+    private GameObject deathScreenUI; // resolved from PlayerUIRefs in Start
 
     private bool isDead = false;
 
-    private PlayerInventory playerInventory;
     private EquipmentManager equipmentManager;
+    private PlayerAttack playerAttack;
 
     [SerializeField] private Animator animator;
 
@@ -38,67 +45,63 @@ public class PlayerHealth : MonoBehaviour
     void Start()
     {
         equipmentManager = GetComponent<EquipmentManager>();
+        playerAttack = GetComponent<PlayerAttack>();
 
         var ui = PlayerUIRefs.Instance;
         if (ui != null) deathScreenUI = ui.deathScreenPanel;
         else Debug.LogWarning("PlayerHealth: no PlayerHealthBarCanvas in scene.", this);
-        
-        GameEvents.PlayerHealthChanged(health, maxHealth);// initial value for UI
+
+        GameEvents.PlayerHealthChanged(health, maxHealth); // initial value for UI
     }
 
     public void TakeDamage(int damage)
     {
         if (isDead) return;
 
-        Debug.Log($"TakeDamage called at {Time.time:F2}s, damage={damage}"); // ADD THIS
-
         int defense = equipmentManager != null ? equipmentManager.GetTotalDefense() : 0;
         int mitigated = Mathf.Max(1, damage - defense);
 
         health -= mitigated;
-        Debug.Log("Player health: " + health);
         GameEvents.PlayerHealthChanged(health, maxHealth);
 
-        // Sound removed from here — now fires via Animation Event on the
-        // Hit reaction clip instead (see PlayHitSound() below), so it's
-        // guaranteed to sync with the actual visual flinch, not a code timer.
-        if (animator != null) animator.SetTrigger(HitHash);
-
         if (health <= 0)
+        {
             Die();
+            return;
+        }
+
+        // Damage always lands; the FLINCH is limited, the same way Enemy limits it:
+        //  - never mid-swing (unless flinchWhileAttacking), so the player can fight back,
+        //  - at most once per flinchImmunity seconds, so two skeletons can't chain-stun.
+        bool attacking = playerAttack != null && playerAttack.IsAttacking;
+        bool canFlinch = Time.time >= nextFlinchTime && (flinchWhileAttacking || !attacking);
+
+        if (canFlinch && animator != null)
+        {
+            animator.SetTrigger(HitHash);   // Hit_A's PlayHitSound event plays the sound
+            nextFlinchTime = Time.time + flinchImmunity;
+        }
+        else
+        {
+            PlayHitSound();                 // no flinch animation -> play the hurt sound here
+        }
     }
 
-    // Wire this to an Animation Event on your Hit reaction clip
-    // (same pattern as Enemy's PlayAttackSound — may need an
-    // AnimationEventRelay on the Animator's GameObject if it's
-    // a separate child object, e.g. MagePlayerVisual).
+    // Hit_A clip, flinch frame (through PlayerAnimationEventRelay). Also called by
+    // TakeDamage for hits that don't flinch.
     public void PlayHitSound()
     {
-        Debug.Log($"PlayHitSound (animation event) fired at {Time.time:F2}s"); // ADD THIS
         if (playerHitSound != null) playerHitSound.Play();
     }
 
     void Die()
     {
-        // if (isDead) return;
-        // isDead = true;
-
-        // Debug.Log("Player has died");
-        // if (animator != null)
-        // {
-        //     animator.SetBool(isDeadHash, true);
-        //     animator.SetTrigger(DeathHash);
-        // }
-        // StartCoroutine(HandleDeath());
-
         if (isDead) return;
-    isDead = true;
+        isDead = true;
 
-    var refs = GetComponent<PlayerRefs>();
-    if (refs.Controller != null) refs.Controller.enabled = false;
-    if (refs.Attack != null) refs.Attack.enabled = false;
-
-        //if (animator != null) animator.SetTrigger("Death");
+        var refs = GetComponent<PlayerRefs>();
+        if (refs.Controller != null) refs.Controller.enabled = false;
+        if (refs.Attack != null) refs.Attack.enabled = false;
 
         if (animator != null)
         {
@@ -106,7 +109,7 @@ public class PlayerHealth : MonoBehaviour
             animator.SetTrigger(DeathHash);
         }
 
-        GameEvents.PlayerDied();          // add this to GameEvents
+        GameEvents.PlayerDied();
 
         StartCoroutine(HandleDeath());
     }
@@ -115,14 +118,11 @@ public class PlayerHealth : MonoBehaviour
     {
         if (deathScreenUI != null) deathScreenUI.SetActive(true);
 
-        //Time.timeScale = 0f;
-
         if (playerDieSound != null) playerDieSound.Play();
 
-        float waitTime = playerDieSound != null ? playerDieSound.clip.length : 6.0f;
+        float waitTime = playerDieSound != null && playerDieSound.clip != null ? playerDieSound.clip.length : 6.0f;
         yield return new WaitForSecondsRealtime(waitTime);
 
-        //Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

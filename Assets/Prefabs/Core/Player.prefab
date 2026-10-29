@@ -194,9 +194,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 30
-  playerHitSound: {fileID: 0}
+  playerHitSound: {fileID: 3111409405808741662}
   playerDieSound: {fileID: 2272609547113551430}
   maxHealth: 30
+  flinchImmunity: 1.5
+  flinchWhileAttacking: 0
   animator: {fileID: 4185621971781387211}
 --- !u!136 &6031493469010363102
 CapsuleCollider:

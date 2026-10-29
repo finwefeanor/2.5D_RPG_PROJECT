@@ -215,6 +215,11 @@ MonoBehaviour:
   enemyGetHitSound: {fileID: 5534839771477710333}
   enemyAttackSound: {fileID: 3808736605849714670}
   enemyDieSound: {fileID: 4852495460155879043}
+  getHitClips:
+  - {fileID: 8300000, guid: d501ac560df619241b12e4dea7d141d6, type: 3}
+  - {fileID: 8300000, guid: a150febe0bda4a258d1376865097bb27, type: 3}
+  - {fileID: 8300000, guid: e96c1be7b50f4e96903c892903227ee2, type: 3}
+  getHitPitchVariation: 0.1
 --- !u!136 &2110713012232207240
 CapsuleCollider:
   m_ObjectHideFlags: 0

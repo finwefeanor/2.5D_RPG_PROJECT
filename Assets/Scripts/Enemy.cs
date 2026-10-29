@@ -77,6 +77,14 @@ public class Enemy : MonoBehaviour
     public AudioSource enemyAttackSound;
     public AudioSource enemyDieSound;
 
+    [Tooltip("Hurt sounds, one picked at random per flinch and played through enemyGetHitSound. "
+             + "Empty = the AudioSource's own clip.")]
+    public AudioClip[] getHitClips;
+
+    [Tooltip("Random pitch offset per hurt sound (+/-). Stops a crowd sounding identical.")]
+    [Range(0f, 0.3f)]
+    public float getHitPitchVariation = 0.1f;
+
     private NavMeshAgent navMeshAgent;
 
     // ---------------------------------------------------------------------
@@ -326,7 +334,12 @@ public class Enemy : MonoBehaviour
     /// <summary>Shared Hit_A clip — flinch frame.</summary>
     public void PlayHitSound()
     {
-        if (enemyGetHitSound != null) enemyGetHitSound.Play();
+        if (enemyGetHitSound == null) return;
+
+        enemyGetHitSound.pitch = 1f + UnityEngine.Random.Range(-getHitPitchVariation, getHitPitchVariation);
+        AudioClip clip = AbilityDefinition.Pick(getHitClips);
+        if (clip != null) enemyGetHitSound.PlayOneShot(clip);
+        else enemyGetHitSound.Play();   // no clips set: the AudioSource's own clip
     }
 
     /// <summary>Swing contact frame.</summary>

@@ -56,7 +56,7 @@ public class PlayerAttack : MonoBehaviour
     // How many attack states are playing. Normally 0 or 1; it is 2 for a moment while one
     // combo step crossfades into the next (Unity enters the new state BEFORE exiting the old).
     private int attackStatesActive = 0;
-    private bool IsAttacking => attackStatesActive > 0;
+    public bool IsAttacking => attackStatesActive > 0;   // read by PlayerHealth (no flinch mid-swing)
     private float nextAttackTime = 0f;
 
     // Snapshot taken when the swing starts. The contact-frame event reads this,
