@@ -6,7 +6,7 @@ models and animations. Branch: `upgrade/unity6`.
 This document explains how the code is organised, why it is organised that way, and how each
 system works. Read sections 1-4 once; after that, use it as a reference.
 
-> Written against commit `f1f153e` + the class-select / HUD patch + the local NavMesh enemy work.
+> Written against commit `f4743ef` + the class-select / HUD patch + the local NavMesh enemy work.
 > When the code and this guide disagree, the code wins - fix the guide in the same commit.
 
 ---
@@ -39,7 +39,7 @@ system works. Read sections 1-4 once; after that, use it as a reference.
 | | |
 |---|---|
 | Unity | 6.5 - `6000.5.8f1` |
-| Render pipeline | URP (GlobalVolume prefab) |
+| Render pipeline | URP, **Forward+** renderer (no per-object light limit), GlobalVolume prefab |
 | Main test scene | `Assets/Scenes/newTestingScene.unity` |
 | Target | Android (also builds for Linux / Windows Mono for testing) |
 | Input | Old Input Manager (`Input.GetKeyDown`, `Input.GetAxisRaw`) + on-screen joystick / buttons |
@@ -384,6 +384,8 @@ Base Layer
      Entry --AttackIndex==0--> Melee_1H_Attack_Slice_Horizontal
      Entry --AttackIndex==1--> Melee_1H_Attack_Jump_Chop
      Entry --AttackIndex==2--> Ranged_Bow_Release      (crossbow, events at 0.125)
+     Entry --AttackIndex==3--> Melee_1H_Attack_Slice_Diagonal  (Blade combo 2, events at 0.433)
+     Entry --AttackIndex==4--> Melee_1H_Attack_Stab            (Blade combo 3, events at 0.271)
      Entry --AttackIndex==10-> Melee_Unarmed_Attack_Punch_A
      Entry --AttackIndex==11-> Melee_Unarmed_Attack_Kick
      every state: Speed multiplier = AttackSpeed parameter
@@ -440,7 +442,12 @@ overwrite a root rotation.
 
 ### 7.4 Combos
 
-Example: `Unarmed_Punch -> Unarmed_Kick -> Unarmed_Punch -> ...` (each points at the other).
+Examples:
+- `Unarmed_Punch -> Unarmed_Kick -> Unarmed_Punch -> ...` (each points at the other).
+- Blade: `Attack_1H_Slice -> Attack_1H_SliceDiagonal -> Attack_1H_Stab` (Stab is the finisher, chain ends).
+
+Contact frames for new clips can be estimated from the FBX: the frame of peak angular speed of the
+right arm chain matches the hand-placed events of Slice / JumpChop / Kick / Punch within ~1 frame.
 
 1. During a swing, a press calls `QueueComboInput()`. It is ignored if
    `swingTime < comboInputOpens` (too early = mashing) or there is no `nextInCombo`.
@@ -644,6 +651,9 @@ On the Player. Tab or the close button toggles it. One row per owned item: name 
 | `HUDCanvas` | `VirtualJoystick`, `AttackButtonRelay`, `InteractButtonRelay` | Mobile controls |
 | (built in code) `ClassSelectCanvas` | `ClassSelectMenu` on GameManager | Class picker |
 
+**Music**: `MusicManager` on the GameManager prefab creates its own 2D AudioSource and loops
+`Music_Crypt_Loop.ogg` (generated, licence-free, 64 s seamless, Load Type Streaming) at volume 0.35.
+
 - **`PlayerHealthUI`**: slider driven by `GameEvents.OnPlayerHealthChanged`.
 - **`PlayerStatsHUD`**: builds a two-line Text (`Mage` / gold-coloured `Gold: 120`) anchored under the
   `Slider` child's bottom-left corner. Listens to `OnGoldChanged` and `OnPlayerClassChanged`. Phase B
@@ -699,8 +709,10 @@ outlive scene reloads, so a missing `-=` keeps a destroyed object subscribed.
 |---|---|---|---|---|---|
 | Unarmed_Punch | 10 | 1.15 | 0.5 | 1.2 | -> Unarmed_Kick (at 0.5) |
 | Unarmed_Kick | 11 | 1.0 | 0.7 | 1.4 | -> Unarmed_Punch (at 0.55) |
-| Attack_1H_Slice | 0 | 1.3 | 1.0 | 1.5 | none |
-| Attack_1H_JumpChop | 1 | 1.0 | 1.5 | 1.6 | none |
+| Attack_1H_Slice | 0 | 1.3 | 1.0 | 1.5 | -> Attack_1H_SliceDiagonal (opens 0.15, at 0.42) |
+| Attack_1H_SliceDiagonal | 3 | 1.2 | 1.1 | 1.5 | -> Attack_1H_Stab (opens 0.25, at 0.6) |
+| Attack_1H_Stab | 4 | 1.25 | 1.5 | 1.8 | none (finisher) |
+| Attack_1H_JumpChop | 1 | 1.0 | 1.5 | 1.0 | none. Sounds: JumpChop_Slam_01-03 / JumpChop_Hit_01-03 |
 | Ranged_Bow_Release | 2 | 1.0 | 1.0 | Projectile: speed 15, range 15 | none |
 
 ### Items (all price 10)
@@ -863,7 +875,6 @@ Claude reviews by cloning the branch - it never pushes to the repo.
 | `DebugInventoryTester.cs` | Temporary I/U/G/H test keys. Not on any prefab |
 | `AttackStateLogger.cs` | Debug behaviour, replaced by `EnemyAttackState`. Not on any animator |
 | `UsesRootMotion.cs` + `CharacterMotor.cs` | Root-motion experiment. `UsesRootMotion` is on no state, so `CharacterMotor` never activates. Attacks use Bake Into Pose instead |
-| `MusicManager.cs` | Not in any scene |
 | `Prefabs/Enemy_0.prefab`, `Enemy_0_backup.prefab`, `SampleScene_backup.unity` | Old copies |
 | Assets/README.md | Old note for the greybox RPGSceneBuilder. Not this guide |
 
@@ -931,7 +942,7 @@ Claude reviews by cloning the branch - it never pushes to the repo.
 | `InventoryUIController` | Player | Inventory panel rows, equip / unequip |
 | `ItemData` | asset | One item |
 | `ItemDatabase` | Player | Name -> item lookup for saves |
-| `MusicManager` | - | Unused background music |
+| `MusicManager` | GameManager | Looping 2D background music (`Music_Crypt_Loop`, Streaming) |
 | `PauseMenu` | PauseMenuCanvas (+ GameManager, duplicate) | Pause, save, restart, quit |
 | `PauseUIRefs` | PauseMenuCanvas | Pause panel ref |
 | `PlayerAnimationEventRelay` | player visuals | Forwards Animation Events to `PlayerAttack` / `PlayerHealth` |

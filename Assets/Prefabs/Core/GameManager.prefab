@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 198048744868883466}
   - component: {fileID: 6928606781893461082}
   - component: {fileID: 2554084293475002905}
+  - component: {fileID: 8842514861359412280}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -63,3 +64,17 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c37b050b18674ac68da161c8d7acb3ad, type: 2}
   showOnStart: 1
   reopenKey: 99
+--- !u!114 &8842514861359412280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1273893659659257554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6eb4dde32568b84dae5b9d710593628, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  music: {fileID: 8300000, guid: f27c0c461cce4276a08cca7486c9545f, type: 3}
+  volume: 0.35

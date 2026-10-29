@@ -20,11 +20,10 @@ MonoBehaviour:
   comboInputOpens: 0.2
   comboChainAt: 0.5
   swingSounds:
-  - {fileID: 8300000, guid: 523896b749bacee2ab42382da5d5673d, type: 3}
-  - {fileID: 8300000, guid: 1fb56c0767443c6d897b23385da92ec6, type: 3}
+  - {fileID: 8300000, guid: b8939a6714f84799a8383f26fad1915a, type: 3}
+  - {fileID: 8300000, guid: 770f06579c5f4f9cb17f717f249dac1f, type: 3}
+  - {fileID: 8300000, guid: 773db97658454333820693681f793750, type: 3}
   hitSounds:
-  - {fileID: 8300000, guid: 159561b2ad8cad67fb0bb19445593612, type: 3}
-  - {fileID: 8300000, guid: e255fe797f3c34fef81e142cd55b2c23, type: 3}
-  - {fileID: 8300000, guid: e00d96fdf6ce4ce21af3643e9861904c, type: 3}
-  - {fileID: 8300000, guid: 6a7417553fe7fdc5ebbf4be8fb905820, type: 3}
-  - {fileID: 8300000, guid: e32361dd987e99a7faa89d35a59bb397, type: 3}
+  - {fileID: 8300000, guid: 0be29dc175e642efa37187a68faddeb5, type: 3}
+  - {fileID: 8300000, guid: 88caeb496c934cee8a3c9f06237fc44d, type: 3}
+  - {fileID: 8300000, guid: 611a31fbf8da436fac7e45951c85db91, type: 3}

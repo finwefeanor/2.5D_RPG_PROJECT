@@ -20,9 +20,9 @@ MonoBehaviour:
   range: 1.5
   projectileSpeed: 25
   projectileRange: 15
-  nextInCombo: {fileID: 0}
-  comboInputOpens: 0.2
-  comboChainAt: 0.5
+  nextInCombo: {fileID: 11400000, guid: e8cf819b553946ceb3b5613a0e8d5156, type: 2}
+  comboInputOpens: 0.15
+  comboChainAt: 0.42
   swingSounds:
   - {fileID: 8300000, guid: 48922161dc8877f94b19cda718325b73, type: 3}
   - {fileID: 8300000, guid: 1fb56c0767443c6d897b23385da92ec6, type: 3}
