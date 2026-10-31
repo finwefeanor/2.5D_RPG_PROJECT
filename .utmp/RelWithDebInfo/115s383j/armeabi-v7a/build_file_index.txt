@@ -1,0 +1,2 @@
+C:\Github\2.5D_RPG_PROJECT\Library\Bee\Android\Prj\Mono2x\Gradle\unityLibrary\src\main\cpp\CMakeLists.txt
+C:\Github\2.5D_RPG_PROJECT\Library\Bee\Android\Prj\Mono2x\Gradle\unityLibrary\src\main\cpp\FramePacing\CMakeLists.txt

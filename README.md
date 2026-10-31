@@ -657,7 +657,7 @@ On the Player. Tab or the close button toggles it. One row per owned item: name 
 | `PlayerHealthBarCanvas` | `PlayerHealthUI`, `PlayerStatsHUD`, `PlayerUIRefs` | Health slider, class + gold text under it, death panel |
 | `ShopCanvas` | `ShopUIRefs` | Shop panel, inventory panel |
 | `PauseMenuCanvas` | `PauseMenu`, `PauseUIRefs` | Pause panel with Save / New Game / Restart / Quit |
-| `HUDCanvas` | `VirtualJoystick`, `AttackButtonRelay`, `InteractButtonRelay` | Mobile controls |
+| `HUDCanvas` | `VirtualJoystick`, `AttackButtonRelay`, `InteractButtonRelay` | Mobile controls. Canvas Scaler = Scale With Screen Size, reference 1080x1920 (portrait), match 0.5 - so controls keep the same physical proportion on every phone |
 | (built in code) `ClassSelectCanvas` | `ClassSelectMenu` on GameManager | Class picker |
 
 **Music**: `MusicManager` on the GameManager prefab creates its own 2D AudioSource and loops
@@ -691,11 +691,18 @@ outlive scene reloads, so a missing `-=` keeps a destroyed object subscribed.
 ## 11. Input, camera, mobile controls
 
 - **Keyboard**: each script reads its own key (table in section 1).
-- **Mobile buttons**: a UI Button's `OnClick` calls a relay on the same canvas (`AttackButtonRelay`,
-  `InteractButtonRelay`), which fires a `GameEvents` event. The canvas therefore never references the
-  Player prefab (rule 1).
-- **`VirtualJoystick`**: drag handler on a UI image; exposes `Horizontal` / `Vertical` and a static
-  `Instance`. `PlayerController` reads it when the keyboard axes are idle.
+- **Mobile buttons**: a relay on the same canvas fires a `GameEvents` event, so the canvas never
+  references the Player prefab (rule 1).
+  - **ATTACK** (bottom-right, 240 px round, centre (-230, 300) from the corner - mirrors the joystick):
+    `AttackButtonRelay.OnPointerDown` fires on finger DOWN. The Button's `OnClick` list is empty on
+    purpose (OnClick fires on release - laggy, and wiring both would attack twice per tap).
+  - **USE** (160 px, up-left of ATTACK): Button `OnClick` -> `InteractButtonRelay` (release is fine there).
+  - Both use the built-in round Knob sprite, dark translucent, white bold labels.
+- **`VirtualJoystick`**: drag handler on the `JoystickBackground` image (HUDCanvas, bottom-left,
+  260 px, centre at (230, 300) px from the corner so the thumb can pull down/left without leaving the
+  screen). Input is measured from the circle's centre (pivot-independent), clamped to 1, with a
+  `deadZone` (0.1). Exposes `Horizontal` / `Vertical` and a static `Instance`. `PlayerController`
+  reads it when the keyboard axes are idle.
 - **`TopDownCameraController`** (on Main Camera, in the scene): follows
   `GameManager.Instance.Player` with `offset (0, 22, -14)`, `pitchAngle 58`, smooth lerp in
   `LateUpdate`. Snaps to the player on the first frame.
