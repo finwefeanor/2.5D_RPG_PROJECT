@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 // ============================================================
-//  DebugInventoryTester.cs  —  TEMPORARY, delete once
+//  DebugInventoryTester.cs  ï¿½  TEMPORARY, delete once
 //  a real inventory UI exists.
 //  Attach to the Player GameObject alongside InventoryManager.
 // ============================================================

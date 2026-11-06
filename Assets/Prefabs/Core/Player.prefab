@@ -140,6 +140,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8f42d5d457c7ac64382162a1d548791a, type: 2}
   - {fileID: 11400000, guid: 2d8e7e7343c029644b413b199707ca03, type: 2}
   - {fileID: 11400000, guid: 2deb670568d1537479029806ec7d2080, type: 2}
+  - {fileID: 11400000, guid: 64c5d384591ea7285b5dd904fabf387f, type: 2}
 --- !u!114 &4895785420610898260
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -194,9 +195,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 30
+  maxHealth: 30
   playerHitSound: {fileID: 3111409405808741662}
   playerDieSound: {fileID: 2272609547113551430}
-  maxHealth: 30
   flinchImmunity: 1.5
   flinchWhileAttacking: 0
   animator: {fileID: 4185621971781387211}

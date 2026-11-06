@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3930377806025155544}
   - component: {fileID: 8018612272566832871}
   - component: {fileID: 5404406143711829978}
+  - component: {fileID: 1272667879802200688}
   m_Layer: 0
   m_Name: Merchant
   m_TagString: Untagged
@@ -34,6 +35,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 5040695338908000613}
   - {fileID: 4657394010916289516}
   - {fileID: 5746911423511780653}
   m_Father: {fileID: 0}
@@ -121,6 +123,22 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 03d6c0d58f534fc6e9facac5bb735a18, type: 2}
   - {fileID: 11400000, guid: 89df85b9c029aa1638733295e6d20213, type: 2}
   - {fileID: 11400000, guid: c1fca072a03a4ee5cac0929c46b24619, type: 2}
+  - {fileID: 11400000, guid: 64c5d384591ea7285b5dd904fabf387f, type: 2}
+--- !u!114 &1272667879802200688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 351996720073605871}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3975bc3c24114b4fc83b3c728601d0f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MerchantMovement
+  playerTranform: {fileID: 0}
+  turnSpeed: 240
+  lookRange: 3
 --- !u!1 &2406439159582205321
 GameObject:
   m_ObjectHideFlags: 0
@@ -373,6 +391,7 @@ GameObject:
   - component: {fileID: 8677137098022682297}
   - component: {fileID: 5253974527932150293}
   - component: {fileID: 3999496030858331276}
+  - component: {fileID: 7102610492367165384}
   m_Layer: 0
   m_Name: Body
   m_TagString: Untagged
@@ -402,7 +421,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5790756467348685449}
-  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 0}
 --- !u!136 &5253974527932150293
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -475,3 +494,108 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!95 &7102610492367165384
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5790756467348685449}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 0947bbd647ecfde46803655f0dc26404, type: 3}
+  m_Controller: {fileID: 9100000, guid: 41febb999a89bc64dbaa0c7d5448b813, type: 2}
+  m_CullingMode: 1
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!1001 &4791439441848256142
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 428674548891780563}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 0947bbd647ecfde46803655f0dc26404, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.027280003
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 0947bbd647ecfde46803655f0dc26404, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.35
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 0947bbd647ecfde46803655f0dc26404, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.40708494
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 0947bbd647ecfde46803655f0dc26404, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 0947bbd647ecfde46803655f0dc26404, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 0947bbd647ecfde46803655f0dc26404, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 0947bbd647ecfde46803655f0dc26404, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 0947bbd647ecfde46803655f0dc26404, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 0947bbd647ecfde46803655f0dc26404, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 0947bbd647ecfde46803655f0dc26404, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0947bbd647ecfde46803655f0dc26404, type: 3}
+      propertyPath: m_Name
+      value: Skeleton_Minion
+      objectReference: {fileID: 0}
+    - target: {fileID: 3000256035407954547, guid: 0947bbd647ecfde46803655f0dc26404, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 74ac6f152262a4a63a44da256ef12781, type: 2}
+    - target: {fileID: 5866666021909216657, guid: 0947bbd647ecfde46803655f0dc26404, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: c6f27e38ba6c1c71fb8e0f5f70708a96, type: 2}
+    - target: {fileID: 5866666021909216657, guid: 0947bbd647ecfde46803655f0dc26404, type: 3}
+      propertyPath: m_WarningMessage
+      value: "\nBinding warning: Some generic clip(s) animate transforms that are
+        already bound by a Humanoid avatar. These transforms can only be changed
+        by Humanoid clips.\n\tTransform 'upperarm.l'\n\tTransform 'upperleg.l'\n\tTransform
+        'upperleg.r'\n\tTransform 'hips'\n\tTransform 'upperarm.r'\n\tTransform 'lowerarm.r'\n\tTransform
+        'upperarm.l'\n\tTransform 'chest'\n\tTransform 'lowerarm.l'\n\tTransform
+        'lowerleg.r'\n\tand more ...\n\tFrom animation clip 'Running_A'"
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909216657, guid: 0947bbd647ecfde46803655f0dc26404, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 0947bbd647ecfde46803655f0dc26404, type: 3}
+--- !u!4 &5040695338908000613 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0947bbd647ecfde46803655f0dc26404, type: 3}
+  m_PrefabInstance: {fileID: 4791439441848256142}
+  m_PrefabAsset: {fileID: 0}
