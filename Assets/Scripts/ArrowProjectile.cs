@@ -19,6 +19,11 @@ public class ArrowProjectile : MonoBehaviour
              "fades out instead of vanishing together with the bolt.")]
     [SerializeField] private TrailRenderer trail;
 
+    [Tooltip("Optional particle effects on CHILD objects (fireball flames, sparks). On despawn " +
+            "they stop emitting, are detached, and delete themselves when the last particle dies. " +
+            "Set their Simulation Space to World so the flames trail behind in flight.")]
+    [SerializeField] private ParticleSystem[] particles;
+
     private float despawnTime;   // out-of-range time, set in Launch
 
     private Rigidbody rb;
@@ -111,6 +116,19 @@ public class ArrowProjectile : MonoBehaviour
             trail.transform.SetParent(null, true);
             trail.emitting = false;
             trail.autodestruct = true;
+        }
+
+        // Same idea for particles: let the flames already in the air burn out naturally.
+        if (particles != null)
+        {
+            foreach (ParticleSystem ps in particles)
+            {
+                if (ps == null) continue;
+                ps.transform.SetParent(null, true);
+                var main = ps.main;
+                main.stopAction = ParticleSystemStopAction.Destroy;   // removes itself when empty
+                ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+            }
         }
 
         Destroy(gameObject);

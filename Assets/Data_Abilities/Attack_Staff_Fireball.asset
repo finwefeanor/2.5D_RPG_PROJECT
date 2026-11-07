@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3789f0ad930c4913b278008d7bcfaf11, type: 3}
+  m_Name: Attack_Staff_Fireball
+  m_EditorClassIdentifier: Assembly-CSharp::AbilityDefinition
+  delivery: 1
+  projectilePrefab: {fileID: -8122217159348622759, guid: 626ec0490afe0ce2ca23293fc805ef85, type: 3}
+  projectileSpeed: 12
+  projectileRange: 14
+  animatorIndex: 30
+  animationSpeed: 1
+  damageMultiplier: 1.2
+  range: 1.5
+  nextInCombo: {fileID: 0}
+  comboInputOpens: 0.2
+  comboChainAt: 0.5
+  swingSounds:
+  - {fileID: 8300000, guid: 75db40e5970c997769c3e2d7487f0291, type: 3}
+  - {fileID: 8300000, guid: 2ff15b265d1869bddb8d457d48986d9c, type: 3}
+  - {fileID: 8300000, guid: 3c556530554e1ac6c8c454d194c72a06, type: 3}
+  hitSounds:
+  - {fileID: 8300000, guid: 3d5cbe1d7f01b02b6990f15888d6c26f, type: 3}
+  - {fileID: 8300000, guid: 3cbe66970b0c0039fbe382eef5e4dfb7, type: 3}
+  - {fileID: 8300000, guid: 01a8b853159cb10aba2cd6f0faaf37e9, type: 3}
