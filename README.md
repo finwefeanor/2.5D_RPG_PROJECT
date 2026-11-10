@@ -49,13 +49,15 @@ system works. Read sections 1-4 once; after that, use it as a reference.
 | Key | Action | Handled by |
 |---|---|---|
 | WASD / arrows | Move | `PlayerController` |
-| Space | Attack (press again mid-swing = combo) | `PlayerAttack` |
+| Caps Lock | Toggle walk / run (starts in run) | `PlayerController` |
+| Space | Jump | `PlayerController` |
+| Left mouse / J | Attack (press again mid-swing = combo). Mouse is ignored over UI and on phones | `PlayerAttack` |
 | E | Open / close shop (near the merchant) | `ShopKeeperInteraction` |
 | Tab | Open / close inventory | `InventoryUIController` |
 | Esc | Pause menu (Save / New Game / Restart / Quit) | `PauseMenu` |
 | C | Re-open the class picker (editor + development builds only) | `ClassSelectMenu` |
 
-**Controls (mobile)**: `VirtualJoystick` (move), Attack button, Interact button - all on `HUDCanvas`.
+**Controls (mobile)**: `VirtualJoystick` (move; tilt = speed), ATTACK, JUMP and USE buttons - all on `HUDCanvas`.
 
 **Building an empty scene from scratch**: `RPG Scene Builder -> Build MVP Scene` spawns all core
 prefabs. The ground needs a `NavMeshSurface` and a baked NavMesh for enemies to move.
@@ -241,11 +243,25 @@ is the only file that changes.
 ### 5.3 `PlayerController` - movement
 
 - `Update`: reads `Horizontal` / `Vertical` axes; if both are ~0, reads the `VirtualJoystick` instead.
-  Sets the Animator bool `isMoving`.
-- `FixedUpdate`: rotates toward the move direction (`turnSpeed` deg/s) and sets
-  `rb.linearVelocity = direction * moveSpeed` (keeps gravity's Y).
-- `rootMotionActive` makes it skip `FixedUpdate` (only used by the legacy `CharacterMotor`).
-- `moveSpeed` is overwritten by the class (`ApplyStats`).
+  Input is clamped to length 1 (no faster diagonals; half stick tilt = half speed).
+- **Walk / run**: `moveSpeed` is the **run** speed (overwritten by the class in `ApplyStats`, so the Rogue
+  is faster in both modes). Walk = `moveSpeed * walkSpeedRatio` (0.45, one ratio for all classes).
+  Caps Lock toggles; `startRunning` = true. No stamina (yet).
+- Animator: `MoveSpeed` float (m/s, damped by `speedDampTime`) drives the Locomotion blend tree;
+  `IsGrounded` bool (with `coyoteTime`, so stepping off a bump doesn't flash the fall pose).
+- **Jump** (physics hop, `jumpHeight` 1.2 m, `gravityMultiplier` 2, `airControl` 12):
+  - `RequestJump()` (Space / `GameEvents.JumpPressed` from the JUMP button) only works grounded and not
+    mid-attack. It sets the `Jump` trigger - Jump_Start plays the crouch.
+  - Animation is the clock: Jump_Start's **`JumpTakeoff`** event (frame 9, normalized 0.5) ->
+    `PlayerAnimationEventRelay` -> `JumpTakeoff()` sets the upward velocity `sqrt(2 g h)`.
+  - If the event never comes (a flinch cut the crouch), the request is dropped after `takeoffTimeout`.
+  - Grounded = sphere probe at the feet (`groundLayers`: everything except Player, Enemy, Ignore Raycast,
+    UI; triggers ignored) and not still rising. The probe is ignored for 0.15 s after takeoff.
+  - `IsBusyJumping` (crouch -> landing): `PlayerAttack` buffers attack presses instead of attacking,
+    `PlayerHealth` doesn't flinch (Hit_A mid-air would skip the landing).
+- `FixedUpdate`: rotates toward the move direction (`turnSpeed` deg/s). Grounded: velocity = direction *
+  speed. Airborne: horizontal velocity moves toward the input by `airControl`, plus extra gravity.
+- `rootMotionActive` makes it skip movement (only used by the legacy `CharacterMotor`).
 
 Movement is **not** blocked while attacking. Attack clips use *Bake Into Pose* so the clip itself
 doesn't move the character; the Rigidbody does.
@@ -377,12 +393,21 @@ every skeleton sharing the KayKit material.
 
 ### 7.2 Player Animator (`MageAnimationController`, shared by all classes)
 
-Parameters: `isMoving` (bool), `Attack` (trigger), `AttackIndex` (int), `AttackSpeed` (float),
-`ComboNext` (trigger), `Hit` (trigger), `Death` (trigger), `isDead` (bool).
+Parameters: `MoveSpeed` (float, m/s), `Jump` (trigger), `IsGrounded` (bool, default true),
+`Attack` (trigger), `AttackIndex` (int), `AttackSpeed` (float), `ComboNext` (trigger), `Hit` (trigger),
+`Death` (trigger), `isDead` (bool).
 
 ```
 Base Layer
-  Idle / Walking / Running  (isMoving)
+  Locomotion (default) = 1D blend tree on MoveSpeed, thresholds set by hand because the KayKit
+                         clips are in place (no root motion to compute from):
+                           0 Idle_B  |  2.2 Walking_B  |  5 Running_A
+  AnyState --Jump-----------> Jump_Start (speed 1.5, JumpTakeoff event @ 0.5)
+  Jump_Start --exit 0.75----> Jump_Idle (loops in the air)
+  Jump_Idle  --IsGrounded---> Jump_Land (speed 1.3)
+  Jump_Land  --exit 0.55----> Locomotion      (or --Attack--> Attacks_SubState)
+  Locomotion --!IsGrounded--> Jump_Idle       (walked off a ledge)
+  Hit_A --exit--> Locomotion;  Attacks_SubState exit --> Locomotion
   Hit_A, Death_A ...
   AnyState --Attack-------> Attacks_SubState
   AnyState --ComboNext----> Attacks_SubState
@@ -404,8 +429,9 @@ Clip import settings for attacks: root transform rotation / position Y / positio
 ### 7.3 One attack, start to finish
 
 ```
-Space / Attack button
+Left mouse / J / ATTACK button
   -> PlayerAttack.TryAttack()
+       jumping (crouch to landing)? -> remember the press (inputBuffer)
        already attacking?  -> combo attack: QueueComboInput()  (see 7.4)
                               no combo:     remember the press (inputBuffer)
        still in recovery?  -> remember the press (inputBuffer)
@@ -697,6 +723,8 @@ outlive scene reloads, so a missing `-=` keeps a destroyed object subscribed.
     `AttackButtonRelay.OnPointerDown` fires on finger DOWN. The Button's `OnClick` list is empty on
     purpose (OnClick fires on release - laggy, and wiring both would attack twice per tap).
   - **USE** (160 px, up-left of ATTACK): Button `OnClick` -> `InteractButtonRelay` (release is fine there).
+  - **JUMP** (160 px, left of ATTACK at (-480, 230)): `JumpButtonRelay.OnPointerDown` ->
+    `GameEvents.JumpPressed`; its Button `OnClick` is empty (press tint only).
   - Both use the built-in round Knob sprite, dark translucent, white bold labels.
 - **`VirtualJoystick`**: drag handler on the `JoystickBackground` image (HUDCanvas, bottom-left,
   260 px, centre at (230, 300) px from the corner so the thumb can pull down/left without leaving the
@@ -953,6 +981,7 @@ Claude reviews by cloning the branch - it never pushes to the repo.
 | `GameManager` | GameManager | Singleton; holds `Player` (`PlayerRefs`) |
 | `GoldPickup` | CubeCollectible | Spinning gold, adds gold on touch |
 | `InteractButtonRelay` | HUDCanvas | Interact button -> `GameEvents.InteractPressed` |
+| `JumpButtonRelay` | HUDCanvas | Jump button (pointer down) -> `GameEvents.JumpPressed` |
 | `Interactions` | - | Legacy 2D-era NPC / shopkeeper |
 | `InventoryManager` | Player | Owned items + gold; loads the save |
 | `InventoryUIController` | Player | Inventory panel rows, equip / unequip |
@@ -965,7 +994,7 @@ Claude reviews by cloning the branch - it never pushes to the repo.
 | `PlayerAttack` | Player | Attacks, combos, damage, sounds |
 | `PlayerAttackState` | `Attacks_SubState` | Reports swing start / progress / end to `PlayerAttack` |
 | `PlayerClass` | Player | Applies / switches class |
-| `PlayerController` | Player | Movement |
+| `PlayerController` | Player | Movement: walk / run, jump, ground check |
 | `PlayerHealth` | Player | HP, damage after armour, death |
 | `PlayerHealthUI` | PlayerHealthBarCanvas | Health slider |
 | `PlayerInventory` | - | Legacy outfit system |

@@ -32,6 +32,7 @@ public class PlayerHealth : MonoBehaviour
 
     private EquipmentManager equipmentManager;
     private PlayerAttack playerAttack;
+    private PlayerController playerController;
 
     [SerializeField] private Animator animator;
 
@@ -46,6 +47,7 @@ public class PlayerHealth : MonoBehaviour
     {
         equipmentManager = GetComponent<EquipmentManager>();
         playerAttack = GetComponent<PlayerAttack>();
+        playerController = GetComponent<PlayerController>();
 
         var ui = PlayerUIRefs.Instance;
         if (ui != null) deathScreenUI = ui.deathScreenPanel;
@@ -74,7 +76,8 @@ public class PlayerHealth : MonoBehaviour
         //  - never mid-swing (unless flinchWhileAttacking), so the player can fight back,
         //  - at most once per flinchImmunity seconds, so two skeletons can't chain-stun.
         bool attacking = playerAttack != null && playerAttack.IsAttacking;
-        bool canFlinch = Time.time >= nextFlinchTime && (flinchWhileAttacking || !attacking);
+        bool jumping = playerController != null && playerController.IsBusyJumping;   // keep the jump arc
+        bool canFlinch = Time.time >= nextFlinchTime && !jumping && (flinchWhileAttacking || !attacking);
 
         if (canFlinch && animator != null)
         {

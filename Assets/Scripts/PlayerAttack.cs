@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class PlayerAttack : MonoBehaviour
 {
@@ -30,6 +31,7 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] private Animator animator;
 
     private EquipmentManager equipmentManager;
+    private PlayerController controller;
 
     private static readonly int AttackHash = Animator.StringToHash("Attack");
     private static readonly int AttackIndexHash = Animator.StringToHash("AttackIndex");
@@ -75,23 +77,34 @@ public class PlayerAttack : MonoBehaviour
     void Start()
     {
         equipmentManager = GetComponent<EquipmentManager>();
+        controller = GetComponent<PlayerController>();
     }
 
     
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        // Space is jump now. Attack: J, or left mouse on PC (not on phones - a touch is also a
+        // mouse click there - and not when the click lands on UI like the joystick or buttons).
+        bool mouseAttack = !Application.isMobilePlatform && Input.GetMouseButtonDown(0) && !PointerOverUI();
+        if (Input.GetKeyDown(KeyCode.J) || mouseAttack)
             TryAttack();
         else
             TryBufferedAttack();
     }
 
+    private static bool PointerOverUI() =>
+        EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+
+    // No attacks from the jump press until landing; the press is buffered instead,
+    // so attacking just before touching down swings on landing.
+    private bool JumpBlocksAttack => controller != null && controller.IsBusyJumping;
+
     // Fires a remembered press once attacking is allowed again - only if the press is
     // recent, so an old press can't fire a surprise shot seconds later.
     private void TryBufferedAttack()
     {
-        if (bufferedPressTime < 0f || IsAttacking || Time.time < nextAttackTime) return;
+        if (bufferedPressTime < 0f || IsAttacking || Time.time < nextAttackTime || JumpBlocksAttack) return;
 
         bool fresh = Time.time - bufferedPressTime <= inputBuffer;
         bufferedPressTime = -1f;
@@ -126,9 +139,9 @@ public class PlayerAttack : MonoBehaviour
             else bufferedPressTime = Time.time;
             return;
         }
-        if (Time.time < nextAttackTime)
+        if (Time.time < nextAttackTime || JumpBlocksAttack)
         {
-            bufferedPressTime = Time.time;   // still in recovery: fire when it ends
+            bufferedPressTime = Time.time;   // recovery or mid-jump: fire when it's allowed
             return;
         }
 

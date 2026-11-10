@@ -7,9 +7,11 @@ public class PlayerAnimationEventRelay : MonoBehaviour
 {
     private PlayerHealth playerHealth;
     private PlayerAttack playerAttack;
+    private PlayerController playerController;
 
     void Awake()
     {
+        playerController = GetComponentInParent<PlayerController>();
         playerHealth = GetComponentInParent<PlayerHealth>();
         playerAttack = GetComponentInParent<PlayerAttack>();
 
@@ -35,5 +37,11 @@ public class PlayerAnimationEventRelay : MonoBehaviour
     public void DealAttackDamage()
     {
         if (playerAttack != null) playerAttack.DealAttackDamage();
+    }
+
+    // Jump_Start clip, frame 9 (end of the crouch): the Rigidbody leaves the ground here.
+    public void JumpTakeoff()
+    {
+        if (playerController != null) playerController.JumpTakeoff();
     }
 }

@@ -17,6 +17,8 @@ public static class GameEvents
     public static event Action OnInteractPressed;
     public static event Action OnAttackPressed;
     public static void AttackPressed() => OnAttackPressed?.Invoke();
+    public static event Action OnJumpPressed;                       // JUMP button (HUD)
+    public static void JumpPressed() => OnJumpPressed?.Invoke();
     public static void InteractPressed() => OnInteractPressed?.Invoke();
 
     public static void GoldChanged(int gold) => OnGoldChanged?.Invoke(gold);

@@ -309,6 +309,7 @@ public class Enemy : MonoBehaviour
     private void FacePlayer()
     {
         Vector3 dir = playerTransform.position - transform.position;
+        Vector3 mercDirToPlayer = playerTransform.position - transform.position;
         dir.y = 0;
         if (dir.sqrMagnitude < 0.0001f) return;
 
