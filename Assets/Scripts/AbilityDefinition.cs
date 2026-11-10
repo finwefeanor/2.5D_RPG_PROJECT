@@ -69,6 +69,14 @@ public class AbilityDefinition : ScriptableObject
     [Range(0f, 1f)]
     public float comboChainAt = 0.5f;
 
+    [Header("Skill (only used when this ability sits in a class skill slot)")]
+    [Tooltip("Name shown on the SKILL button. Empty = \"SKILL\".")]
+    public string displayName = "";
+
+    [Tooltip("Seconds before the skill can be used again, counted from the press. " +
+             "Ignored for weapon / unarmed attacks.")]
+    public float cooldown = 0f;
+
     [Header("Audio")]
     [Tooltip("Played on every swing, hit or miss. One picked at random. Empty = silent swing.")]
     public AudioClip[] swingSounds;

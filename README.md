@@ -52,12 +52,13 @@ system works. Read sections 1-4 once; after that, use it as a reference.
 | Caps Lock | Toggle walk / run (starts in run) | `PlayerController` |
 | Space | Jump | `PlayerController` |
 | Left mouse / J | Attack (press again mid-swing = combo). Mouse is ignored over UI and on phones | `PlayerAttack` |
+| Right mouse / Q | Class skill (cooldown). Same mouse rules | `PlayerAttack.TrySkill` |
 | E | Open / close shop (near the merchant) | `ShopKeeperInteraction` |
 | Tab | Open / close inventory | `InventoryUIController` |
 | Esc | Pause menu (Save / New Game / Restart / Quit) | `PauseMenu` |
 | C | Re-open the class picker (editor + development builds only) | `ClassSelectMenu` |
 
-**Controls (mobile)**: `VirtualJoystick` (move; tilt = speed), ATTACK, JUMP and USE buttons - all on `HUDCanvas`.
+**Controls (mobile)**: `VirtualJoystick` (move; tilt = speed), ATTACK, SKILL, JUMP and USE buttons - all on `HUDCanvas`.
 
 **Building an empty scene from scratch**: `RPG Scene Builder -> Build MVP Scene` spawns all core
 prefabs. The ground needs a `NavMeshSurface` and a baked NavMesh for enemies to move.
@@ -306,6 +307,8 @@ maxHealth, baseAttackDamage
 attackSpeed       multiplies every ability's animationSpeed (Rogue 1.25 = 25% faster swings)
 moveSpeed
 unarmedAttack     AbilityDefinition used when the right hand is empty
+skill             AbilityDefinition for the class skill (Right mouse / Q / SKILL button), any weapon.
+                  Null = no skill (the SKILL button hides). Barbarian = Skill_Leap.
 ```
 
 ### 6.2 What `PlayerClass` does at startup (`Awake`, order -100)
@@ -385,6 +388,8 @@ every skeleton sharing the KayKit material.
 | `nextInCombo` | Attack that follows if the player presses again mid-swing (null = no combo). Must use a different clip |
 | `comboInputOpens` | Normalized time (0-1) from which a press is remembered. Earlier presses are ignored, so mashing doesn't chain |
 | `comboChainAt` | Normalized time at which a remembered press starts the next attack. Keep it **after** the contact frame |
+| `displayName` | Skill only: text on the SKILL button (empty = "SKILL") |
+| `cooldown` | Skill only: seconds before it can be used again, counted from the press |
 | `swingSounds[]` | Random one plays every swing, hit or miss |
 | `hitSounds[]` | Random one plays only when something was hit (empty = the AudioSource's own clip) |
 
@@ -431,11 +436,12 @@ Clip import settings for attacks: root transform rotation / position Y / positio
 ```
 Left mouse / J / ATTACK button
   -> PlayerAttack.TryAttack()
-       jumping (crouch to landing)? -> remember the press (inputBuffer)
+       jumping (crouch to landing)? -> queue the press (queueTime)
        already attacking?  -> combo attack: QueueComboInput()  (see 7.4)
-                              no combo:     remember the press (inputBuffer)
-       still in recovery?  -> remember the press (inputBuffer)
-       a remembered press fires as soon as attacking is allowed, if it is <= inputBuffer s old
+                              no combo:     queue the press (queueTime)
+       still in recovery?  -> queue the press (queueTime)
+       a queued press fires as soon as the player is free, if it is <= queueTime (2 s) old;
+       only one action is queued (attack OR skill) - the newest press wins
        attack = EquipmentManager.CurrentAttack
   -> StartAttack(attack, "Attack")
        activeAttack = attack                        (snapshot - equipping mid-swing can't change it)
@@ -498,6 +504,25 @@ newest swing's time drives the combo window.
 
 When the chain ends (finished, or interrupted by `Hit_A` / death), the `ComboNext` trigger is reset so
 it can't fire later by surprise.
+
+### 7.5 Class skill (weapon attack vs class skill)
+
+- The **basic attack belongs to the weapon** (`EquipmentManager.CurrentAttack`, unarmed fallback).
+  The **skill belongs to the class** (`CharacterClassDefinition.skill`), so it works with any weapon.
+- A skill is an ordinary `AbilityDefinition`; it goes through the same pipeline (`StartAttack` ->
+  animation -> contact-frame `DealAttackDamage` -> delivery branch). Only the source and the cooldown differ.
+- `PlayerAttack.TrySkill()` (Right mouse / Q / `GameEvents.SkillPressed` from the SKILL button):
+  - no skill, or `Time.time < skillReadyTime` (cooldown) -> ignored;
+  - mid-swing / recovery / jumping -> remembered (`bufferedSkillTime`, same `queueTime` action queue);
+  - otherwise: `skillReadyTime = now + cooldown`, `comboRoot = null` (skills never chain),
+    `StartAttack(skill)`, then `GameEvents.SkillUsed(cooldown)` for the HUD.
+- A basic-attack press during a skill is buffered and swings right after it.
+- `ResetAttackState` (class switch) clears the cooldown; `SkillButtonUI` resets its overlay on
+  `OnPlayerClassChanged`.
+- Skill assets are separate from weapon attacks even when they share a clip: `Skill_Leap` uses the
+  JumpChop clip (AttackIndex 1) with its own damage (1.8), range (2) and cooldown (6 s); the Axe keeps
+  `Attack_1H_JumpChop` unchanged.
+- Later: a skill list per class + which one is on right-click (F1-F4), weapon-type requirements, mana.
 
 ### 7.5 Animation Events and relays
 
@@ -725,6 +750,10 @@ outlive scene reloads, so a missing `-=` keeps a destroyed object subscribed.
   - **USE** (160 px, up-left of ATTACK): Button `OnClick` -> `InteractButtonRelay` (release is fine there).
   - **JUMP** (160 px, left of ATTACK at (-480, 230)): `JumpButtonRelay.OnPointerDown` ->
     `GameEvents.JumpPressed`; its Button `OnClick` is empty (press tint only).
+  - **SKILL** (160 px, above ATTACK at (-230, 520)): `SkillButtonUI` - pointer down ->
+    `GameEvents.SkillPressed`; label = the skill's `displayName`; child `CooldownOverlay` (Image Filled /
+    Radial 360, black 65%) unwinds on `GameEvents.OnSkillUsed`; a `CanvasGroup` hides the button when the
+    class has no skill (`OnPlayerClassChanged` + initial pull from `GameManager.Instance.Player.Class`).
   - Both use the built-in round Knob sprite, dark translucent, white bold labels.
 - **`VirtualJoystick`**: drag handler on the `JoystickBackground` image (HUDCanvas, bottom-left,
   260 px, centre at (230, 300) px from the corner so the thumb can pull down/left without leaving the
@@ -747,6 +776,8 @@ outlive scene reloads, so a missing `-=` keeps a destroyed object subscribed.
 | Barbarian | 50 | 14 | 0.9 | 4.6 | Unarmed_Punch | BarbarianPlayerVisual |
 | Rogue | 25 | 9 | 1.25 | 5.6 | Unarmed_Punch | RoguePlayerVisual |
 
+Class skills: Barbarian = `Skill_Leap`; Mage = none yet (Summon comes next); Rogue = none yet.
+
 ### Abilities
 
 | Ability | AttackIndex | Anim speed | Dmg mult | Range | Combo |
@@ -758,6 +789,7 @@ outlive scene reloads, so a missing `-=` keeps a destroyed object subscribed.
 | Attack_1H_Stab | 4 | 1.25 | 1.5 | 1.8 | none (finisher) |
 | Attack_1H_JumpChop | 1 | 1.0 | 1.5 | 1.0 | none. Sounds: JumpChop_Slam_01-03 / JumpChop_Hit_01-03 (about 3 dB louder than Slice's - heavy attack) |
 | Ranged_Bow_Release | 2 | 1.0 | 1.0 | Projectile: speed 15, range 15 | none |
+| Skill_Leap (Barbarian skill) | 1 | 1.0 | 1.8 | 2.0 | none. Cooldown 6 s, displayName Leap, JumpChop sounds |
 
 ### Items (all price 10)
 
@@ -982,6 +1014,7 @@ Claude reviews by cloning the branch - it never pushes to the repo.
 | `GoldPickup` | CubeCollectible | Spinning gold, adds gold on touch |
 | `InteractButtonRelay` | HUDCanvas | Interact button -> `GameEvents.InteractPressed` |
 | `JumpButtonRelay` | HUDCanvas | Jump button (pointer down) -> `GameEvents.JumpPressed` |
+| `SkillButtonUI` | HUDCanvas | Skill button: pointer down -> `GameEvents.SkillPressed`, cooldown overlay, hide when no skill |
 | `Interactions` | - | Legacy 2D-era NPC / shopkeeper |
 | `InventoryManager` | Player | Owned items + gold; loads the save |
 | `InventoryUIController` | Player | Inventory panel rows, equip / unequip |

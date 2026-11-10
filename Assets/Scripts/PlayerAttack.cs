@@ -32,6 +32,7 @@ public class PlayerAttack : MonoBehaviour
 
     private EquipmentManager equipmentManager;
     private PlayerController controller;
+    private PlayerClass playerClass;
 
     private static readonly int AttackHash = Animator.StringToHash("Attack");
     private static readonly int AttackIndexHash = Animator.StringToHash("AttackIndex");
@@ -49,11 +50,17 @@ public class PlayerAttack : MonoBehaviour
              "0 = swing again immediately, 0.5 = half-second breather.")]
     public float attackRecovery = 0.15f;
 
-    [Tooltip("A press made up to this many seconds before the next attack is allowed is " +
-            "remembered and fires as soon as it can. 0 = off (press must be exactly on time).")]
-    public float inputBuffer = 0.3f;
+    [Tooltip("Action queue: an attack / skill pressed while busy (swing, recovery, jump) plays as " +
+             "soon as the player is free - if the press is at most this many seconds old. Long " +
+             "enough to cover a whole swing (JumpChop 1.33 s), short enough that a forgotten press " +
+             "doesn't fire much later. Only ONE action is queued: the newest press wins.")]
+    public float queueTime = 2f;
 
     private float bufferedPressTime = -1f;   // < 0 = nothing remembered
+
+    // --- Class skill ---
+    private float skillReadyTime = 0f;       // cooldown ends at this Time.time
+    private float bufferedSkillTime = -1f;   // skill pressed mid-swing / mid-jump
 
     // How many attack states are playing. Normally 0 or 1; it is 2 for a moment while one
     // combo step crossfades into the next (Unity enters the new state BEFORE exiting the old).
@@ -78,6 +85,7 @@ public class PlayerAttack : MonoBehaviour
     {
         equipmentManager = GetComponent<EquipmentManager>();
         controller = GetComponent<PlayerController>();
+        playerClass = GetComponent<PlayerClass>();
     }
 
     
@@ -91,6 +99,13 @@ public class PlayerAttack : MonoBehaviour
             TryAttack();
         else
             TryBufferedAttack();
+
+        // Class skill: Q, or right mouse on PC (same UI / phone rules as the attack).
+        bool mouseSkill = !Application.isMobilePlatform && Input.GetMouseButtonDown(1) && !PointerOverUI();
+        if (Input.GetKeyDown(KeyCode.Q) || mouseSkill)
+            TrySkill();
+        else
+            TryBufferedSkill();
     }
 
     private static bool PointerOverUI() =>
@@ -106,7 +121,7 @@ public class PlayerAttack : MonoBehaviour
     {
         if (bufferedPressTime < 0f || IsAttacking || Time.time < nextAttackTime || JumpBlocksAttack) return;
 
-        bool fresh = Time.time - bufferedPressTime <= inputBuffer;
+        bool fresh = Time.time - bufferedPressTime <= queueTime;
         bufferedPressTime = -1f;
         if (fresh) TryAttack();
     }
@@ -120,11 +135,50 @@ public class PlayerAttack : MonoBehaviour
     void OnEnable()
     {
         GameEvents.OnAttackPressed += OnAttackButtonPressed;
+        GameEvents.OnSkillPressed += TrySkill;
     }
 
     void OnDisable()
     {
         GameEvents.OnAttackPressed -= OnAttackButtonPressed;
+        GameEvents.OnSkillPressed -= TrySkill;
+    }
+
+    // The skill comes from the CLASS, not the weapon - so it works with any weapon in hand.
+    private AbilityDefinition CurrentSkill =>
+        playerClass != null && playerClass.Definition != null ? playerClass.Definition.skill : null;
+
+    // Q / right mouse / SKILL button. Same pipeline as a basic attack (animation is the clock,
+    // contact-frame event, delivery branch) - only the ability's source and the cooldown differ.
+    public void TrySkill()
+    {
+        AbilityDefinition skill = CurrentSkill;
+        if (skill == null) return;
+        if (Time.time < skillReadyTime) return;   // on cooldown: ignored (the button shows it)
+
+        // Busy (swing, recovery, jump): remember it and cast as soon as it's allowed.
+        if (IsAttacking || Time.time < nextAttackTime || JumpBlocksAttack)
+        {
+            bufferedSkillTime = Time.time;
+            bufferedPressTime = -1f;   // newest press wins
+            return;
+        }
+
+        bufferedSkillTime = -1f;
+        bufferedPressTime = -1f;   // the skill replaces a remembered basic attack
+        comboRoot = null;          // skills never chain (TryChainCombo drops the chain)
+        skillReadyTime = Time.time + skill.cooldown;
+        StartAttack(skill, AttackHash);
+        GameEvents.SkillUsed(skill.cooldown);
+    }
+
+    private void TryBufferedSkill()
+    {
+        if (bufferedSkillTime < 0f || IsAttacking || Time.time < nextAttackTime || JumpBlocksAttack) return;
+
+        bool fresh = Time.time - bufferedSkillTime <= queueTime;
+        bufferedSkillTime = -1f;
+        if (fresh) TrySkill();
     }
 
 
@@ -136,12 +190,13 @@ public class PlayerAttack : MonoBehaviour
             // Attack with a combo: the press may chain (QueueComboInput's rules).
             // Attack without one (crossbow): remember it for when the swing is over.
             if (activeAttack != null && activeAttack.nextInCombo != null) QueueComboInput();
-            else bufferedPressTime = Time.time;
+            else { bufferedPressTime = Time.time; bufferedSkillTime = -1f; }   // newest press wins
             return;
         }
         if (Time.time < nextAttackTime || JumpBlocksAttack)
         {
             bufferedPressTime = Time.time;   // recovery or mid-jump: fire when it's allowed
+            bufferedSkillTime = -1f;         // newest press wins
             return;
         }
 
@@ -213,6 +268,8 @@ public class PlayerAttack : MonoBehaviour
         activeAttack       = null;
         nextAttackTime     = 0f;
         bufferedPressTime  = -1f;   // a press made before a class switch must not fire after it
+        bufferedSkillTime  = -1f;
+        skillReadyTime     = 0f;    // new class, new skill: start ready
     }
 
     // --- called by PlayerAttackState (the StateMachineBehaviour) ---

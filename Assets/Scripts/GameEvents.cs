@@ -19,6 +19,10 @@ public static class GameEvents
     public static void AttackPressed() => OnAttackPressed?.Invoke();
     public static event Action OnJumpPressed;                       // JUMP button (HUD)
     public static void JumpPressed() => OnJumpPressed?.Invoke();
+    public static event Action OnSkillPressed;                      // SKILL button (HUD)
+    public static void SkillPressed() => OnSkillPressed?.Invoke();
+    public static event Action<float> OnSkillUsed;                  // cooldown seconds, for the HUD overlay
+    public static void SkillUsed(float cooldown) => OnSkillUsed?.Invoke(cooldown);
     public static void InteractPressed() => OnInteractPressed?.Invoke();
 
     public static void GoldChanged(int gold) => OnGoldChanged?.Invoke(gold);

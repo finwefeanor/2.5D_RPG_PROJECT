@@ -41,4 +41,8 @@ public class CharacterClassDefinition : ScriptableObject
     [Header("Combat")]
     [Tooltip("Attack used when the right hand is empty.")]
     public AbilityDefinition unarmedAttack;
+
+    [Tooltip("Class skill (right mouse / Q / SKILL button). Works with any weapon. " +
+             "Uses the ability's cooldown and displayName. Null = this class has no skill yet.")]
+    public AbilityDefinition skill;
 }

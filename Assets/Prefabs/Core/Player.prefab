@@ -186,7 +186,7 @@ MonoBehaviour:
   animator: {fileID: 4185621971781387211}
   attackSpeed: 1
   attackRecovery: 0.15
-  inputBuffer: 0.3
+  queueTime: 2
 --- !u!114 &1638234075987857564
 MonoBehaviour:
   m_ObjectHideFlags: 0
