@@ -12,8 +12,9 @@
 //  requiredLevel, summon prefab.
 // ============================================================
 using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 
-public enum AbilityDelivery {Melee, Projectile}
+public enum AbilityDelivery {Melee, Projectile, Summon}
 
 [CreateAssetMenu(fileName = "NewAbility", menuName = "RPG/Ability")]
 public class AbilityDefinition : ScriptableObject
@@ -23,6 +24,15 @@ public class AbilityDefinition : ScriptableObject
     [Tooltip("What the clip's DealAttackDamage event does. Melee = hit sphere at attackPoint. " +
              "Projectile = spawns projectilePrefab at PlayerAttack.firePoint.")]
     public AbilityDelivery delivery = AbilityDelivery.Melee;
+
+
+    [Header("Summon")]
+    [Tooltip("Summon fields for mage character.")]
+    public Summon summonPrefab;
+    public int summonCount = 2;
+    public int summonLifeTime = 20;
+    public int maxActiveSummons = 4;
+    public float summonSpacing = 1.5f;
 
 
 

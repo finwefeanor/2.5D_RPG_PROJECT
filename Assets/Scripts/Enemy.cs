@@ -136,7 +136,7 @@ public class Enemy : MonoBehaviour
 
         if (navMeshAgent != null)
         {
-            navMeshAgent.speed        = moveSpeed;   // boss's slower moveSpeed still applies
+            navMeshAgent.speed        = moveSpeed;
             navMeshAgent.angularSpeed = turnSpeed;
             navMeshAgent.autoBraking  = true;
 

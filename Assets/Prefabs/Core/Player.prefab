@@ -106,8 +106,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
+  walkSpeedRatio: 0.45
+  startRunning: 1
   turnSpeed: 720
+  jumpHeight: 1.2
+  gravityMultiplier: 2
+  airControl: 12
+  groundLayers:
+    serializedVersion: 2
+    m_Bits: 275
+  groundCheckRadius: 0.3
+  coyoteTime: 0.12
+  takeoffTimeout: 0.6
   animator: {fileID: 4185621971781387211}
+  speedDampTime: 0.1
   rootMotionActive: 0
 --- !u!114 &6506765914230487345
 MonoBehaviour:
