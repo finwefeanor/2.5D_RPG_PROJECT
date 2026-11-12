@@ -10,15 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3789f0ad930c4913b278008d7bcfaf11, type: 3}
-  m_Name: Attack_1H_JumpChop
+  m_Name: Attack_1H_Chop
   m_EditorClassIdentifier: Assembly-CSharp::AbilityDefinition
-  animatorIndex: 1
-  animationSpeed: 1
-  damageMultiplier: 1.5
-  range: 1
+  animatorIndex: 5
+  animationSpeed: 1.1
+  damageMultiplier: 1.3
+  range: 1.4
   nextInCombo: {fileID: 0}
   comboInputOpens: 0.2
   comboChainAt: 0.5
+  cancelFrom: 0.75
   swingSounds:
   - {fileID: 8300000, guid: b8939a6714f84799a8383f26fad1915a, type: 3}
   - {fileID: 8300000, guid: 770f06579c5f4f9cb17f717f249dac1f, type: 3}

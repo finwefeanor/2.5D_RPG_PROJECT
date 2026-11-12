@@ -23,6 +23,7 @@ MonoBehaviour:
   nextInCombo: {fileID: 11400000, guid: 841d8dd04f8447ea993909f55a2e8573, type: 2}
   comboInputOpens: 0.25
   comboChainAt: 0.6
+  cancelFrom: 0.55
   swingSounds:
   - {fileID: 8300000, guid: 48922161dc8877f94b19cda718325b73, type: 3}
   - {fileID: 8300000, guid: 1fb56c0767443c6d897b23385da92ec6, type: 3}

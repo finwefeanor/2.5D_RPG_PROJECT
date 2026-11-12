@@ -12,17 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3789f0ad930c4913b278008d7bcfaf11, type: 3}
   m_Name: Ranged_Magic_Summon
   m_EditorClassIdentifier: Assembly-CSharp::AbilityDefinition
-  delivery: 1
+  delivery: 0
   projectilePrefab: {fileID: 0}
   projectileSpeed: 25
   projectileRange: 15
-  animatorIndex: 1
+  animatorIndex: 31
   animationSpeed: 1
   damageMultiplier: 1.5
   range: 1
   nextInCombo: {fileID: 0}
   comboInputOpens: 0.2
   comboChainAt: 0.5
+  cancelFrom: 1
   swingSounds:
   - {fileID: 8300000, guid: b8939a6714f84799a8383f26fad1915a, type: 3}
   - {fileID: 8300000, guid: 770f06579c5f4f9cb17f717f249dac1f, type: 3}

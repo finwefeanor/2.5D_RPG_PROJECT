@@ -69,6 +69,13 @@ public class AbilityDefinition : ScriptableObject
     [Range(0f, 1f)]
     public float comboChainAt = 0.5f;
 
+    [Header("Cancel window")]
+    [Tooltip("Normalized time (0-1) from which a QUEUED attack or skill may cut this clip's " +
+             "follow-through. Only after the contact event has fired (the hit always lands). " +
+             "1 = never cut, the clip plays to its normal end.")]
+    [Range(0f, 1f)]
+    public float cancelFrom = 1f;
+
     [Header("Skill (only used when this ability sits in a class skill slot)")]
     [Tooltip("Name shown on the SKILL button. Empty = \"SKILL\".")]
     public string displayName = "";

@@ -388,6 +388,7 @@ every skeleton sharing the KayKit material.
 | `nextInCombo` | Attack that follows if the player presses again mid-swing (null = no combo). Must use a different clip |
 | `comboInputOpens` | Normalized time (0-1) from which a press is remembered. Earlier presses are ignored, so mashing doesn't chain |
 | `comboChainAt` | Normalized time at which a remembered press starts the next attack. Keep it **after** the contact frame |
+| `cancelFrom` | Normalized time from which a QUEUED attack / skill may cut this clip's follow-through (only after the contact event fired). 1 = never |
 | `displayName` | Skill only: text on the SKILL button (empty = "SKILL") |
 | `cooldown` | Skill only: seconds before it can be used again, counted from the press |
 | `swingSounds[]` | Random one plays every swing, hit or miss |
@@ -418,7 +419,8 @@ Base Layer
   AnyState --ComboNext----> Attacks_SubState
   Attacks_SubState   (has the PlayerAttackState behaviour on the sub-state node)
      Entry --AttackIndex==0--> Melee_1H_Attack_Slice_Horizontal
-     Entry --AttackIndex==1--> Melee_1H_Attack_Jump_Chop
+     Entry --AttackIndex==1--> Melee_1H_Attack_Jump_Chop  (Barbarian Leap skill only)
+     Entry --AttackIndex==5--> Melee_1H_Attack_Chop       (Axe, events at 0.594, exit 0.85)
      Entry --AttackIndex==2--> Ranged_Bow_Release      (crossbow, events at 0.125)
      Entry --AttackIndex==3--> Melee_1H_Attack_Slice_Diagonal  (Blade combo 2, events at 0.433)
      Entry --AttackIndex==4--> Melee_1H_Attack_Stab            (Blade combo 3, events at 0.271)
@@ -516,12 +518,19 @@ it can't fire later by surprise.
   - mid-swing / recovery / jumping -> remembered (`bufferedSkillTime`, same `queueTime` action queue);
   - otherwise: `skillReadyTime = now + cooldown`, `comboRoot = null` (skills never chain),
     `StartAttack(skill)`, then `GameEvents.SkillUsed(cooldown)` for the HUD.
-- A basic-attack press during a skill is buffered and swings right after it.
+- A basic-attack press during a skill is queued and swings right after it.
+- **Cancel window**: a queued attack / skill may cut the current clip's follow-through once
+  `swingTime >= activeAttack.cancelFrom` AND this swing's `DealAttackDamage` already fired
+  (`contactDone`) - the hit always lands first. `TryCancelIntoQueued()` runs every frame of the swing
+  (from `OnAttackAnimationUpdate`) and starts the next action through the `ComboNext` crossfade,
+  like a combo step. Never into the SAME clip (`animatorIndex` equal): a state crossfading into
+  itself would make `swingTime` jump between the two copies, so repeating an attack waits for the
+  clip's normal exit. Nothing queued = nothing cut.
 - `ResetAttackState` (class switch) clears the cooldown; `SkillButtonUI` resets its overlay on
   `OnPlayerClassChanged`.
-- Skill assets are separate from weapon attacks even when they share a clip: `Skill_Leap` uses the
-  JumpChop clip (AttackIndex 1) with its own damage (1.8), range (2) and cooldown (6 s); the Axe keeps
-  `Attack_1H_JumpChop` unchanged.
+- Skill assets are separate from weapon attacks: `Skill_Leap` uses the JumpChop clip (AttackIndex 1)
+  with its own damage (1.8), range (2) and cooldown (6 s). The Axe has its own overhead
+  `Attack_1H_Chop` (AttackIndex 5), so the jump chop is Barbarian-only.
 - Later: a skill list per class + which one is on right-click (F1-F4), weapon-type requirements, mana.
 
 ### 7.5 Animation Events and relays
@@ -787,16 +796,19 @@ Class skills: Barbarian = `Skill_Leap`; Mage = none yet (Summon comes next); Rog
 | Attack_1H_Slice | 0 | 1.3 | 1.0 | 1.5 | -> Attack_1H_SliceDiagonal (opens 0.15, at 0.42) |
 | Attack_1H_SliceDiagonal | 3 | 1.2 | 1.1 | 1.5 | -> Attack_1H_Stab (opens 0.25, at 0.6) |
 | Attack_1H_Stab | 4 | 1.25 | 1.5 | 1.8 | none (finisher) |
-| Attack_1H_JumpChop | 1 | 1.0 | 1.5 | 1.0 | none. Sounds: JumpChop_Slam_01-03 / JumpChop_Hit_01-03 (about 3 dB louder than Slice's - heavy attack) |
+| Attack_1H_Chop (Axe) | 5 | 1.1 | 1.3 | 1.4 | none. Sounds: JumpChop_Slam_01-03 / JumpChop_Hit_01-03 |
 | Ranged_Bow_Release | 2 | 1.0 | 1.0 | Projectile: speed 15, range 15 | none |
 | Skill_Leap (Barbarian skill) | 1 | 1.0 | 1.8 | 2.0 | none. Cooldown 6 s, displayName Leap, JumpChop sounds |
+
+Cancel windows (`cancelFrom`, all after the contact frame): Slice 0.35, SliceDiagonal 0.55, Stab 0.45,
+Chop 0.75, Leap 0.7, Punch 0.55, Kick 0.6, Bow 0.4, Fireball 0.4, Summon 1 (never).
 
 ### Items (all price 10)
 
 | Item | Slot | Def | Dmg | Grants attack | Classes |
 |---|---|---|---|---|---|
 | Blade | RightHand | 0 | 0 | Attack_1H_Slice | any |
-| Axe | RightHand | 0 | 25 | Attack_1H_JumpChop | any |
+| Axe | RightHand | 0 | 25 | Attack_1H_Chop | any |
 | Shield | LeftHand | 0 | 0 | - | any |
 | Hat_For_Mage | Head | 5 | 0 | - | Mage |
 | ChestItem_For_Mage | Chest | 2 | 3 | - | Mage |

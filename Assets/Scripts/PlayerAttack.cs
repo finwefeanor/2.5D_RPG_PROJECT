@@ -78,6 +78,7 @@ public class PlayerAttack : MonoBehaviour
     private float swingTime;               // its normalized time (0-1), fed by PlayerAttackState
     private bool comboQueued;              // a press was remembered during this swing
     private bool chainPending;             // ComboNext sent, waiting for the next state to enter
+    private bool contactDone;              // this swing's DealAttackDamage already fired (cancel guard)
 
 
     
@@ -213,6 +214,7 @@ public class PlayerAttack : MonoBehaviour
     {
         activeAttack = attack;
         comboQueued = false;
+        contactDone = false;   // the new swing hasn't hit yet
 
         if (animator != null)
         {
@@ -270,6 +272,7 @@ public class PlayerAttack : MonoBehaviour
         bufferedPressTime  = -1f;   // a press made before a class switch must not fire after it
         bufferedSkillTime  = -1f;
         skillReadyTime     = 0f;    // new class, new skill: start ready
+        contactDone        = false;
     }
 
     // --- called by PlayerAttackState (the StateMachineBehaviour) ---
@@ -288,6 +291,47 @@ public class PlayerAttack : MonoBehaviour
 
         swingTime = normalizedTime;
         TryChainCombo();
+        TryCancelIntoQueued();
+    }
+
+    // Cancel window: a queued skill / attack cuts this swing's follow-through instead of
+    // waiting for the clip's end. Never before the hit (contactDone), never before cancelFrom,
+    // and never into the SAME clip (a state crossfading into itself would make swingTime
+    // jump between the old and new copy) - repeating an attack waits for the normal end.
+    private void TryCancelIntoQueued()
+    {
+        if (chainPending || !contactDone || activeAttack == null) return;
+        if (swingTime < activeAttack.cancelFrom) return;
+
+        AbilityDefinition next = null;
+        bool isSkill = false;
+        if (bufferedSkillTime >= 0f && Time.time - bufferedSkillTime <= queueTime &&
+            CurrentSkill != null && Time.time >= skillReadyTime)
+        {
+            next = CurrentSkill;
+            isSkill = true;
+        }
+        else if (bufferedPressTime >= 0f && Time.time - bufferedPressTime <= queueTime)
+        {
+            next = equipmentManager != null ? equipmentManager.CurrentAttack : null;
+        }
+        if (next == null || next.animatorIndex == activeAttack.animatorIndex) return;
+
+        bufferedPressTime = -1f;
+        bufferedSkillTime = -1f;
+        chainPending = true;   // same handshake as a combo step
+        if (isSkill)
+        {
+            comboRoot = null;
+            skillReadyTime = Time.time + next.cooldown;
+            StartAttack(next, ComboNextHash);
+            GameEvents.SkillUsed(next.cooldown);
+        }
+        else
+        {
+            comboRoot = next;      // a fresh basic attack starts its own chain
+            StartAttack(next, ComboNextHash);
+        }
     }
 
     public void OnAttackAnimationEnd()
@@ -308,6 +352,7 @@ public class PlayerAttack : MonoBehaviour
     {
 
         if (activeAttack == null) return;
+        contactDone = true;   // the hit is out - the cancel window may open now
 
         int bonus = equipmentManager != null ? equipmentManager.GetTotalDamageBonus() : 0;
         int totalDamage = Mathf.RoundToInt(baseAttackDamage * activeAttack.damageMultiplier) + bonus;
