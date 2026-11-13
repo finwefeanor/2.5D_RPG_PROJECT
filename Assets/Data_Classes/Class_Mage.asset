@@ -21,4 +21,4 @@ MonoBehaviour:
   attackSpeed: 1
   moveSpeed: 5
   unarmedAttack: {fileID: 11400000, guid: f4d7e2f4c961425592e9772c51259028, type: 2}
-  skill: {fileID: 0}
+  skill: {fileID: 11400000, guid: cd9d1499da21108a38c00b29e264e8bb, type: 2}

@@ -12,7 +12,6 @@
 //  requiredLevel, summon prefab.
 // ============================================================
 using UnityEngine;
-using UnityEngine.Rendering.PostProcessing;
 
 public enum AbilityDelivery {Melee, Projectile, Summon}
 
@@ -26,12 +25,20 @@ public class AbilityDefinition : ScriptableObject
     public AbilityDelivery delivery = AbilityDelivery.Melee;
 
 
-    [Header("Summon")]
-    [Tooltip("Summon fields for mage character.")]
+    [Header("Summon (delivery = Summon)")]
+    [Tooltip("Prefab with a Summon component. Spawned by PlayerSummons on the contact event.")]
     public Summon summonPrefab;
+
+    [Tooltip("How many appear per cast.")]
     public int summonCount = 2;
-    public int summonLifeTime = 20;
+
+    [Tooltip("Seconds each summon stays before it falls apart.")]
+    public float summonLifetime = 20f;
+
+    [Tooltip("Cap on living summons. Casting past it removes the oldest first.")]
     public int maxActiveSummons = 4;
+
+    [Tooltip("Metres between summons when they appear side by side in front of the player.")]
     public float summonSpacing = 1.5f;
 
 

@@ -7,30 +7,32 @@ using UnityEngine;
 // not on parent GameObjects like "Enemy_0_with_sword" where Enemy.cs actually lives.
 public class AnimationEventRelay : MonoBehaviour
 {
+
+    private ICombatAnimationReceiver receiver;
     private Enemy enemy;
 
     void Awake()
     {
-        enemy = GetComponentInParent<Enemy>();
-        if (enemy == null)
-            Debug.LogWarning($"{name}: AnimationEventRelay couldn't find an Enemy component in its parents.");
+        receiver = GetComponentInParent<ICombatAnimationReceiver>();
+        if (receiver == null)
+            Debug.LogWarning($"{name}: AnimationEventRelay found no Enemy / Summon in its parents.");
     }
 
     // Wire the Animation Event's Function field to THIS method name.
     public void PlayAttackSound()
     {
-        if (enemy != null) enemy.PlayAttackSound();
+        if (receiver != null) receiver.PlayAttackSound();
     }
 
     // Also relays the shared Hit_A clip's event (same clip the Player uses).
     public void PlayHitSound()
     {
-        if (enemy != null) enemy.PlayHitSound();
+        if (receiver != null) receiver.PlayHitSound();
     }
 
     public void DealAttackDamage()
     {
-        if (enemy != null) enemy.DealAttackDamage();
+        if (receiver != null) receiver.DealAttackDamage();
     }
 
 }

@@ -25,6 +25,7 @@ GameObject:
   - component: {fileID: 2272609547113551430}
   - component: {fileID: 7252764632173276278}
   - component: {fileID: 4944903950311277122}
+  - component: {fileID: 7626743320690874855}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -590,6 +591,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62dde5ef5ab7a530393a65ceecc4b720, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerRefs
+--- !u!114 &7626743320690874855
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 102258945551000686}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72939635b15f7f32aa31445b6762ebde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSummons
+  spawnForward: 1.5
+  navMeshSnapDistance: 2
 --- !u!1 &2565101573087808740
 GameObject:
   m_ObjectHideFlags: 0
@@ -982,6 +997,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2470501650263969863}
     m_Modifications:
+    - target: {fileID: 3373026942746379520, guid: 9a1a73f7bc4922c4b963be1c1a58150a, type: 3}
+      propertyPath: m_WarningMessage
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 8314940524376475072, guid: 9a1a73f7bc4922c4b963be1c1a58150a, type: 3}
       propertyPath: m_Name
       value: MagePlayerVisual

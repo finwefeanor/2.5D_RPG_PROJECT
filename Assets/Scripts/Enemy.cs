@@ -14,7 +14,7 @@ using UnityEngine.AI;
 ///     relayed through AnimationEventRelay on Skeleton_Minion.
 /// No clip lengths appear anywhere in this file.
 /// </summary>
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour, ICombatAnimationReceiver
 {
     // ---------------------------------------------------------------------
     // Inspector
@@ -106,6 +106,7 @@ public class Enemy : MonoBehaviour
     private float nextAttackTime = 0f;
     private bool isAttacking = false;    // set by EnemyAttackState, not by us
     private bool isDead = false;
+    public bool IsDead => isDead;        // summons skip corpses (collider lives 2.5 s)
 
     private bool playerDead = false;
 

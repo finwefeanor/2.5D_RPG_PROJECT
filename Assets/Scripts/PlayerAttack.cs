@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -33,6 +34,7 @@ public class PlayerAttack : MonoBehaviour
     private EquipmentManager equipmentManager;
     private PlayerController controller;
     private PlayerClass playerClass;
+    private PlayerSummons playerSummons;
 
     private static readonly int AttackHash = Animator.StringToHash("Attack");
     private static readonly int AttackIndexHash = Animator.StringToHash("AttackIndex");
@@ -87,6 +89,7 @@ public class PlayerAttack : MonoBehaviour
         equipmentManager = GetComponent<EquipmentManager>();
         controller = GetComponent<PlayerController>();
         playerClass = GetComponent<PlayerClass>();
+        playerSummons = GetComponent<PlayerSummons>();
     }
 
     
@@ -354,6 +357,16 @@ public class PlayerAttack : MonoBehaviour
         if (activeAttack == null) return;
         contactDone = true;   // the hit is out - the cancel window may open now
 
+        if (activeAttack.delivery == AbilityDelivery.Summon)
+        {
+            // Summons scale with the character, not the weapon: no item damageBonus
+            // (the Axe's +25 on every skeleton hit would be absurd).
+            int summonDamage = Mathf.Max(1, Mathf.RoundToInt(baseAttackDamage * activeAttack.damageMultiplier));
+            if (playerSummons != null) playerSummons.Spawn(activeAttack, summonDamage);
+            else Debug.LogWarning("PlayerAttack: Summon ability but no PlayerSummons on the Player.");
+            return;
+        }
+
         int bonus = equipmentManager != null ? equipmentManager.GetTotalDamageBonus() : 0;
         int totalDamage = Mathf.RoundToInt(baseAttackDamage * activeAttack.damageMultiplier) + bonus;
 
@@ -425,7 +438,7 @@ public class PlayerAttack : MonoBehaviour
 
         // One random pitch per swing. The hit sound fires on the same frame and shares it,
         // so changing pitch here can't bend a sound that's already playing.
-        attackSound.pitch = 1f + Random.Range(-pitchVariation, pitchVariation);
+        attackSound.pitch = 1f + UnityEngine.Random.Range(-pitchVariation, pitchVariation);
 
         AudioClip swing = AbilityDefinition.Pick(activeAttack.swingSounds);
         if (swing != null) attackSound.PlayOneShot(swing);
