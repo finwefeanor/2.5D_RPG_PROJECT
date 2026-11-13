@@ -10,4 +10,5 @@ public interface ICombatAnimationReceiver
     void DealAttackDamage();
     void PlayAttackSound();
     void PlayHitSound();
+
 }

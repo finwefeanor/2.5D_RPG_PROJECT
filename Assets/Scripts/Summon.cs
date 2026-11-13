@@ -140,7 +140,7 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver
         else
         {
             TickFollow();
-        }                           StopMoving();
+        }
     }
 
     // ---------------------------------------------------------------------
