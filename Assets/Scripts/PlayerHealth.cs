@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 // Lives on the Player root. The hurt sound normally comes from the Hit_A clip's
 // PlayHitSound Animation Event (so it matches the visible flinch); when a hit does
 // NOT flinch, TakeDamage plays it directly instead.
-public class PlayerHealth : MonoBehaviour
+public class PlayerHealth : MonoBehaviour, ICombatTarget
 {
     public int health = 100;
     public int maxHealth = 100;
@@ -30,6 +30,14 @@ public class PlayerHealth : MonoBehaviour
 
     private bool isDead = false;
 
+    private float radius;   // world capsule radius - enemies measure edge to edge
+
+    // --- ICombatTarget: what an enemy needs to chase and hit the player ---
+    public Transform Root => transform;
+    public float Radius => radius;
+    public bool IsAlive => !isDead;
+    // TakeDamage(int) below already matches the interface - it IS the implementation.
+
     private EquipmentManager equipmentManager;
     private PlayerAttack playerAttack;
     private PlayerController playerController;
@@ -49,11 +57,20 @@ public class PlayerHealth : MonoBehaviour
         playerAttack = GetComponent<PlayerAttack>();
         playerController = GetComponent<PlayerController>();
 
+        CapsuleCollider capsule = GetComponent<CapsuleCollider>();
+        if (capsule != null)
+        {
+            Vector3 s = transform.lossyScale;
+            radius = capsule.radius * Mathf.Max(Mathf.Abs(s.x), Mathf.Abs(s.z));
+        }
+
         var ui = PlayerUIRefs.Instance;
         if (ui != null) deathScreenUI = ui.deathScreenPanel;
         else Debug.LogWarning("PlayerHealth: no PlayerHealthBarCanvas in scene.", this);
 
         GameEvents.PlayerHealthChanged(health, maxHealth); // initial value for UI
+
+        
     }
 
     public void TakeDamage(int damage)

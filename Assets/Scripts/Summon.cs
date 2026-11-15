@@ -7,7 +7,7 @@ using UnityEngine.AI;
 //   target    -> nearest living Enemy near this summon AND near the player (leash)
 //   in range  -> stop, face it, swing. Damage lands on the clip's contact event.
 // v1: enemies ignore summons and summons have no health. They leave when their time is up.
-public class Summon : MonoBehaviour, ICombatAnimationReceiver
+public class Summon : MonoBehaviour, ICombatAnimationReceiver, ICombatTarget
 {
 
     [Header("Follow")]
@@ -25,6 +25,11 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver
     [Header("Targeting")]
     [Tooltip("Enemies further than this from the summon are not noticed.")]
     public float aggroRange = 8f;
+
+        private bool isDead = false;
+
+    private float radius;   // world capsule radius - enemies measure edge to edge
+
 
     [Tooltip("Enemies further than this from the PLAYER are ignored or dropped, so summons stay close.")]
     public float leashRange = 12f;
@@ -48,6 +53,32 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver
     [Tooltip("Seconds the death clip plays before the object is removed.")]
     public float despawnDelay = 2.5f;
 
+
+    [Header("Health")]
+    [Tooltip("Enemies hit for 1-2 (boss 2), so 15 survives roughly 8-15 swings.")]
+    public int maxHealth = 15;
+
+    [Tooltip("After a flinch, further hits still deal damage but don't restart Hit_A for this long. " +
+             "Stops a crowd from stun-locking the summon. 0 = flinch on every hit.")]
+    public float flinchImmunity = 1.2f;
+
+    [Tooltip("Never play Hit_A, only take damage.")]
+    public bool neverFlinch = false;
+
+    [Header("Audio")]
+    [Tooltip("Plays the hurt clips (Hit_A's PlayHitSound event).")]
+    public AudioSource getHitSound;
+
+    [Tooltip("One picked at random per flinch. Empty = getHitSound's own clip.")]
+    public AudioClip[] getHitClips;
+
+    [Range(0f, 0.3f)]
+    public float getHitPitchVariation = 0.1f;
+
+    [Tooltip("Played when the summon falls apart (killed, lifetime over, or pushed out by the cap).")]
+    public AudioSource dieSound;
+
+
     [Header("Refs (inside this prefab)")]
     public Animator animator;
     public AudioSource attackSound;
@@ -60,6 +91,9 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver
     private int damage;
     private float despawnTime;
     private float bodyRadius;
+
+    private int health;
+    private float nextFlinchTime;
 
     private Enemy target;
     private float targetRadius;
@@ -77,6 +111,7 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver
     private static readonly int AttackIndexHash = Animator.StringToHash("AttackIndex");
     private static readonly int DeathHash       = Animator.StringToHash("Death");
     private static readonly int IsDeadHash      = Animator.StringToHash("isDead");
+    private static readonly int HitHash         = Animator.StringToHash("Hit");
 
     
 
@@ -85,6 +120,7 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver
         agent = GetComponent<NavMeshAgent>();
         bodyRadius = WorldRadius(this);
         if (animator == null) animator = GetComponentInChildren<Animator>();
+        health = maxHealth;
     }
 
     void Start()
@@ -95,6 +131,13 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver
             agent.angularSpeed = turnSpeed;
             agent.autoBraking  = true;
             agent.stoppingDistance = 0.1f;   // Update stops it at attackRange (edge distance) itself
+        }
+
+        CapsuleCollider capsule = GetComponent<CapsuleCollider>();
+        if (capsule != null)
+        {
+            Vector3 s = transform.lossyScale;
+            radius = capsule.radius * Mathf.Max(Mathf.Abs(s.x), Mathf.Abs(s.z));
         }
 
     }
@@ -156,7 +199,7 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver
     private void FindTarget()
     {
         Collider[] hits = Physics.OverlapSphere(transform.position, aggroRange, enemyLayer,
-                                                QueryTriggerInteraction.Ignore);
+        QueryTriggerInteraction.Ignore);
         Enemy best = null;
         float bestSqr = float.MaxValue;
 
@@ -282,6 +325,33 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver
     // ICombatAnimationReceiver (EnemyAttackState + AnimationEventRelay)
     // ---------------------------------------------------------------------
 
+    public Transform Root => transform;
+    public float Radius => radius;
+    public bool IsAlive => !isDead;
+
+        // Same rules as Enemy.TakeDamage: damage always lands, the FLINCH is rate-limited.
+    // No armour and no UI event. At 0 the summon falls apart through the normal Despawn.
+    public void TakeDamage(int damage)
+    {
+        if (leaving) return;
+
+        health -= damage;
+        if (health <= 0)
+        {
+            Despawn();
+            return;
+        }
+
+        // Hit_A interrupts a swing: EnemyAttackState's OnStateExit clears isAttacking.
+        if (!neverFlinch && Time.time >= nextFlinchTime && animator != null)
+        {
+            animator.SetTrigger(HitHash);
+            nextFlinchTime = Time.time + flinchImmunity;
+        }
+    }
+
+    
+
     public void OnAttackAnimationStart()
     {
         isAttacking = true;
@@ -310,7 +380,16 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver
         if (attackSound != null) attackSound.Play();
     }
 
-    public void PlayHitSound() { }   // v1: summons are never hit
+    // Hit_A's flinch frame (shared clip), relayed by AnimationEventRelay.
+    public void PlayHitSound()
+    {
+        if (getHitSound == null) return;
+
+        getHitSound.pitch = 1f + Random.Range(-getHitPitchVariation, getHitPitchVariation);
+        AudioClip clip = AbilityDefinition.Pick(getHitClips);
+        if (clip != null) getHitSound.PlayOneShot(clip);
+        else getHitSound.Play();
+    }
 
     // ---------------------------------------------------------------------
     // Leaving
@@ -323,6 +402,7 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver
         leaving = true;
 
         if (owner != null) owner.Remove(this);   // frees its slot and cap place right away
+        if (dieSound != null) dieSound.Play();
         StopMoving();
         if (agent != null) agent.enabled = false;
         foreach (Collider c in GetComponentsInChildren<Collider>()) c.enabled = false;
@@ -365,5 +445,6 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver
         Gizmos.color = Color.magenta;
         Gizmos.DrawWireSphere(transform.position, aggroRange);
     }
+
 
 }

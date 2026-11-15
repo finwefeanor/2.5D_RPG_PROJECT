@@ -65,6 +65,15 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
     public float moveSpeed = 3f;
     public LayerMask playerLayer;
 
+    [Tooltip("Seconds between target searches while the enemy has no target.")]
+    public float retargetInterval = 0.3f;
+
+    [Tooltip("A target this far BEYOND detectRange is dropped. Stops flip-flopping at the edge.")]
+    public float loseTargetMargin = 2f;
+
+    private ICombatTarget target;          // the player OR a summon - the enemy doesn't care which
+    private float nextRetargetTime = 0f;
+
     [Header("Rewards")]
     public int goldReward = 5;
     public GameObject goldPickupPrefab;
@@ -99,6 +108,7 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
     // ---------------------------------------------------------------------
 
     private Transform playerTransform;
+
     private PlayerHealth playerHealth;   // cached — no per-hit GetComponent
 
     private float bodyRadius;     // own capsule radius in world units - grows with scale
@@ -133,7 +143,7 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
         navMeshAgent = GetComponent<NavMeshAgent>();
 
 
-        ResolvePlayer();
+        //ResolvePlayer();
 
         if (navMeshAgent != null)
         {
@@ -154,7 +164,7 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
 
     void Update()
     {
-        if (isDead || playerDead || playerTransform == null)
+        if (isDead || playerDead)
         {
             StopMoving();   // otherwise the agent keeps walking to its last destination
             return;
@@ -163,13 +173,23 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
         // While the swing is playing, the animation is in charge. Don't touch anything.
         if (isAttacking) return;
 
+        // Sticky target: search only when there is none (cheap, and no flip-flopping).
+        if (!IsValidTarget(target)) target = null;
+        if (target == null && Time.time >= nextRetargetTime)
+        {
+            nextRetargetTime = Time.time + retargetInterval;
+            FindTarget();
+        }
 
-        //float distance = Vector3.Distance(transform.position, playerTransform.position);
-        float distance = EdgeDistanceToPlayer();
+        if (target == null)
+        {
+            StopMoving();
+            return;
+        }
 
-        if (distance <= attackRange)      TickAttack();
-        else if (distance <= detectRange) TickChase();
-        else                              StopMoving();
+        if (EdgeDistanceToTarget() <= attackRange) TickAttack();
+        else                                       TickChase();
+
     }
 
     // ---------------------------------------------------------------------
@@ -210,6 +230,54 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
         SetMoving(false);
     }
 
+        // Physics returns every collider on playerLayer (Player + Summon) inside detectRange.
+    // Each one is asked "which component here is an ICombatTarget?" - PlayerHealth answers
+    // for the player, Summon (next step) for a summon, anything else returns null.
+    private void FindTarget()
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, detectRange, playerLayer,
+                                                QueryTriggerInteraction.Ignore);
+
+                                                    // in FindTarget(), right after OverlapSphere:
+        ICombatTarget best = null;
+        float bestSqr = float.MaxValue;
+
+        foreach (Collider c in hits)
+        {
+            ICombatTarget t = c.GetComponentInParent<ICombatTarget>();
+            if (t == null || !t.IsAlive) continue;
+
+            float sqr = (t.Root.position - transform.position).sqrMagnitude;
+            if (sqr < bestSqr)
+            {
+                bestSqr = sqr;
+                best = t;
+            }
+        }
+        SetTarget(best);
+            // in FindTarget(), last line, after SetTarget(best):
+    }
+
+    // One place that changes the target. Each target has its own radius, so the agent's
+    // stop point (edge to edge = attackRange) is recalculated here.
+    private void SetTarget(ICombatTarget t)
+    {
+        target = t;
+        if (target != null && navMeshAgent != null)
+            navMeshAgent.stoppingDistance = Mathf.Max(attackRange, 0.05f) + bodyRadius + target.Radius;
+    }
+
+    // Keep the current target until it dies, is destroyed, or walks well out of range.
+    private bool IsValidTarget(ICombatTarget t)
+    {
+        // An interface variable hides Unity's "destroyed object == null" check, so test the
+        // real object. UnityEngine.Object, because this file also has "using System;".
+        if (t == null || (t as UnityEngine.Object) == null || !t.IsAlive) return false;
+
+        float keep = detectRange + loseTargetMargin;
+        return (t.Root.position - transform.position).sqrMagnitude <= keep * keep;
+    }
+
     
         
     
@@ -221,14 +289,14 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
     private void TickAttack()
     {
         StopMoving();
-        FacePlayer();   // keep turning toward the player while in range (not mid-swing:
+        FaceTarget();   // keep turning toward the player while in range (not mid-swing:
                         // Update() returns early while isAttacking, so swings stay committed)
 
         if (Time.time < nextAttackTime || animator == null) return;
 
         // Only swing when roughly facing the player - e.g. right after a flinch,
         // or when the player has circled behind.
-        Vector3 dirToPlayer = playerTransform.position - transform.position;
+        Vector3 dirToPlayer = target.Root.position - transform.position;
         dirToPlayer.y = 0;
         if (Vector3.Angle(transform.forward, dirToPlayer) > attackAngle / 2f) return;
 
@@ -245,7 +313,7 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
         navMeshAgent.isStopped = false;
 
 
-        navMeshAgent.SetDestination(playerTransform.position);
+        navMeshAgent.SetDestination(target.Root.position);
 
 
         SetMoving(true);
@@ -292,25 +360,31 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
     /// <summary>Contact frame (frame 8 on Melee_1H_Attack_Slice_Horizontal).</summary>
     public void DealAttackDamage()
     {
-        if (isDead || playerTransform == null || playerHealth == null) return;
+        if (isDead || target == null || !target.IsAlive) return;
 
-        // Player stepped back out of a committed swing — a real miss.
-        float distance = EdgeDistanceToPlayer();
-        if (distance > attackRange + dodgeMargin) return;
+        // Target stepped back out of the swing - a real miss.
+        if (EdgeDistanceToTarget() > attackRange + dodgeMargin) return;
+
 
         // Player sidestepped / got behind the swing — also a miss. 360 = hits all around.
-        Vector3 dirToPlayer = playerTransform.position - transform.position;
+        Vector3 dirToPlayer = target.Root.position - transform.position;
         dirToPlayer.y = 0;
         if (Vector3.Angle(transform.forward, dirToPlayer) > hitAngle / 2f) return;
 
-        playerHealth.TakeDamage(attackDamage);
+        target.TakeDamage(attackDamage);
 
     }
 
-    private void FacePlayer()
+    // Gap between the two bodies' edges, not their centres.
+    private float EdgeDistanceToTarget()
     {
-        Vector3 dir = playerTransform.position - transform.position;
-        Vector3 mercDirToPlayer = playerTransform.position - transform.position;
+        float centres = Vector3.Distance(transform.position, target.Root.position);
+        return centres - bodyRadius - target.Radius;
+    }
+
+    private void FaceTarget()
+    {
+        Vector3 dir = target.Root.position - transform.position;
         dir.y = 0;
         if (dir.sqrMagnitude < 0.0001f) return;
 
@@ -324,13 +398,6 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
         if (capsule == null) return 0f;
         Vector3 s = capsule.transform.lossyScale;
         return capsule.radius * Mathf.Max(Mathf.Abs(s.x), Mathf.Abs(s.z));
-    }
-
-    // Gap between the two bodies' edges, not their centres.
-    private float EdgeDistanceToPlayer()
-    {
-        float centres = Vector3.Distance(transform.position, playerTransform.position);
-        return centres - bodyRadius - playerRadius;
     }
 
     /// <summary>Shared Hit_A clip — flinch frame.</summary>

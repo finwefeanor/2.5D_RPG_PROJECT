@@ -208,7 +208,9 @@ MonoBehaviour:
   moveSpeed: 3
   playerLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 576
+  retargetInterval: 0.3
+  loseTargetMargin: 2
   goldReward: 5
   goldPickupPrefab: {fileID: 5936751999796041709, guid: af18841a7bbe8534895cbf5fca60f1a0, type: 3}
   animator: {fileID: 6890284235173722031}
