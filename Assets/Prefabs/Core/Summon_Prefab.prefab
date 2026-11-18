@@ -494,8 +494,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Summon
   followDistance: 3
   followRadius: 1.8
-  moveSpeed: 4.5
-  turnSpeed: 360
+  moveSpeed: 2
+  turnSpeed: 180
   aggroRange: 8
   leashRange: 12
   retargetInterval: 0.3
@@ -509,6 +509,13 @@ MonoBehaviour:
   hitAngle: 120
   dodgeMargin: 0.5
   despawnDelay: 2.5
+  maxHealth: 15
+  flinchImmunity: 1.2
+  neverFlinch: 0
+  getHitSound: {fileID: 0}
+  getHitClips: []
+  getHitPitchVariation: 0.1
+  dieSound: {fileID: 0}
   animator: {fileID: 6890284235173722031}
   attackSound: {fileID: 5534839771477710333}
 --- !u!1 &2110713012783099401
@@ -1032,7 +1039,7 @@ PrefabInstance:
     - target: {fileID: 5866666021909216657, guid: 0947bbd647ecfde46803655f0dc26404, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 41febb999a89bc64dbaa0c7d5448b813, type: 2}
+      objectReference: {fileID: 9100000, guid: 5a05e4a40d9b998b1bf5c0050b51e963, type: 2}
     - target: {fileID: 5866666021909216657, guid: 0947bbd647ecfde46803655f0dc26404, type: 3}
       propertyPath: m_AnimatePhysics
       value: 0

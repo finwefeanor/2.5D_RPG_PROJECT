@@ -13,6 +13,11 @@ MonoBehaviour:
   m_Name: Skill_Leap
   m_EditorClassIdentifier: Assembly-CSharp::AbilityDefinition
   delivery: 0
+  summonPrefab: {fileID: 0}
+  summonCount: 2
+  summonLifetime: 20
+  maxActiveSummons: 4
+  summonSpacing: 1.5
   projectilePrefab: {fileID: 0}
   projectileSpeed: 25
   projectileRange: 15
@@ -25,7 +30,7 @@ MonoBehaviour:
   comboChainAt: 0.5
   cancelFrom: 0.7
   displayName: Leap
-  cooldown: 0
+  cooldown: 3
   swingSounds:
   - {fileID: 8300000, guid: b8939a6714f84799a8383f26fad1915a, type: 3}
   - {fileID: 8300000, guid: 770f06579c5f4f9cb17f717f249dac1f, type: 3}

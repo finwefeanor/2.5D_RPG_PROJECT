@@ -17,7 +17,7 @@ MonoBehaviour:
   summonCount: 2
   summonLifetime: 20
   maxActiveSummons: 4
-  summonSpacing: 1.5
+  summonSpacing: 3
   projectilePrefab: {fileID: 0}
   projectileSpeed: 25
   projectileRange: 15

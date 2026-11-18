@@ -26,9 +26,6 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver, ICombatTarget
     [Tooltip("Enemies further than this from the summon are not noticed.")]
     public float aggroRange = 8f;
 
-        private bool isDead = false;
-
-    private float radius;   // world capsule radius - enemies measure edge to edge
 
 
     [Tooltip("Enemies further than this from the PLAYER are ignored or dropped, so summons stay close.")]
@@ -127,19 +124,11 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver, ICombatTarget
     {
         if (agent != null)
         {
-            agent.speed        = moveSpeed;   // boss's slower moveSpeed still applies
+            agent.speed        = moveSpeed;
             agent.angularSpeed = turnSpeed;
             agent.autoBraking  = true;
             agent.stoppingDistance = 0.1f;   // Update stops it at attackRange (edge distance) itself
         }
-
-        CapsuleCollider capsule = GetComponent<CapsuleCollider>();
-        if (capsule != null)
-        {
-            Vector3 s = transform.lossyScale;
-            radius = capsule.radius * Mathf.Max(Mathf.Abs(s.x), Mathf.Abs(s.z));
-        }
-
     }
 
       // Called by PlayerSummons right after Instantiate (after Awake, before Start).
@@ -326,8 +315,8 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver, ICombatTarget
     // ---------------------------------------------------------------------
 
     public Transform Root => transform;
-    public float Radius => radius;
-    public bool IsAlive => !isDead;
+    public float Radius => bodyRadius;   // computed once in Awake
+    public bool IsAlive => !leaving;     // dying / despawning: enemies drop it at once
 
         // Same rules as Enemy.TakeDamage: damage always lands, the FLINCH is rate-limited.
     // No armour and no UI event. At 0 the summon falls apart through the normal Despawn.
