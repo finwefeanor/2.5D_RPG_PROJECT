@@ -503,7 +503,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   attackRange: 0.4
-  attackIndex: 0
+  attackIndex: 1
   attackRecovery: 0.4
   attackAngle: 60
   hitAngle: 120
