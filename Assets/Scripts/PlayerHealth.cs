@@ -5,13 +5,26 @@ using UnityEngine.SceneManagement;
 // Player health: armour mitigation, flinch, death.
 // Lives on the Player root. The hurt sound normally comes from the Hit_A clip's
 // PlayHitSound Animation Event (so it matches the visible flinch); when a hit does
-// NOT flinch, TakeDamage plays it directly instead.
+// NOT flinch, TakeDamage plays it directly instead - but at most once per
+// flinchImmunity window, the same pace as the flinches. One random clip from
+// hurtClips each time (Diablo 2 uses 5 per class, soft and hard grunts).
 public class PlayerHealth : MonoBehaviour, ICombatTarget
 {
     public int health = 100;
     public int maxHealth = 100;
     public AudioSource playerHitSound;
     public AudioSource playerDieSound;
+
+    [Tooltip("Hurt grunts, one picked at random per hurt sound (never the same twice in a row), " +
+             "played through playerHitSound. Empty = playerHitSound's own clip.")]
+    public AudioClip[] hurtClips;
+
+    [Tooltip("Random pitch offset per hurt sound (+/-).")]
+    [Range(0f, 0.3f)]
+    public float hurtPitchVariation = 0.06f;
+
+    private float nextHurtSoundTime = 0f;   // one hurt sound per flinchImmunity window
+    private int lastHurtClip = -1;
     // Health UI listens to GameEvents.OnPlayerHealthChanged (the old per-player event was unused).
 
     [Header("Flinch (stun-lock protection)")]
@@ -100,10 +113,15 @@ public class PlayerHealth : MonoBehaviour, ICombatTarget
         {
             animator.SetTrigger(HitHash);   // Hit_A's PlayHitSound event plays the sound
             nextFlinchTime = Time.time + flinchImmunity;
+            nextHurtSoundTime = nextFlinchTime;   // that sound is this window's one
         }
-        else
+        else if (Time.time >= nextHurtSoundTime)
         {
-            PlayHitSound();                 // no flinch animation -> play the hurt sound here
+            // No flinch (mid-swing, mid-jump or inside the immunity window): play the hurt
+            // sound here, but only once per window - a crowd hitting a high-immunity
+            // player no longer grunts on every hit.
+            PlayHitSound();
+            nextHurtSoundTime = Time.time + flinchImmunity;
         }
     }
 
@@ -111,7 +129,7 @@ public class PlayerHealth : MonoBehaviour, ICombatTarget
     // TakeDamage for hits that don't flinch.
     public void PlayHitSound()
     {
-        if (playerHitSound != null) playerHitSound.Play();
+        lastHurtClip = RandomSound.Play(playerHitSound, hurtClips, hurtPitchVariation, lastHurtClip);
     }
 
     void Die()

@@ -216,6 +216,13 @@ MonoBehaviour:
   maxHealth: 30
   playerHitSound: {fileID: 3111409405808741662}
   playerDieSound: {fileID: 2272609547113551430}
+  hurtClips:
+  - {fileID: 8300000, guid: cee68343950abc14cb6884646f323391, type: 3}
+  - {fileID: 8300000, guid: f882abf1c0ba6bd49bebaf97437725ef, type: 3}
+  - {fileID: 8300000, guid: d501ac560df619241b12e4dea7d141d6, type: 3}
+  - {fileID: 8300000, guid: a0f77d5082844e7fbe8bf3397400e5d2, type: 3}
+  - {fileID: 8300000, guid: b425f792cf1f42568be25c2c7caca866, type: 3}
+  hurtPitchVariation: 0.06
   flinchImmunity: 1.5
   flinchWhileAttacking: 0
   animator: {fileID: 4185621971781387211}

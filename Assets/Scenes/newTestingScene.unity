@@ -3107,6 +3107,10 @@ PrefabInstance:
       value: 300
       objectReference: {fileID: 0}
     - target: {fileID: 1638234075987857564, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
+      propertyPath: flinchImmunity
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1638234075987857564, guid: e4aa3dc50204288b1817edaf6b824b4d, type: 3}
       propertyPath: flinchWhileAttacking
       value: 0
       objectReference: {fileID: 0}
