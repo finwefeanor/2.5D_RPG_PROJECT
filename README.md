@@ -6,7 +6,8 @@ models and animations. Branch: `upgrade/unity6`.
 This document explains how the code is organised, why it is organised that way, and how each
 system works. Read sections 1-4 once; after that, use it as a reference.
 
-> Written against commit `3b7796c` + the class-select / HUD patch + the local NavMesh enemy work.
+> Written against commit `7f50418` + the summon-final patch (summons, enemy targeting, sounds,
+> runner enemy).
 > When the code and this guide disagree, the code wins - fix the guide in the same commit.
 
 ---
@@ -75,11 +76,15 @@ Assets/
   Data_Classes/       CharacterClassDefinition assets (Class_Mage, Class_Barbarian, Class_Rogue)
   Data_Items/         ItemData assets            (Axe, Blade, Shield, Hat_For_Mage, ...)
   Animators/          MageAnimationController (shared by ALL player visuals),
-                      EnemyAnimationController
+                      EnemyAnimationController (+ EnemyRunnerAnimationController override),
+                      SummonAnimationController (Mage's summoned skeletons)
+  Audio and Sounds/   every clip (wav / ogg / mp3). Bone_Hit_* / Bone_Death_* / Player_Hurt_* are
+                      generated (section 8.6)
   Prefabs/
     |VFX/ | | | | | | VFX_HitSpark and VFX_*_Mat
     Core/             everything Build MVP Scene spawns:
                       GameManager, Player, Merchant, Enemy_0_with_sword (+ Boss_Variant),
+                      Enemy_1_Runner, Summon_Prefab (spawned by the Mage skill, not placed),
                       ShopCanvas, PlayerHealthBarCanvas, PauseMenuCanvas, HUDCanvas, GlobalVolume
     *PlayerVisual     MagePlayerVisual, BarbarianPlayerVisual, RoguePlayerVisual
                       (spawned at runtime by PlayerClass - NOT placed in scenes)
@@ -103,7 +108,7 @@ scripts find each other at runtime in one of three ways:
 
 | Need | Use | Example |
 |---|---|---|
-| "Give me the player" | `GameManager.Instance.Player` (a `PlayerRefs`) | `Enemy.ResolvePlayer()` |
+| "Give me the player" | `GameManager.Instance.Player` (a `PlayerRefs`) | `ClassSelectMenu.Choose()` |
 | "Something happened, whoever cares should react" | `GameEvents` static events | gold changed -> HUD, shop |
 | "Give me a UI object inside canvas X" | A `...Refs` component on that canvas root with a static `Instance` | `ShopUIRefs.Instance.goldText` |
 
@@ -179,7 +184,7 @@ START
   PlayerClass              GameEvents.PlayerClassChanged(class)      -> HUD shows class name
   InventoryManager         SaveSystem.Load(...) then GoldChanged(gold) -> HUD / shop show gold
   PlayerHealth             GameEvents.PlayerHealthChanged(...)       -> health bar
-  Enemy                    ResolvePlayer() via GameManager.Instance.Player
+  Enemy                    agent setup only - targets are found by physics in Update (8.2)
   ShopManager / InventoryUIController / PauseMenu  resolve their UI via ...Refs.Instance
   ClassSelectMenu          builds its canvas, opens (Time.timeScale = 0)
   PlayerStatsHUD           initial pull of gold + class
@@ -201,7 +206,8 @@ Player  (prefab: Prefabs/Core/Player)          <- all LOGIC lives here
   PlayerRefs              cache of the components below + registers with GameManager
   PlayerController        movement
   PlayerAttack            attacks + combos
-  PlayerHealth            health, damage, death
+  PlayerHealth            health, damage, death; an ICombatTarget (enemies can attack it)
+  PlayerSummons           the Mage's summoned skeletons: cap, spawn points, DespawnAll (7.7)
   EquipmentManager        what is equipped, current attack, class restrictions
   InventoryManager        owned items + gold
   CharacterVisualController  shows equipment on the model
@@ -277,9 +283,15 @@ doesn't move the character; the Rigidbody does.
     ticked - so a swing the player committed to always finishes (hyper armour), and
   - at least `flinchImmunity` seconds (1.5) passed since the last flinch - so 2-3 skeletons hitting
     in turn can't chain-stun the player. Same idea as `Enemy.flinchImmunity`.
-- The hurt **sound** (`playerHitSound`, GruntVoice01) normally comes from the `PlayHitSound`
-  Animation Event on `Hit_A`, so it matches the flinch. Hits that don't flinch play it directly from
-  `TakeDamage`, so every hit is still audible.
+- The hurt **sound** normally comes from the `PlayHitSound` Animation Event on `Hit_A`, so it matches
+  the flinch. Hits that don't flinch (mid-swing, mid-jump, inside the immunity window) play it from
+  `TakeDamage` - but **at most once per `flinchImmunity` window**, so a high immunity (e.g. 5) means
+  a rare grunt, not one on every hit. The flinch itself counts as that window's sound.
+- One clip from `hurtClips` per hurt sound (`RandomSound`: never the same twice in a row, +/-
+  `hurtPitchVariation`): GruntVoice01, wounded-character_trimmed, zombie-hit, Player_Hurt_Low,
+  Player_Hurt_Soft. Diablo 2 uses 5 per class (soft and hard grunts, one voice per class).
+- **`ICombatTarget`**: `Root` = transform, `Radius` = capsule radius (cached in `Start`),
+  `IsAlive` = not dead, `TakeDamage`. That is all an enemy needs to chase and hit the player (8.2).
 - `Die()`: disables `PlayerController` and `PlayerAttack`, sets `isDead` + `Death` on the Animator,
   fires `GameEvents.PlayerDied` (enemies stop attacking), shows the death panel from
   `PlayerUIRefs`, waits for the death sound, then **reloads the scene**.
@@ -331,6 +343,7 @@ Called by `ClassSelectMenu`. Order matters:
 | # | Step | Why |
 |---|---|---|
 | 1 | `PlayerAttack.ResetAttackState()` | The old Animator is about to be destroyed mid-swing; its `OnStateExit` will never arrive, so the attack counters would stay stuck at "attacking" forever |
+| 1b | `PlayerSummons.DespawnAll()` | Summons belong to the class that cast them - a Barbarian has no skeletons. They fall apart like at the end of their lifetime |
 | 2 | `SpawnVisual` | New model |
 | 3 | `BindVisual` | Everyone now points at the new Animator / sockets / pieces |
 | 4 | `ApplyStats` | New stats, **full heal** |
@@ -377,11 +390,16 @@ every skeleton sharing the KayKit material.
 
 | Field | Meaning |
 |---|---|
-| `animatorIndex` | Written to Animator int `AttackIndex`; picks the clip inside `Attacks_SubState`. 0-9 = one-handed / ranged, 10-19 = unarmed  |
+| `animatorIndex` | Written to Animator int `AttackIndex`; picks the clip inside `Attacks_SubState`. 0-9 = one-handed melee, 10-19 = unarmed, 20-29 = ranged weapons, 30-39 = magic |
 | `animationSpeed` | Clip playback speed. Multiplied by the class's `attackSpeed` and written to Animator float `AttackSpeed` |
 | `damageMultiplier` | x `PlayerAttack.baseAttackDamage` |
 | `range` | Melee only: radius of the hit sphere around `AttackPoint` |
-| `delivery` | What the contact-frame event does. `Melee` = hit sphere + front arc (`PlayerAttack.meleeHitAngle`). `Projectile` = spawns `projectilePrefab` at `FirePoint` |
+| `delivery` | What the contact-frame event does. `Melee` = hit sphere + front arc (`PlayerAttack.meleeHitAngle`). `Projectile` = spawns `projectilePrefab` at `FirePoint`. `Summon` = `PlayerSummons.Spawn` (7.7) |
+| `summonPrefab` | Summon only: prefab with a `Summon` component |
+| `summonCount` | Summon only: how many appear per cast |
+| `summonLifetime` | Summon only: seconds before each one falls apart |
+| `maxActiveSummons` | Summon only: cap on living summons; casting past it removes the oldest first |
+| `summonSpacing` | Summon only: metres between summons when they appear side by side |
 | `projectilePrefab` | `ArrowProjectile` prefab (Projectile only) |
 | `projectileSpeed` | Metres per second |
 | `projectileRange` | Metres flown before the projectile is removed |
@@ -421,7 +439,9 @@ Base Layer
      Entry --AttackIndex==0--> Melee_1H_Attack_Slice_Horizontal
      Entry --AttackIndex==1--> Melee_1H_Attack_Jump_Chop  (Barbarian Leap skill only)
      Entry --AttackIndex==5--> Melee_1H_Attack_Chop       (Axe, events at 0.594, exit 0.85)
-     Entry --AttackIndex==2--> Ranged_Bow_Release      (crossbow, events at 0.125)
+     Entry --AttackIndex==20-> Ranged_Bow_Release      (crossbow, events at 0.125)
+     Entry --AttackIndex==30-> Ranged_Magic_Shoot      (staff fireball)
+     Entry --AttackIndex==31-> Ranged_Magic_Summon     (Mage skill, events at ~0.744)
      Entry --AttackIndex==3--> Melee_1H_Attack_Slice_Diagonal  (Blade combo 2, events at 0.433)
      Entry --AttackIndex==4--> Melee_1H_Attack_Stab            (Blade combo 3, events at 0.271)
      Entry --AttackIndex==10-> Melee_Unarmed_Attack_Punch_A
@@ -541,9 +561,15 @@ the parent, so each character has a relay on the visual:
 | Relay (on the visual) | Forwards to | Methods |
 |---|---|---|
 | `PlayerAnimationEventRelay` | `PlayerAttack`, `PlayerHealth` | `PlayAttackSound`, `DealAttackDamage`, `PlayHitSound` |
-| `AnimationEventRelay` (enemies) | `Enemy` | `PlayAttackSound`, `DealAttackDamage`, `PlayHitSound` |
+| `AnimationEventRelay` (enemies, summons) | the `ICombatAnimationReceiver` on the root: `Enemy` or `Summon` | `PlayAttackSound`, `DealAttackDamage`, `PlayHitSound` |
 
 `Hit_A` is shared by player and enemies, which is why both relays have `PlayHitSound`.
+
+**`ICombatAnimationReceiver`** (5 methods: `OnAttackAnimationStart / End`, `DealAttackDamage`,
+`PlayAttackSound`, `PlayHitSound`) lets one relay and one `EnemyAttackState` serve every character
+that runs an enemy-style controller. `Enemy` and `Summon` implement it; the relay finds it with
+`GetComponentInParent<ICombatAnimationReceiver>()`. In the editor, Ctrl+Click on a call goes to the
+interface - use **Go to Implementations** (Ctrl+F12) to reach `Enemy` / `Summon`.
 
 Events are stored in the FBX `.meta` (clip import settings) as normalized time, so they scale with
 playback speed. Use **Tools -> RPG -> Attack Events** to place them (section 13).
@@ -553,9 +579,50 @@ playback speed. Use **Tools -> RPG -> Attack Events** to place them (section 13)
 | Behaviour | On | Calls |
 |---|---|---|
 | `PlayerAttackState` | `Attacks_SubState` node in MageAnimationController | `PlayerAttack.OnAttackAnimationStart / Update / End` |
-| `EnemyAttackState` | Attack state in EnemyAnimationController | `Enemy.OnAttackAnimationStart / End` |
+| `EnemyAttackState` | Attack states in EnemyAnimationController and SummonAnimationController | `ICombatAnimationReceiver.OnAttackAnimationStart / End` (Enemy or Summon) |
+| `SummonAwakenState` | `Skeletons_Awaken_Floor` in SummonAnimationController | `Summon.OnAwakened()` when the rise clip is left |
 
-Both find their target with `animator.GetComponentInParent<...>()` and cache it.
+All find their target with `animator.GetComponentInParent<...>()` and cache it. **Every attack state
+needs `EnemyAttackState`** - without it `isAttacking` never changes and the character requests a new
+swing every frame.
+
+### 7.7 Summons (Mage skill)
+
+`Ranged_Magic_Summon` (AttackIndex 31, delivery `Summon`) is `Class_Mage.skill`. The clip's contact
+event calls `PlayerAttack.DealAttackDamage`, whose Summon branch calls
+`PlayerSummons.Spawn(ability, damage)`.
+
+- **Damage**: `round(baseAttackDamage x damageMultiplier)`, **without** item `damageBonus` (the Axe's
+  +25 on every skeleton hit would be absurd). Summons scale with the character, not the weapon.
+- **`PlayerSummons`** (Player root) - the one place that decides how many summons exist:
+  - spawn points: a row in front of the player (`spawnForward`, ability `summonSpacing`), each moved
+    onto the NavMesh with `NavMesh.SamplePosition` (an agent created off the mesh never moves);
+  - cap: past `maxActiveSummons` the oldest despawns first; `FreeSlot()` gives each one its own
+    follow slot;
+  - `DespawnAll()` on `GameEvents.OnPlayerDied` and on a class switch (6.3).
+- **`Summon`** (summon prefab root; also an `ICombatAnimationReceiver` and an `ICombatTarget`):
+  ```
+  awakening  -> nothing until the rise clip ends (SummonAwakenState; awakenTimeout = safety net)
+  no target  -> stand on its slot around the player (followRadius, 4 diagonals, then a wider ring);
+                walk back once the player is further than followDistance
+  target     -> nearest living Enemy within aggroRange of the summon AND leashRange of the player;
+                kept until it dies or leaves the leash (searched every retargetInterval, only when idle)
+  in range   -> stop, face, swing (attackIndex: 0 slice, 1 stab). Damage on the contact event, with
+                the same range / dodge / arc rules as Enemy
+  ```
+  - Health (`maxHealth` 15), flinch limited by `flinchImmunity`, hurt / death clips through
+    `RandomSound`. At 0 HP, or when `summonLifetime` runs out, or pushed out by the cap ->
+    `Despawn()`: death clip, collider + agent off, removed after `despawnDelay`.
+  - **Walk speed matches the feet**: Animator float `WalkSpeed` (multiplier on Skeletons_Walking) =
+    agent velocity / `walkAnimSpeed` (0.7 m/s, measured from the clip), clamped 0.5-3.
+- **`SummonAnimationController`**: Skeletons_Awaken_Floor (default) -> Idle_B, Skeletons_Walking
+  (loops, `WalkSpeed`), Slice_Horizontal / Stab (both with `EnemyAttackState`), Hit_A, Death_A.
+- **Layer `Summon` (9)**: the player walks through own summons (Summon / Player off in the collision
+  matrix), fireballs and arrows pass through them (projectile Rigidbody `Exclude Layers` = Summon),
+  enemies find them through `playerLayer` (8.2).
+- **Variants** (later): a Prefab Variant of `Summon_Prefab` with another `moveSpeed`; for another walk
+  clip an Animator Override Controller of SummonAnimationController and that clip's `walkAnimSpeed`.
+  Second `AbilityDefinition` with `summonPrefab` = the variant.
 
 ---
 
@@ -571,38 +638,56 @@ Enemy_0_with_sword  (Prefabs/Core)
     Animator (EnemyAnimationController, EnemyAttackState on the Attack state)
     AnimationEventRelay
 Enemy_0_with_sword_Boss_Variant   prefab variant: bigger, more HP, neverFlinch, 360 degree swing
+Enemy_1_Runner                    prefab variant: runs (Running_A via EnemyRunnerAnimationController),
+                                  faster swings, less HP (8.5)
 ```
 
 ### 8.2 Behaviour (`Enemy.Update`)
 
 ```
-dead / player dead / no player / mid-swing  -> do nothing
-distance = EdgeDistanceToPlayer()           (centre distance - own radius - player radius)
-distance <= attackRange   -> TickAttack()
-distance <= detectRange   -> TickChase()
-otherwise                 -> idle
+dead / player dead / mid-swing  -> do nothing
+target invalid (dead, destroyed, further than detectRange + loseTargetMargin) -> drop it
+no target -> every retargetInterval: FindTarget()
+no target -> idle
+EdgeDistanceToTarget() <= attackRange -> TickAttack()
+otherwise                             -> TickChase()
 ```
+
+- **Targets = `ICombatTarget`** (`Root`, `Radius`, `IsAlive`, `TakeDamage`), implemented by
+  `PlayerHealth` and `Summon`. `FindTarget()`: `Physics.OverlapSphere(detectRange, playerLayer)`,
+  then `GetComponentInParent<ICombatTarget>()` on each collider, nearest alive one wins. `playerLayer`
+  = **Player + Summon**. The enemy never knows whether it is fighting the player or a skeleton.
+- **Sticky**: the target is kept until it dies or walks away, so the enemy doesn't flip between two
+  targets every frame. Effect: an enemy that chases you turns to your summons once you run off.
+- **`SetTarget()`** is the one place that changes the target; it also sets the agent's
+  `stoppingDistance` (each target has its own radius).
+- `IsValidTarget` casts to `UnityEngine.Object` for the null check: an interface variable hides
+  Unity's "destroyed object == null".
 
 - **Edge distance**: ranges are measured between the capsules' surfaces, so a scaled-up boss doesn't
   need a bigger `attackRange` just because its body is wider. Radii include `lossyScale`.
-- **TickChase**: `NavMeshAgent.SetDestination(player)`. The agent paths around obstacles (boxes,
-  walls). `stoppingDistance = max(attackRange, 0.05) + bodyRadius + playerRadius` so the agent stops
-  at the edge of attack range instead of pushing into the player.
+- **TickChase**: `NavMeshAgent.SetDestination(target)`. The agent paths around obstacles (boxes,
+  walls). `stoppingDistance = max(attackRange, 0.05) + bodyRadius + target.Radius` so the agent stops
+  at the edge of attack range instead of pushing into the target.
 - **Stopping**: when attacking / idle the agent is stopped and its `velocity` is zeroed, so it doesn't
   slide into the player with leftover momentum. `isOnNavMesh` is checked before every agent call.
-- **TickAttack**: stop, `FacePlayer()` (`turnSpeed` deg/s). Swing only when recovery is over **and** the
-  player is inside the `attackAngle` cone in front. Sets `AttackIndex` + `Attack` trigger - nothing else.
+- **TickAttack**: stop, `FaceTarget()` (`turnSpeed` deg/s). Swing only when recovery is over **and**
+  the target is inside the `attackAngle` cone in front. Sets `AttackSpeed` (= `attackAnimSpeed`),
+  `AttackIndex` + `Attack` trigger - nothing else.
 - **DealAttackDamage** (contact-frame event): the swing is committed but can still miss:
-  - player stepped back beyond `attackRange + dodgeMargin` -> miss
-  - player outside the `hitAngle` arc -> miss (360 = full circle, used by the boss)
-  - otherwise `PlayerHealth.TakeDamage(attackDamage)`
+  - target stepped back beyond `attackRange + dodgeMargin` -> miss
+  - target outside the `hitAngle` arc -> miss (360 = full circle, used by the boss)
+  - otherwise `target.TakeDamage(attackDamage)`
 - **Flinch**: `TakeDamage` always removes health, but plays `Hit_A` at most once per `flinchImmunity`
   seconds - so a combo can't stun-lock an enemy forever. `neverFlinch` disables it (bosses).
-- **Hurt sound**: `PlayHitSound` (Hit_A event) picks a random clip from `getHitClips`
-  (zombie-hit, Skeleton_Hit_01, Skeleton_Hit_02) with +/- `getHitPitchVariation` pitch, played through
-  the `enemyGetHitSound` AudioSource. Empty array = that AudioSource's own clip.
+- **Hurt sound**: `PlayHitSound` (Hit_A event, so only on a flinch) plays one clip from `getHitClips`
+  through `enemyGetHitSound`; **death**: one clip from `dieClips` through `enemyDieSound`. Both via
+  `RandomSound` (8.6). Empty array = the AudioSource's own clip.
 - **Death**: drops a `CubeCollectible` gold pickup worth `goldReward`, plays the death animation,
   destroys itself after 2.5 s.
+- **Move clip speed**: with `moveClipSpeed` > 0 the move state plays at agent speed / `moveClipSpeed`
+  (Animator float `MoveAnimSpeed`, clamped 0.5-2.5), so the feet match the ground. 0 = off (the
+  normal skeleton walks Walking_B at speed 1 while moving 3 m/s - it slides, see 16).
 - **Player death**: listens to `GameEvents.OnPlayerDied` and stops attacking the corpse.
 
 The ground needs a `NavMeshSurface` (AI Navigation package). **Re-bake** it after moving obstacles.
@@ -619,12 +704,52 @@ The ground needs a `NavMeshSurface` (AI Navigation package). **Re-bake** it afte
 | `dodgeMargin` | How far past `attackRange` a committed swing still connects |
 | `flinchImmunity` / `neverFlinch` | Stun-lock protection |
 | `moveSpeed`, `turnSpeed` | Chase speed / facing speed |
+| `moveClipSpeed` | m/s the move clip covers at speed 1 (Walking_B ~1.1, Running_A ~3.3). 0 = don't scale |
+| `attackAnimSpeed` | Attack clip playback speed (events stay on the right frame - normalized time) |
+| `playerLayer` | What it can attack: **Player + Summon** |
+| `retargetInterval`, `loseTargetMargin` | How often an idle enemy searches; how far beyond `detectRange` a target is dropped |
 | `goldReward`, `goldPickupPrefab` | Loot |
 
 ### 8.4 `EnemyHealthBar`
 
 World-space slider above the enemy. Subscribes to the enemy's own `OnHealthChanged` (per-enemy C#
 event, not `GameEvents`) and billboards toward the camera in `LateUpdate`.
+
+### 8.5 Enemy types
+
+| Prefab | Base | Move clip | HP | Move speed | Attack | Notes |
+|---|---|---|---|---|---|---|
+| `Enemy_0_with_sword` | - | Walking_B (speed 1) | prefab value | 3 | Slice, recovery 0.4 | |
+| `Enemy_0_with_sword_Boss_Variant` | variant | Walking_B | 150 | 2.6 | recovery 0.7, dmg 4, hitAngle 270 | scale 2, neverFlinch |
+| `Enemy_1_Runner` | variant | **Running_A** (`moveClipSpeed` 3.3) | 20 | 4.2 | `attackAnimSpeed` 1.3, recovery 0.15 | detectRange 7, flinchImmunity 0.8, gold 8 |
+
+The runner is a Prefab Variant (inherits every fix to the base) whose Animator uses
+**`EnemyRunnerAnimationController`** - an *Animator Override Controller* of EnemyAnimationController
+that swaps only Walking_B -> Running_A. States, parameters and `EnemyAttackState` stay shared.
+`moveSpeed` 4.2 is just under the slowest class (Barbarian 4.6), so the player can still outrun it.
+Running_B (~5 m/s, measured roughly) is the faster option, but its clip has Loop Time off.
+
+Clip speeds were measured from the FBX: the planted foot's backward speed during ground contact.
+Walking_B ~1.1, Running_A ~3.4, Skeletons_Walking ~0.7 m/s.
+
+### 8.6 Sounds: `RandomSound`, and why skeletons don't grunt
+
+- `RandomSound.Play(source, clips, pitchVariation, lastIndex)` (static): one clip from a set,
+  **never the same one twice in a row**, random pitch, `PlayOneShot`. Returns the index to keep.
+  `Enemy` and `Summon` keep the last index in a **static** field, so two skeletons hit or killed back
+  to back sound different too.
+- **Diablo 2 reference** (`MonSounds.txt` / `Sounds.txt`, 1.13 data): skeletons have **no voice** - no
+  attack shout, no idle sound; 7 get-hit and 5 death variants (bone sounds), very quiet bone-rattle
+  footsteps (even quieter for a necromancer's skeletons). Zombies have attack / idle groans. Every
+  player class has 5 get-hit grunts in its own voice.
+- Skeletons (enemy and summon): hurt = Skeleton_Hit_01/02 + Bone_Hit_01-04; death =
+  skeleton-death_by_mellau_preview + Bone_Death_01-03. `zombie-hit` (a voiced "uhh") is player-only.
+  `EnemyDeathVoice(2).wav` (identical files, a human voice) is kept for future human enemies.
+- `Bone_Hit_*` / `Bone_Death_*` were **generated** (modal "bone clack" synthesis + noise + small room)
+  and matched to Skeleton_Hit_01/02 by noisiness / brightness. `Player_Hurt_Low` / `_Soft` are
+  pitched variants of the existing grunts. Replace any that sound synthetic with real recordings.
+- Hurt sounds follow the flinch (Hit_A event), so `flinchImmunity` also limits how often a skeleton
+  makes them. A scene override of 0 = a hurt sound on every hit.
 
 ---
 
@@ -785,7 +910,7 @@ outlive scene reloads, so a missing `-=` keeps a destroyed object subscribed.
 | Barbarian | 50 | 14 | 0.9 | 4.6 | Unarmed_Punch | BarbarianPlayerVisual |
 | Rogue | 25 | 9 | 1.25 | 5.6 | Unarmed_Punch | RoguePlayerVisual |
 
-Class skills: Barbarian = `Skill_Leap`; Mage = none yet (Summon comes next); Rogue = none yet.
+Class skills: Barbarian = `Skill_Leap`; Mage = `Ranged_Magic_Summon`; Rogue = none yet.
 
 ### Abilities
 
@@ -797,7 +922,9 @@ Class skills: Barbarian = `Skill_Leap`; Mage = none yet (Summon comes next); Rog
 | Attack_1H_SliceDiagonal | 3 | 1.2 | 1.1 | 1.5 | -> Attack_1H_Stab (opens 0.25, at 0.6) |
 | Attack_1H_Stab | 4 | 1.25 | 1.5 | 1.8 | none (finisher) |
 | Attack_1H_Chop (Axe) | 5 | 1.1 | 1.3 | 1.4 | none. Sounds: JumpChop_Slam_01-03 / JumpChop_Hit_01-03 |
-| Ranged_Bow_Release | 2 | 1.0 | 1.0 | Projectile: speed 15, range 15 | none |
+| Ranged_Bow_Release | 20 | 1.0 | 1.0 | Projectile: speed 15, range 15 | none |
+| Attack_Staff_Fireball (Mage_Staff) | 30 | 1.0 | 1.2 | Projectile: speed 12, range 14 | none |
+| Ranged_Magic_Summon (Mage skill) | 31 | 1.0 | 0.4 (per skeleton hit, no item bonus) | Summon: 2 per cast, 20 s, max 4, spacing 3 | none. Cooldown currently 0 (testing; planned 12 s, animationSpeed 1.5) |
 | Skill_Leap (Barbarian skill) | 1 | 1.0 | 1.8 | 2.0 | none. Cooldown 6 s, displayName Leap, JumpChop sounds |
 
 Cancel windows (`cancelFrom`, all after the contact frame): Slice 0.35, SliceDiagonal 0.55, Stab 0.45,
@@ -817,6 +944,7 @@ Chop 0.75, Leap 0.7, Punch 0.55, Kick 0.6, Bow 0.4, Fireball 0.4, Summon 1 (neve
 | Hood_For_Rogue | Head | 0 | 0 | - | Rogue |
 | Cape_For_Rogue | Chest | 0 | 0 | - | Rogue |
 | Crossbow | RightHand | 0 | 0 | Ranged_Bow_Release | Rogue |
+| Mage_Staff | RightHand | 0 | 0 | Attack_Staff_Fireball | Mage |
 
 > Balance note: the Axe's `damageBonus 25` is huge compared to base damage 9-14. Expect it to be
 > retuned when the progression phase adds stat growth.
@@ -869,8 +997,23 @@ No code changes.
 ### Add a new enemy type
 
 Make a prefab variant of `Enemy_0_with_sword` and change Inspector values (section 8.3). For a new
-attack clip, add a state + `AttackIndex` transition in EnemyAnimationController, set the variant's
-`attackIndex`, and place its events with the Attack Events tool.
+attack clip, add a state + `AttackIndex` transition in EnemyAnimationController (with
+`EnemyAttackState` and the `AttackSpeed` multiplier), set the variant's `attackIndex`, and place its
+events with the Attack Events tool.
+
+**Other move clip** (like the runner): `Create -> Animator Override Controller`, Controller =
+EnemyAnimationController, override Walking_B with the clip (Loop Time on!), assign it to the
+variant's Animator. Set `moveClipSpeed` to the clip's own speed so the feet match.
+
+**Other model** (zombie, ...): duplicate the base prefab (not a variant - the visual child changes),
+swap the visual, keep `AnimationEventRelay` on the Animator object. Clips must fit the rig (KayKit
+Rig_Medium for all KayKit characters).
+
+### Add a summon type
+
+Prefab Variant of `Summon_Prefab` (change `moveSpeed`, `maxHealth`, `attackIndex`, sounds) + a new
+`AbilityDefinition` with delivery `Summon` and `summonPrefab` = the variant. Another walk clip ->
+Animator Override Controller of SummonAnimationController + `walkAnimSpeed`.
 
 ### React to something in UI
 
@@ -982,6 +1125,10 @@ Claude reviews by cloning the branch - it never pushes to the repo.
 - Death always reloads the scene; there is no respawn point or game-over menu.
 - The class is not saved; the picker appears on every start.
 - A dying enemy keeps its collider for 2.5 s, so bolts stop on corpses (fixed in the VFX step).
+- **Foot sliding**: the player's Locomotion blend puts Running_A (natural ~3.4 m/s) at MoveSpeed 5 and
+  Walking_B (~1.1 m/s) at 2.2, and the base enemy walks Walking_B at speed 1 while moving 3 m/s. The
+  runner and summons already scale their clip (`moveClipSpeed` / `walkAnimSpeed`).
+- `Ranged_Magic_Summon.cooldown` is 0 for testing.
 
 ---
 
@@ -998,7 +1145,32 @@ Claude reviews by cloning the branch - it never pushes to the repo.
 | **B - In Progress** | `ClassIdentity` (locomotion, delivery types, crossbow, staff, VFX) |
 | C - Skills | Ability loadout / skill bar, `requiredLevel`, resources (mana / rage / energy) | |
 | D - Ranged | Projectile system: crossbow, mage staff, VFX | |
-| E - Enemy variety | Enemies using `AbilityDefinition`, archers, summoners | |
+| E - Enemy variety | Enemies using `AbilityDefinition`, archers, summoners | Runner done |
+| Mage skill | Summon skeletons: PlayerSummons / Summon, awaken, follow, target, health; enemies target summons (`ICombatTarget`) | Done |
+| Sound pass | `RandomSound`, bone hit / death sets, player hurt set, one hurt sound per flinch window | Done |
+
+### 17.1 TODO (next steps)
+
+Gameplay
+- [ ] Leap distance / height scaling through the progression system.
+- [ ] Damage types (physical / fire / ice / poison), so a fireball hit doesn't play the bone-crack hurt
+      sound and each type can have its own hit VFX + sound.
+- [ ] Blade: a faster chop-style strike (the Axe's non-jump Chop reads better than a horizontal
+      slice). The Blade combo is Slice -> SliceDiagonal -> Stab today; e.g. use the Chop clip as a
+      Blade combo step with a higher `animationSpeed`.
+- [ ] Summon polish: aggro on damage (an enemy hit by a summon turns to it), summon variants
+      (`FastSkeletonSummon`), quiet bone-rattle footsteps (D2 style).
+- [ ] Per-class hurt voices (`hurtClips` on `CharacterClassDefinition`) once there are recordings.
+- [ ] Player foot sliding: scale the Locomotion clips like `moveClipSpeed` (section 16).
+
+Content
+- [ ] Zombie enemy (KayKit model, D2-style voice: attack / idle groans, 6 hit, 4 death sounds).
+- [ ] VFX: ice damage, different fire damages, a summon effect (skeletons rising from the ground,
+      timed with Skeletons_Awaken_Floor).
+
+UI / tools
+- [ ] Scaling the `PlayerHealthBarCanvas` (phone screens).
+- [ ] Scene builder tool (spawn enemy groups / layouts, beyond `Build MVP Scene`).
 
 ---
 
@@ -1007,7 +1179,7 @@ Claude reviews by cloning the branch - it never pushes to the repo.
 | Script | Lives on | One-line job |
 |---|---|---|
 | `AbilityDefinition` | asset | One attack: clip index, speed, damage, range, combo, sounds |
-| `AnimationEventRelay` | enemy visual | Forwards Animation Events to `Enemy` |
+| `AnimationEventRelay` | enemy / summon visual | Forwards Animation Events to the `ICombatAnimationReceiver` (`Enemy` / `Summon`) |
 | `ArrowProjectile` | projectile prefab | Flies straight, damages the first Enemy it touches, removed on contact or after projectileRange |
 | `AttackButtonRelay` | HUDCanvas | Attack button -> `GameEvents.AttackPressed` |
 | `AttackStateLogger` | - | Legacy debug behaviour |
@@ -1017,13 +1189,15 @@ Claude reviews by cloning the branch - it never pushes to the repo.
 | `CharacterVisualController` | Player | Shows equipment on the current model |
 | `ClassSelectMenu` | GameManager | Class picker screen (built in code) |
 | `DebugInventoryTester` | - | Legacy test keys |
-| `Enemy` | enemy root | AI: chase (NavMesh), attack, flinch, die, drop gold |
-| `EnemyAttackState` | enemy Animator | Reports attack start / end to `Enemy` |
+| `Enemy` | enemy root | AI: find the nearest `ICombatTarget`, chase (NavMesh), attack, flinch, die, drop gold |
+| `EnemyAttackState` | enemy / summon Animator | Reports attack start / end to the `ICombatAnimationReceiver` |
 | `EnemyHealthBar` | enemy child canvas | World-space HP bar |
 | `EquipmentManager` | Player | Equipped items, current attack, class restrictions |
 | `GameEvents` | static | Global event hub |
 | `GameManager` | GameManager | Singleton; holds `Player` (`PlayerRefs`) |
 | `GoldPickup` | CubeCollectible | Spinning gold, adds gold on touch |
+| `ICombatAnimationReceiver` | interface | What `AnimationEventRelay` / `EnemyAttackState` call: `Enemy`, `Summon` |
+| `ICombatTarget` | interface | What an enemy can attack: `PlayerHealth`, `Summon` |
 | `InteractButtonRelay` | HUDCanvas | Interact button -> `GameEvents.InteractPressed` |
 | `JumpButtonRelay` | HUDCanvas | Jump button (pointer down) -> `GameEvents.JumpPressed` |
 | `SkillButtonUI` | HUDCanvas | Skill button: pointer down -> `GameEvents.SkillPressed`, cooldown overlay, hide when no skill |
@@ -1045,9 +1219,13 @@ Claude reviews by cloning the branch - it never pushes to the repo.
 | `PlayerInventory` | - | Legacy outfit system |
 | `PlayerRefs` | Player | Component cache, registers with GameManager |
 | `PlayerStatsHUD` | PlayerHealthBarCanvas | Class name + gold under the health bar |
+| `PlayerSummons` | Player | Spawns / caps / despawns the Mage's summons |
+| `RandomSound` | static | One clip from a set, never twice in a row, random pitch |
 | `PlayerUIRefs` | PlayerHealthBarCanvas | Death panel ref |
 | `SaveSystem` | static | PlayerPrefs save / load / clear |
 | `SceneBuilderNote` | various | Inspector note text |
+| `Summon` | summon root | Summoned skeleton: awaken, follow, target enemies, attack, health, despawn |
+| `SummonAwakenState` | SummonAnimationController | Tells `Summon` the rise clip ended |
 | `ShopKeeperInteraction` | Merchant | Range trigger, opens / closes the shop |
 | `ShopManager` | Merchant | Shop buttons, buying |
 | `ShopUIController` | Merchant | Shows / hides the shop panel |

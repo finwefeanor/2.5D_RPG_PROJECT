@@ -57,6 +57,10 @@ public class PlayerClass : MonoBehaviour
         // A swing on the old Animator never gets its OnStateExit - clear it.
         PlayerAttack attack = GetComponent<PlayerAttack>();
         if (attack != null) attack.ResetAttackState();
+
+        // Summons belong to the class that cast them: a Barbarian has no skeletons.
+        PlayerSummons summons = GetComponent<PlayerSummons>();
+        if (summons != null) summons.DespawnAll();
  
         Visual = SpawnVisual(classDefinition);
         if (Visual == null) return;

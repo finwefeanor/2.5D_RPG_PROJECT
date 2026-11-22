@@ -60,9 +60,21 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
     [Tooltip("How fast the enemy turns to face the player while in attack range (deg/sec).")]
     public float turnSpeed = 360f;
 
+    [Tooltip("Playback speed of the attack clips (Animator float AttackSpeed). The contact-frame " +
+             "events are in normalized time, so damage stays on the right frame. 1 = clip speed.")]
+    public float attackAnimSpeed = 1f;
+
     [Header("Movement & Detection")]
     public float detectRange = 5f;
     public float moveSpeed = 3f;
+
+    [Tooltip("Metres per second the move clip's feet cover at playback speed 1 (Walking_B ~1.1, " +
+             "Running_A ~3.3). The move clip then plays at agent speed / this, so the feet match " +
+             "the ground. 0 = off: the clip always plays at speed 1.")]
+    public float moveClipSpeed = 0f;
+
+    [Tooltip("What this enemy can attack: Player + Summon. Anything on these layers that has an " +
+             "ICombatTarget component (PlayerHealth, Summon) is a possible target.")]
     public LayerMask playerLayer;
 
     [Tooltip("Seconds between target searches while the enemy has no target.")]
@@ -120,12 +132,7 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
     // Runtime state
     // ---------------------------------------------------------------------
 
-    private Transform playerTransform;
-
-    private PlayerHealth playerHealth;   // cached — no per-hit GetComponent
-
     private float bodyRadius;     // own capsule radius in world units - grows with scale
-    private float playerRadius;   // player's capsule radius in world units
     private float nextAttackTime = 0f;
     private bool isAttacking = false;    // set by EnemyAttackState, not by us
     private bool isDead = false;
@@ -138,6 +145,8 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
     // ---------------------------------------------------------------------
 
     private static readonly int isMovingHash    = Animator.StringToHash("isMoving");
+    private static readonly int AttackSpeedHash = Animator.StringToHash("AttackSpeed");
+    private static readonly int MoveAnimSpeedHash = Animator.StringToHash("MoveAnimSpeed");
     private static readonly int AttackHash      = Animator.StringToHash("Attack");
     private static readonly int AttackIndexHash = Animator.StringToHash("AttackIndex");
     private static readonly int HitHash         = Animator.StringToHash("Hit");
@@ -155,9 +164,6 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
 
         navMeshAgent = GetComponent<NavMeshAgent>();
 
-
-        //ResolvePlayer();
-
         if (navMeshAgent != null)
         {
             navMeshAgent.speed        = moveSpeed;
@@ -165,10 +171,10 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
             navMeshAgent.autoBraking  = true;
 
             // The agent measures centre-to-centre, our attackRange is edge-to-edge.
-            // Stop where the bodies are attackRange apart - never inside the player.
-            // Mathf.Max keeps a gap even if attackRange is 0 or negative.
-            navMeshAgent.stoppingDistance =
-                Mathf.Max(attackRange, 0.05f) + bodyRadius + playerRadius;
+            // SetTarget adds the target's own radius once there is a target (the player
+            // and a summon have different radii). Mathf.Max keeps a gap even if
+            // attackRange is 0 or negative.
+            navMeshAgent.stoppingDistance = Mathf.Max(attackRange, 0.05f) + bodyRadius;
         }
 
 
@@ -185,6 +191,8 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
 
         // While the swing is playing, the animation is in charge. Don't touch anything.
         if (isAttacking) return;
+
+        UpdateMoveAnimSpeed();
 
         // Sticky target: search only when there is none (cheap, and no flip-flopping).
         if (!IsValidTarget(target)) target = null;
@@ -206,28 +214,10 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
     }
 
     // ---------------------------------------------------------------------
-    // Setup
+    // Player death: stop attacking the corpse
     // ---------------------------------------------------------------------
 
-
-    private void ResolvePlayer()
-    {
-        PlayerRefs refs = GameManager.Instance != null ? GameManager.Instance.Player : null;
-        if (refs == null)
-        {
-            Debug.LogWarning($"{name}: no Player registered — enemy will idle.", this);
-            return;
-        }
-
-        playerTransform = refs.transform;
-        playerHealth    = refs.Health;
-        playerRadius    = WorldRadius(refs);
-    }
-
-    /*
-        It stops enemy to attack death player's corpse
-    */
-        void OnEnable()
+    void OnEnable()
     {
         GameEvents.OnPlayerDied += HandlePlayerDied;
     }
@@ -313,9 +303,21 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
         dirToPlayer.y = 0;
         if (Vector3.Angle(transform.forward, dirToPlayer) > attackAngle / 2f) return;
 
+        animator.SetFloat(AttackSpeedHash, attackAnimSpeed);
         animator.SetInteger(AttackIndexHash, attackIndex);
         animator.SetTrigger(AttackHash);
         // NO damage, NO sound, NO timer here — the animation handles all three.
+    }
+
+    // Feet match the ground: move clip playback = real speed / clip speed. Off when
+    // moveClipSpeed is 0 (the parameter keeps its default 1). Clamped so a nearly stopped
+    // agent doesn't freeze the clip and a fast one doesn't look frantic.
+    private void UpdateMoveAnimSpeed()
+    {
+        if (animator == null || navMeshAgent == null || moveClipSpeed <= 0f) return;
+
+        float speed = navMeshAgent.velocity.magnitude / moveClipSpeed;
+        animator.SetFloat(MoveAnimSpeedHash, Mathf.Clamp(speed, 0.5f, 2.5f));
     }
 
     private void TickChase()

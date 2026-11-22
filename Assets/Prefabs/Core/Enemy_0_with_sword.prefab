@@ -204,8 +204,10 @@ MonoBehaviour:
   hitAngle: 120
   dodgeMargin: 0.5
   turnSpeed: 360
+  attackAnimSpeed: 1
   detectRange: 3.5
   moveSpeed: 3
+  moveClipSpeed: 0
   playerLayer:
     serializedVersion: 2
     m_Bits: 576
