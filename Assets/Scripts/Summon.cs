@@ -1,12 +1,13 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-// The Mage's summoned skeleton. Spawned by PlayerSummons; runs EnemyAnimationController
+// The Mage's summoned skeleton. Spawned by PlayerSummons; runs SummonAnimationController
 // through the same AnimationEventRelay + EnemyAttackState as Enemy (ICombatAnimationReceiver).
+//   awakening -> does nothing until the rise clip ends (SummonAwakenState on that state)
 //   no target -> stand near the player; follow once the player walks away
 //   target    -> nearest living Enemy near this summon AND near the player (leash)
 //   in range  -> stop, face it, swing. Damage lands on the clip's contact event.
-// v1: enemies ignore summons and summons have no health. They leave when their time is up.
+// Enemies can attack it (ICombatTarget). It leaves when killed or when its time is up.
 public class Summon : MonoBehaviour, ICombatAnimationReceiver, ICombatTarget
 {
 
@@ -21,6 +22,16 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver, ICombatTarget
     public float moveSpeed = 4.5f;
 
     public float turnSpeed = 360f;
+
+    [Tooltip("Metres per second the walk clip's feet cover at playback speed 1. Measured from " +
+             "Skeletons_Walking: ~0.7. The walk plays faster / slower so the feet match the " +
+             "agent's real speed. Another walk clip = another value.")]
+    public float walkAnimSpeed = 0.7f;
+
+    [Header("Awaken")]
+    [Tooltip("Safety net only. The AI waits for the rise clip to end (SummonAwakenState). If the " +
+             "controller has no awaken state, the AI starts after this many seconds anyway.")]
+    public float awakenTimeout = 4f;
 
     [Header("Targeting")]
     [Tooltip("Enemies further than this from the summon are not noticed.")]
@@ -75,6 +86,13 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver, ICombatTarget
     [Tooltip("Played when the summon falls apart (killed, lifetime over, or pushed out by the cap).")]
     public AudioSource dieSound;
 
+    [Tooltip("Death sounds, one picked at random and played through dieSound. "
+             + "Empty = dieSound's own clip.")]
+    public AudioClip[] dieClips;
+
+    [Range(0f, 0.3f)]
+    public float diePitchVariation = 0.08f;
+
 
     [Header("Refs (inside this prefab)")]
     public Animator animator;
@@ -92,6 +110,10 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver, ICombatTarget
     private int health;
     private float nextFlinchTime;
 
+    // Shared by all summons: no clip twice in a row across the whole group.
+    private static int lastHitClip = -1;
+    private static int lastDieClip = -1;
+
     private Enemy target;
     private float targetRadius;
     private float nextRetargetTime;
@@ -101,6 +123,8 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver, ICombatTarget
     private bool leaving;            // lifetime over or despawned: playing the death clip
     private bool hasDestination;
     private Vector3 lastDestination;
+    private bool awake;              // false while the rise clip plays - set by SummonAwakenState
+    private float awakenDeadline;    // safety net, see awakenTimeout
 
 
     private static readonly int IsMovingHash    = Animator.StringToHash("isMoving");
@@ -109,6 +133,7 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver, ICombatTarget
     private static readonly int DeathHash       = Animator.StringToHash("Death");
     private static readonly int IsDeadHash      = Animator.StringToHash("isDead");
     private static readonly int HitHash         = Animator.StringToHash("Hit");
+    private static readonly int WalkSpeedHash   = Animator.StringToHash("WalkSpeed");
 
     
 
@@ -118,6 +143,7 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver, ICombatTarget
         bodyRadius = WorldRadius(this);
         if (animator == null) animator = GetComponentInChildren<Animator>();
         health = maxHealth;
+        awakenDeadline = Time.time + awakenTimeout;
     }
 
     void Start()
@@ -141,15 +167,23 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver, ICombatTarget
         this.playerTransform = owner.transform;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (leaving) return;
-        if (Time.time >= despawnTime|| playerTransform == null)
+        if (Time.time >= despawnTime || playerTransform == null)
         {
-            Despawn();   // otherwise the agent keeps walking to its last destination
+            Despawn();   // lifetime over (or the player is gone)
             return;
         }
+
+        // Still getting up from the floor: no moving, no targeting. The rise clip is the clock.
+        if (!awake)
+        {
+            if (Time.time < awakenDeadline) return;
+            awake = true;   // controller without an awaken state - start anyway
+        }
+
+        UpdateWalkAnimSpeed();
 
         // While the swing is playing, the animation is in charge.
         if (isAttacking) return;
@@ -303,6 +337,24 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver, ICombatTarget
         if (animator != null) animator.SetBool(IsMovingHash, moving);
     }
 
+    // Feet match the ground: walk playback speed = real speed / clip speed. Uses the
+    // agent's actual velocity, so acceleration and braking match too. Clamped so a
+    // nearly stopped agent doesn't freeze the clip and a fast one doesn't look frantic.
+    private void UpdateWalkAnimSpeed()
+    {
+        if (animator == null || agent == null || !agent.enabled) return;
+
+        float speed = agent.velocity.magnitude / Mathf.Max(walkAnimSpeed, 0.01f);
+        animator.SetFloat(WalkSpeedHash, Mathf.Clamp(speed, 0.5f, 3f));
+    }
+
+    // Called by SummonAwakenState when the rise clip's state is left (normally into Idle;
+    // a hit that interrupts the rise also ends it).
+    public void OnAwakened()
+    {
+        awake = true;
+    }
+
     private void FaceDirection(Vector3 dir)
     {
         if (dir.sqrMagnitude < 0.0001f) return;
@@ -372,12 +424,7 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver, ICombatTarget
     // Hit_A's flinch frame (shared clip), relayed by AnimationEventRelay.
     public void PlayHitSound()
     {
-        if (getHitSound == null) return;
-
-        getHitSound.pitch = 1f + Random.Range(-getHitPitchVariation, getHitPitchVariation);
-        AudioClip clip = AbilityDefinition.Pick(getHitClips);
-        if (clip != null) getHitSound.PlayOneShot(clip);
-        else getHitSound.Play();
+        lastHitClip = RandomSound.Play(getHitSound, getHitClips, getHitPitchVariation, lastHitClip);
     }
 
     // ---------------------------------------------------------------------
@@ -391,7 +438,7 @@ public class Summon : MonoBehaviour, ICombatAnimationReceiver, ICombatTarget
         leaving = true;
 
         if (owner != null) owner.Remove(this);   // frees its slot and cap place right away
-        if (dieSound != null) dieSound.Play();
+        lastDieClip = RandomSound.Play(dieSound, dieClips, diePitchVariation, lastDieClip);
         StopMoving();
         if (agent != null) agent.enabled = false;
         foreach (Collider c in GetComponentsInChildren<Collider>()) c.enabled = false;

@@ -87,12 +87,25 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
     public AudioSource enemyDieSound;
 
     [Tooltip("Hurt sounds, one picked at random per flinch and played through enemyGetHitSound. "
-             + "Empty = the AudioSource's own clip.")]
+             + "Never the same one twice in a row. Empty = the AudioSource's own clip.")]
     public AudioClip[] getHitClips;
 
     [Tooltip("Random pitch offset per hurt sound (+/-). Stops a crowd sounding identical.")]
     [Range(0f, 0.3f)]
     public float getHitPitchVariation = 0.1f;
+
+    [Tooltip("Death sounds, one picked at random and played through enemyDieSound. "
+             + "Empty = the AudioSource's own clip.")]
+    public AudioClip[] dieClips;
+
+    [Tooltip("Random pitch offset per death sound (+/-).")]
+    [Range(0f, 0.3f)]
+    public float diePitchVariation = 0.08f;
+
+    // Shared by ALL enemies: two skeletons hit or killed back to back never play the
+    // same clip. Just an index into the arrays above - RandomSound checks the range.
+    private static int lastHitClip = -1;
+    private static int lastDieClip = -1;
 
     private NavMeshAgent navMeshAgent;
 
@@ -403,12 +416,7 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
     /// <summary>Shared Hit_A clip — flinch frame.</summary>
     public void PlayHitSound()
     {
-        if (enemyGetHitSound == null) return;
-
-        enemyGetHitSound.pitch = 1f + UnityEngine.Random.Range(-getHitPitchVariation, getHitPitchVariation);
-        AudioClip clip = AbilityDefinition.Pick(getHitClips);
-        if (clip != null) enemyGetHitSound.PlayOneShot(clip);
-        else enemyGetHitSound.Play();   // no clips set: the AudioSource's own clip
+        lastHitClip = RandomSound.Play(enemyGetHitSound, getHitClips, getHitPitchVariation, lastHitClip);
     }
 
     /// <summary>Swing contact frame.</summary>
@@ -455,7 +463,7 @@ public class Enemy : MonoBehaviour, ICombatAnimationReceiver
 
         DropGold();
 
-        if (enemyDieSound != null) enemyDieSound.Play();
+        lastDieClip = RandomSound.Play(enemyDieSound, dieClips, diePitchVariation, lastDieClip);
 
         if (animator != null)
         {

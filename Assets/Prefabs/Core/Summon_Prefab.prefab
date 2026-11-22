@@ -178,7 +178,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: d501ac560df619241b12e4dea7d141d6, type: 3}
+  m_Resource: {fileID: 8300000, guid: a150febe0bda4a258d1376865097bb27, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -372,7 +372,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: a3086d76a6edc924389766cef0b4b11c, type: 3}
+  m_Resource: {fileID: 8300000, guid: 0da9c70b844ac2048bcbae87b6da404d, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -496,6 +496,8 @@ MonoBehaviour:
   followRadius: 1.8
   moveSpeed: 2
   turnSpeed: 180
+  walkAnimSpeed: 0.7
+  awakenTimeout: 4
   aggroRange: 8
   leashRange: 12
   retargetInterval: 0.3
@@ -512,12 +514,24 @@ MonoBehaviour:
   maxHealth: 15
   flinchImmunity: 1.2
   neverFlinch: 0
-  getHitSound: {fileID: 0}
-  getHitClips: []
+  getHitSound: {fileID: 5534839771477710333}
+  getHitClips:
+  - {fileID: 8300000, guid: a150febe0bda4a258d1376865097bb27, type: 3}
+  - {fileID: 8300000, guid: e96c1be7b50f4e96903c892903227ee2, type: 3}
+  - {fileID: 8300000, guid: 1da65166393c4542926d7a4041c0ae5a, type: 3}
+  - {fileID: 8300000, guid: 51c8ace0f7ef4956890e5c412a55bee0, type: 3}
+  - {fileID: 8300000, guid: 7152ed0dd1c4405aaa3b0544459e90d5, type: 3}
+  - {fileID: 8300000, guid: 7093e0fc98224dff8f57e3b314af264c, type: 3}
   getHitPitchVariation: 0.1
-  dieSound: {fileID: 0}
+  dieSound: {fileID: 4852495460155879043}
+  dieClips:
+  - {fileID: 8300000, guid: 0da9c70b844ac2048bcbae87b6da404d, type: 3}
+  - {fileID: 8300000, guid: a054905c636645c6b39c192b63caa3b2, type: 3}
+  - {fileID: 8300000, guid: f56009debed64e4cb2c64a0d49b269e7, type: 3}
+  - {fileID: 8300000, guid: 103a9cc7f0fb49a6a443b8586f168020, type: 3}
+  diePitchVariation: 0.08
   animator: {fileID: 6890284235173722031}
-  attackSound: {fileID: 5534839771477710333}
+  attackSound: {fileID: 3808736605849714670}
 --- !u!1 &2110713012783099401
 GameObject:
   m_ObjectHideFlags: 0
