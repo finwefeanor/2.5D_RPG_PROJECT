@@ -42,6 +42,11 @@ public class AbilityDefinition : ScriptableObject
     public float summonSpacing = 1.5f;
 
 
+    [Tooltip("Movement speed factor while this ability's swing is committed (before the hit). " +
+             "0 = rooted (melee), 0.3 = slow walk while casting, 1 = free.")]
+    [Range(0f, 1f)]
+    public float moveWhileAttacking = 0f;
+
 
     [Header("Projectile (delivery = Projectile)")]
     public ArrowProjectile projectilePrefab;

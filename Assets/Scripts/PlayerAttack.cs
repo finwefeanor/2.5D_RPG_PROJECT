@@ -20,6 +20,16 @@ public class PlayerAttack : MonoBehaviour
     public float meleeHitAngle = 120f;
 
 
+    public enum AttackMovement { Free, RootThenCancel, RootUntilEnd }
+    
+    [Tooltip("Free = move during swings (feet slide). RootThenCancel = rooted until the hit, " +
+             "then movement input cuts the follow-through. RootUntilEnd = Diablo 2: rooted " +
+             "until the clip ends.")]
+    public AttackMovement attackMovement = AttackMovement.RootThenCancel;
+
+    private bool cutByMovement; // this swing was ended by movement input
+
+
 
     public AudioSource attackSound;
 
@@ -218,6 +228,7 @@ public class PlayerAttack : MonoBehaviour
         activeAttack = attack;
         comboQueued = false;
         contactDone = false;   // the new swing hasn't hit yet
+        cutByMovement = false;
 
         if (animator != null)
         {
@@ -259,6 +270,31 @@ public class PlayerAttack : MonoBehaviour
         StartAttack(activeAttack.nextInCombo, ComboNextHash);
     }
 
+    // How much the player may move right now (0-1). Read by PlayerController every
+    // FixedUpdate. Only reads what the swing already tracks - no new timing.
+    public float MoveFactor
+    {
+        get
+        {
+            if (attackMovement == AttackMovement.Free || !IsAttacking || activeAttack == null) return 1f;
+            if (cutByMovement) return 1f; // already walking out of it
+            return activeAttack.moveWhileAttacking; //committed /rooted part
+        }
+        
+    }
+
+    public void TryCancelIntoMovement()
+    {
+        if (attackMovement != AttackMovement.RootThenCancel || cutByMovement) return;
+        if (!IsAttacking || chainPending || !contactDone || activeAttack == null) return;
+        if (swingTime < activeAttack.cancelFrom) return;
+
+        cutByMovement = true;
+        if(animator != null) animator.CrossFade(LocomotionHash, 0.1f);
+    }
+
+    private static readonly int LocomotionHash = Animator.StringToHash("Base Layer Locomotion");
+
     // Called by PlayerClass after it spawns the class's visual.
     public void SetAnimator(Animator a) => animator = a;
 
@@ -276,6 +312,7 @@ public class PlayerAttack : MonoBehaviour
         bufferedSkillTime  = -1f;
         skillReadyTime     = 0f;    // new class, new skill: start ready
         contactDone        = false;
+        cutByMovement = false;
     }
 
     // --- called by PlayerAttackState (the StateMachineBehaviour) ---

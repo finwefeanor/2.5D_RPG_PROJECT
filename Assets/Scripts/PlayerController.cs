@@ -120,6 +120,9 @@ public class PlayerController : MonoBehaviour
         // are not faster and stick tilt sets the speed.
         movementDirection = Vector3.ClampMagnitude(new Vector3(h, 0f, v), 1f);
 
+        if (playerAttack != null && movementDirection.sqrMagnitude > 0.01f)
+            playerAttack.TryCancelIntoMovement();
+
         if (Input.GetKeyDown(KeyCode.CapsLock)) isRunning = !isRunning;
         if (Input.GetKeyDown(KeyCode.Space)) RequestJump();
 
@@ -130,9 +133,14 @@ public class PlayerController : MonoBehaviour
             if (animator != null) animator.ResetTrigger(JumpHash);
         }
 
+
         if (animator != null)
         {
-            float speed = grounded ? movementDirection.magnitude * CurrentSpeed : 0f;
+            Vector3 vector3 = rb.linearVelocity;
+            float realSpeed = new Vector3(vector3.x, 0f, vector3.z).magnitude;
+            float speed = grounded ? realSpeed: 0f;
+            //If the run/idle blend flickers when you stand against a wall (tiny physics jitter), cut out the noise:
+            // float speed = grounded && realSpeed > 0.1f ? realSpeed : 0f; 
             animator.SetFloat(MoveSpeedHash, speed, speedDampTime, Time.deltaTime);
             // Coyote time: a short step off a ledge doesn't flash the falling pose.
             bool animGrounded = grounded ||
@@ -176,7 +184,9 @@ public class PlayerController : MonoBehaviour
         UpdateGrounded();
         if (rootMotionActive) return; // let CharacterMotor drive the Rigidbody instead
 
-        if (movementDirection.sqrMagnitude > 0.01f)
+        float moveFactor = playerAttack != null ? playerAttack.MoveFactor : 1f;
+
+        if (moveFactor > 0f && movementDirection.sqrMagnitude > 0.01f)
         {
             Quaternion target = Quaternion.LookRotation(movementDirection);
             rb.MoveRotation(Quaternion.RotateTowards(rb.rotation, target, turnSpeed * Time.fixedDeltaTime));
