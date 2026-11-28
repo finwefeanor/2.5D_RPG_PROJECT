@@ -192,7 +192,7 @@ public class PlayerController : MonoBehaviour
             rb.MoveRotation(Quaternion.RotateTowards(rb.rotation, target, turnSpeed * Time.fixedDeltaTime));
         }
 
-        Vector3 desired = movementDirection * CurrentSpeed;
+        Vector3 desired = movementDirection * CurrentSpeed * moveFactor;
         Vector3 vel = rb.linearVelocity;
         Vector3 horizontal = new Vector3(vel.x, 0f, vel.z);
 

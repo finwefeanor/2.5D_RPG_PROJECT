@@ -293,7 +293,7 @@ public class PlayerAttack : MonoBehaviour
         if(animator != null) animator.CrossFade(LocomotionHash, 0.1f);
     }
 
-    private static readonly int LocomotionHash = Animator.StringToHash("Base Layer Locomotion");
+    private static readonly int LocomotionHash = Animator.StringToHash("Base Layer.Locomotion");
 
     // Called by PlayerClass after it spawns the class's visual.
     public void SetAnimator(Animator a) => animator = a;
